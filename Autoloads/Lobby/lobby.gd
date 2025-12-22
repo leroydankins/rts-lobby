@@ -175,13 +175,29 @@ func register_player(sender_id: String, new_player_info: Dictionary[String, Vari
 	#only register the player on the server, you will then send this information out on update_player_list function
 	if (lobby_player_dictionary.has(sender_id)):
 		push_error("Recieved register player request on a player that already exists, overwriting previous entry");
-	lobby_player_dictionary[sender_id] = new_player_info;
-	update_player_list.rpc(lobby_player_dictionary);
-	update_lobby_name.rpc(lobby_name);
 	#add player information to dictionary of dictionaries
+	lobby_player_dictionary[sender_id] = new_player_info;
+	#send information to all others connected
+	server_update_player_list.rpc(lobby_player_dictionary);
+	server_update_lobby_name.rpc(lobby_name);
+
+
+#send updated player dictionary when we make changes locally
+@rpc("any_peer","call_local", "reliable")
+func update_peer_information(sender_id: String, updated_dictionary: Dictionary[String, Variant]) -> void:
+	if (!multiplayer.is_server()):
+		return;
+		#only update the player on the server, you will then send this information out on update_player_list function
+	if (!lobby_player_dictionary.has(sender_id)):
+		push_error("Recieved update player data request on a player that does not exist, creating new entry");
+	#add player information to dictionary of dictionaries
+	lobby_player_dictionary[sender_id] = updated_dictionary;
+	#send information to all others connected
+	server_update_player_list.rpc(lobby_player_dictionary);
+	pass;
 
 @rpc("authority","call_local","reliable")
-func update_player_list(lobby_dict: Dictionary)-> void:
+func server_update_player_list(lobby_dict: Dictionary)-> void:
 	#Multiplayer server ID is 1
 	if(multiplayer.get_remote_sender_id() != multiplayer_server_id):
 		return;
@@ -189,7 +205,7 @@ func update_player_list(lobby_dict: Dictionary)-> void:
 	lobby_player_dictionary = lobby_dict;
 
 @rpc("authority","call_local","reliable")
-func update_lobby_name(lob_name: String)-> void:
+func server_update_lobby_name(lob_name: String)-> void:
 	#Multiplayer server ID is 1
 	if(multiplayer.get_remote_sender_id() != multiplayer_server_id):
 		return;
@@ -197,7 +213,6 @@ func update_lobby_name(lob_name: String)-> void:
 	lobby_name = lob_name;
 
 
-##TODO
 #when you connect, send your information to the server and then wait for it to add you to lobby scene
 func on_connected_ok() -> void: #Set player information if you are the authority
 	print("connected to server");
@@ -225,12 +240,14 @@ func on_peer_disconnected(peer_id: int)->void:
 	var id: String = str(peer_id);
 	if (lobby_player_dictionary.has(id)):
 		lobby_player_dictionary.erase(id);
-		update_player_list.rpc(lobby_player_dictionary)
+		server_update_player_list.rpc(lobby_player_dictionary)
 	player_disconnected.emit();
 
 func on_server_disconnected() -> void:
 	remove_multiplayer_peer();
+	server_update_player_list.rpc(lobby_player_dictionary)
 	server_disconnected.emit();
+
 
 
 ##DEPRECATED

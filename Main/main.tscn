@@ -18,7 +18,7 @@ script = ExtResource("1_yh5la")
 [node name="LobbyData" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=715320953]
 layout_mode = 1
 anchor_left = 0.6085069
-anchor_top = 0.09259259
+anchor_top = 0.66820985
 anchor_right = 0.95340276
 anchor_bottom = 0.92311114
 offset_right = -0.3199997
@@ -54,6 +54,52 @@ text = "Peer 3:"
 [node name="Peer4Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=1013814814]
 layout_mode = 2
 text = "Peer 4:"
+
+[node name="LobbyControls" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=756443179]
+layout_mode = 1
+anchor_left = 0.61300004
+anchor_top = 0.086
+anchor_right = 0.96000004
+anchor_bottom = 0.5295803
+offset_left = -0.17602539
+offset_top = 0.27199936
+offset_right = 0.079956055
+offset_bottom = -0.16802979
+metadata/_edit_use_anchors_ = true
+
+[node name="Panel" type="Panel" parent="CanvasLayer/LobbyGUI/LobbyControls" unique_id=94500496]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls" unique_id=1102607349]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="ColorHBox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=2009249289]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/ColorHBox" unique_id=293318454]
+layout_mode = 2
+text = "Team Color"
+
+[node name="ColorPickerButton" type="OptionButton" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/ColorHBox" unique_id=36471339]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+item_count = 4
+popup/item_0/text = "Green"
+popup/item_0/id = 0
+popup/item_1/text = "Red"
+popup/item_1/id = 1
+popup/item_2/text = "Blue"
+popup/item_2/id = 2
+popup/item_3/text = "Yellow"
+popup/item_3/id = 3
 
 [node name="LoginData" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=448704459]
 layout_mode = 1

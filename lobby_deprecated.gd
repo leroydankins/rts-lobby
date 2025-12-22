@@ -143,35 +143,6 @@ func change_level(_scene: PackedScene) -> void:
 	## Add new level (original isnt an RPC and is instead add child with multiplayer spawner)
 	pass;
 
-##DEPRECATED
-#This button will be outside of lobby autoload and in the lobby system, it will just request to connect to lobby
-func on_connect_button() -> void:
-	#player data will come from singleton autoload that has internal players information
-	#get player data from LocalPlayerData
-	#LocalPlayerData.local_dictionary["username"] = "Placeholder Username";
-	#request to join game
-	#join_game(_connect_address.text);
-	pass;
-
-##DEPRECATED
-#This button will be outside of lobby autoload and in the lobby system, it will just request to connect to lobby
-func on_host_button() -> void:
-	#get player data from LocalPlayerData
-	#request to create game
-	#create_game();
-	pass;
-
-#when player connects, send them my player info
-#this allowstransfer of all desired data for eacfh player
-
-##TODO
-func on_peer_connected(id: int) -> void:
-	print(str("player connected, id is ", id, " my id is ", multiplayer.get_unique_id()));
-	#When a peer connects, add them to the lobby scene UI and send any sort of information you need to send to update them
-	if(multiplayer.is_server()):
-		print("the multiplayer server has recieved a peer that has connected")
-		pass;
-	#register_player.rpc_id(id, player_info);
 
 
 #the connecting player will call this when they connect
@@ -192,6 +163,16 @@ func update_player_list(lobby_dict: Dictionary)-> void:
 		return;
 	#update our lobby's reference to palyers to be the same as the
 	lobby_player_dictionary = lobby_dict;
+
+##TODO
+func on_peer_connected(id: int) -> void:
+	print(str("player connected, id is ", id, " my id is ", multiplayer.get_unique_id()));
+	#When a peer connects, add them to the lobby scene UI and send any sort of information you need to send to update them
+	if(multiplayer.is_server()):
+		print("the multiplayer server has recieved a peer that has connected")
+		pass;
+	#register_player.rpc_id(id, player_info);
+
 
 
 func on_peer_disconnected(_id: int)->void:
