@@ -14,12 +14,31 @@ config/name="RTS Lobby"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+Lobby="*uid://dovni8u8e0xdm"
+LocalPlayerData="*uid://4cebbyiw6dgv"
+
+[debug]
+
+gdscript/warnings/untyped_declaration=2
+gdscript/warnings/inferred_declaration=2
+gdscript/warnings/unsafe_property_access=1
+gdscript/warnings/unsafe_method_access=1
+gdscript/warnings/return_value_discarded=1
+
+[gui]
+
+theme/default_font_multichannel_signed_distance_field=true
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/lossless_compression/force_png=true

@@ -1,0 +1,208 @@
+[gd_scene format=3 uid="uid://cfhaie4tf1o6a"]
+
+[ext_resource type="Script" uid="uid://ny1k5n1wesmp" path="res://Main/lobby_gui.gd" id="1_yh5la"]
+
+[node name="Main" type="Node" unique_id=863003041]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=802540709]
+
+[node name="LobbyGUI" type="Control" parent="CanvasLayer" unique_id=1367195987]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_yh5la")
+
+[node name="LobbyData" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=715320953]
+layout_mode = 1
+anchor_left = 0.6085069
+anchor_top = 0.09259259
+anchor_right = 0.95340276
+anchor_bottom = 0.92311114
+offset_right = -0.3199997
+offset_bottom = -0.1760025
+metadata/_edit_use_anchors_ = true
+
+[node name="LobbyBox" type="VBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyData" unique_id=1660532991]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="LobbyLabel" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=597031853]
+layout_mode = 2
+text = "Lobby:"
+
+[node name="LobbyPlayerCount" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=455807804]
+layout_mode = 2
+text = "Connected Count:"
+
+[node name="Peer1Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=461392128]
+layout_mode = 2
+text = "Peer 1 (Host)		:"
+
+[node name="Peer2Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=1053217515]
+layout_mode = 2
+text = "Peer 2:"
+
+[node name="Peer3Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=1401741634]
+layout_mode = 2
+text = "Peer 3:"
+
+[node name="Peer4Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=1013814814]
+layout_mode = 2
+text = "Peer 4:"
+
+[node name="LoginData" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=448704459]
+layout_mode = 1
+anchor_left = 0.067
+anchor_top = 0.063
+anchor_right = 0.41400003
+anchor_bottom = 0.316
+offset_left = -0.18400574
+offset_top = 0.17599869
+offset_right = 0.07196045
+offset_bottom = 0.23199463
+metadata/_edit_use_anchors_ = true
+
+[node name="LoginBox" type="VBoxContainer" parent="CanvasLayer/LobbyGUI/LoginData" unique_id=585903984]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Container" type="PanelContainer" parent="CanvasLayer/LobbyGUI/LoginData/LoginBox" unique_id=2092653103]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/LobbyGUI/LoginData/LoginBox/Container" unique_id=402746857]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "NOTICE:
+Current set-up requires port-forwarding and using an established port and IP address. Will implement a lobby system for finding games"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LoginData/LoginBox" unique_id=1259972777]
+layout_mode = 2
+
+[node name="UserLabel" type="Label" parent="CanvasLayer/LobbyGUI/LoginData/LoginBox/HBoxContainer" unique_id=149217278]
+layout_mode = 2
+text = "Username:"
+
+[node name="UsernameEdit" type="TextEdit" parent="CanvasLayer/LobbyGUI/LoginData/LoginBox/HBoxContainer" unique_id=912006529]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Input Username Here"
+virtual_keyboard_enabled = false
+
+[node name="HostData" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=2136541754]
+layout_mode = 1
+anchor_left = 0.067
+anchor_top = 0.35200003
+anchor_right = 0.41400003
+anchor_bottom = 0.633
+offset_left = -1.1840057
+offset_top = -0.09602356
+offset_right = 0.07196045
+offset_bottom = -0.184021
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HostBox" type="VBoxContainer" parent="CanvasLayer/LobbyGUI/HostData" unique_id=1944053800]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Container" type="PanelContainer" parent="CanvasLayer/LobbyGUI/HostData/HostBox" unique_id=1804515927]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/LobbyGUI/HostData/HostBox/Container" unique_id=931567986]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "For Hosting A Game"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/HostData/HostBox" unique_id=937204251]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/LobbyGUI/HostData/HostBox/HBoxContainer" unique_id=1807735817]
+layout_mode = 2
+text = "Lobby Name"
+
+[node name="LobbyEdit" type="TextEdit" parent="CanvasLayer/LobbyGUI/HostData/HostBox/HBoxContainer" unique_id=330297685]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Input Lobby Name Here"
+virtual_keyboard_enabled = false
+
+[node name="CreateLobbyButton" type="Button" parent="CanvasLayer/LobbyGUI/HostData/HostBox" unique_id=1228425284]
+custom_minimum_size = Vector2(128, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Create Lobby
+"
+metadata/_edit_use_anchors_ = true
+
+[node name="JoinData" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=1484251662]
+layout_mode = 1
+anchor_left = 0.067
+anchor_top = 0.65900004
+anchor_right = 0.416
+anchor_bottom = 0.94000006
+offset_left = 0.81599426
+offset_top = -0.03201294
+offset_right = -0.23199463
+offset_bottom = -0.12005615
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="JoinBox" type="VBoxContainer" parent="CanvasLayer/LobbyGUI/JoinData" unique_id=444592460]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Container" type="PanelContainer" parent="CanvasLayer/LobbyGUI/JoinData/JoinBox" unique_id=827435036]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/LobbyGUI/JoinData/JoinBox/Container" unique_id=2014760189]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "For Joining A Game"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/JoinData/JoinBox" unique_id=262577120]
+layout_mode = 2
+
+[node name="IPLabel" type="Label" parent="CanvasLayer/LobbyGUI/JoinData/JoinBox/HBoxContainer2" unique_id=1651806435]
+layout_mode = 2
+text = "IP Address:"
+
+[node name="IPTextBox" type="TextEdit" parent="CanvasLayer/LobbyGUI/JoinData/JoinBox/HBoxContainer2" unique_id=1033728725]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "127.0.0.1"
+
+[node name="JoinLobbyButton" type="Button" parent="CanvasLayer/LobbyGUI/JoinData/JoinBox" unique_id=1239627604]
+custom_minimum_size = Vector2(128, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Join Lobby"
+metadata/_edit_use_anchors_ = true

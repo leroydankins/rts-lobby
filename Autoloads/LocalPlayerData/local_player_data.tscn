@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://4cebbyiw6dgv"]
+
+[ext_resource type="Script" uid="uid://cfid85p1ex0xi" path="res://Autoloads/LocalPlayerData/local_player_data.gd" id="1_qfpeq"]
+
+[node name="LocalPlayerData" type="Node" unique_id=1447477106]
+script = ExtResource("1_qfpeq")
