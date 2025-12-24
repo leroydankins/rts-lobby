@@ -17,10 +17,10 @@ script = ExtResource("1_yh5la")
 
 [node name="LobbyData" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=715320953]
 layout_mode = 1
-anchor_left = 0.6085069
-anchor_top = 0.66820985
-anchor_right = 0.95340276
-anchor_bottom = 0.92311114
+anchor_left = 0.6137153
+anchor_top = 0.5771605
+anchor_right = 0.9586111
+anchor_bottom = 0.83206177
 offset_right = -0.3199997
 offset_bottom = -0.1760025
 metadata/_edit_use_anchors_ = true
@@ -35,9 +35,9 @@ grow_horizontal = 2
 layout_mode = 2
 text = "Lobby:"
 
-[node name="LobbyPlayerCount" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=455807804]
+[node name="ConnectionStatus" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=455807804]
 layout_mode = 2
-text = "Connected Count:"
+text = "Status:"
 
 [node name="Peer1Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=461392128]
 layout_mode = 2
@@ -101,6 +101,34 @@ popup/item_2/id = 2
 popup/item_3/text = "Yellow"
 popup/item_3/id = 3
 
+[node name="ReadyBox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=1948425708]
+layout_mode = 2
+alignment = 1
+
+[node name="ReadyButton" type="Button" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/ReadyBox" unique_id=1209954372]
+layout_mode = 2
+disabled = true
+toggle_mode = true
+text = "Ready"
+
+[node name="StartBox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=575310932]
+layout_mode = 2
+alignment = 1
+
+[node name="StartButton" type="Button" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/StartBox" unique_id=859717192]
+layout_mode = 2
+disabled = true
+text = "Start Game"
+
+[node name="DisconnectBox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=363188513]
+layout_mode = 2
+alignment = 1
+
+[node name="DisconnectButton" type="Button" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/DisconnectBox" unique_id=93982061]
+layout_mode = 2
+disabled = true
+text = "Disconnect"
+
 [node name="LoginData" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=448704459]
 layout_mode = 1
 anchor_left = 0.067
@@ -145,20 +173,22 @@ custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Input Username Here"
+tab_input_mode = false
 virtual_keyboard_enabled = false
 
 [node name="HostData" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=2136541754]
 layout_mode = 1
-anchor_left = 0.067
-anchor_top = 0.35200003
-anchor_right = 0.41400003
-anchor_bottom = 0.633
+anchor_left = 0.06786806
+anchor_top = 0.29335806
+anchor_right = 0.4148681
+anchor_bottom = 0.57435805
 offset_left = -1.1840057
 offset_top = -0.09602356
 offset_right = 0.07196045
 offset_bottom = -0.184021
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_use_anchors_ = true
 
 [node name="HostBox" type="VBoxContainer" parent="CanvasLayer/LobbyGUI/HostData" unique_id=1944053800]
 layout_mode = 1
@@ -191,6 +221,7 @@ custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Input Lobby Name Here"
+tab_input_mode = false
 virtual_keyboard_enabled = false
 
 [node name="CreateLobbyButton" type="Button" parent="CanvasLayer/LobbyGUI/HostData/HostBox" unique_id=1228425284]
@@ -204,15 +235,16 @@ metadata/_edit_use_anchors_ = true
 [node name="JoinData" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=1484251662]
 layout_mode = 1
 anchor_left = 0.067
-anchor_top = 0.65900004
+anchor_top = 0.5309136
 anchor_right = 0.416
-anchor_bottom = 0.94000006
+anchor_bottom = 0.81191367
 offset_left = 0.81599426
 offset_top = -0.03201294
 offset_right = -0.23199463
 offset_bottom = -0.12005615
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_use_anchors_ = true
 
 [node name="JoinBox" type="VBoxContainer" parent="CanvasLayer/LobbyGUI/JoinData" unique_id=444592460]
 layout_mode = 1
@@ -245,6 +277,7 @@ custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "127.0.0.1"
+tab_input_mode = false
 
 [node name="JoinLobbyButton" type="Button" parent="CanvasLayer/LobbyGUI/JoinData/JoinBox" unique_id=1239627604]
 custom_minimum_size = Vector2(128, 64)

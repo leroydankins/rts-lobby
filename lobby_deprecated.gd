@@ -164,21 +164,18 @@ func update_player_list(lobby_dict: Dictionary)-> void:
 	#update our lobby's reference to palyers to be the same as the
 	lobby_player_dictionary = lobby_dict;
 
-##TODO
+
 func on_peer_connected(id: int) -> void:
 	print(str("player connected, id is ", id, " my id is ", multiplayer.get_unique_id()));
 	#When a peer connects, add them to the lobby scene UI and send any sort of information you need to send to update them
 	if(multiplayer.is_server()):
 		print("the multiplayer server has recieved a peer that has connected")
 		pass;
-	#register_player.rpc_id(id, player_info);
-
 
 
 func on_peer_disconnected(_id: int)->void:
 	player_disconnected.emit();
 
-##TODO
 #when you connect, send your information to the server and then wait for it to add you to lobby scene
 func on_connected_ok() -> void: #Set player information if you are the authority
 	print("connected to server");
