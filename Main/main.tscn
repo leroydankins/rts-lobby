@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://cfhaie4tf1o6a"]
 
+[ext_resource type="Script" uid="uid://uq2xxe87qrg3" path="res://Main/main.gd" id="1_2w1kt"]
 [ext_resource type="Script" uid="uid://ny1k5n1wesmp" path="res://Main/lobby_gui.gd" id="1_yh5la"]
 
 [node name="Main" type="Node" unique_id=863003041]
+script = ExtResource("1_2w1kt")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=802540709]
 
@@ -39,21 +41,89 @@ text = "Lobby:"
 layout_mode = 2
 text = "Status:"
 
-[node name="Peer1Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=461392128]
+[node name="Peer1Box" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=167645729]
 layout_mode = 2
-text = "Peer 1 (Host)		:"
 
-[node name="Peer2Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=1053217515]
+[node name="Peer1Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer1Box" unique_id=461392128]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "Peer 1:"
+
+[node name="Peer1Ready" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer1Box" unique_id=350273173]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="Peer1Team" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer1Box" unique_id=1785726854]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="Peer1Color" type="ColorRect" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer1Box" unique_id=2026308779]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Peer2Box" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=179728432]
+layout_mode = 2
+
+[node name="Peer2Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer2Box" unique_id=1053217515]
+custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 text = "Peer 2:"
 
-[node name="Peer3Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=1401741634]
+[node name="Peer2Ready" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer2Box" unique_id=1864888187]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="Peer2Team" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer2Box" unique_id=1557268472]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="Peer2Color" type="ColorRect" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer2Box" unique_id=350595240]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Peer3Box" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=1069628252]
+layout_mode = 2
+
+[node name="Peer3Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer3Box" unique_id=1401741634]
+custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 text = "Peer 3:"
 
-[node name="Peer4Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=1013814814]
+[node name="Peer3Ready" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer3Box" unique_id=881942166]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="Peer3Team" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer3Box" unique_id=844772519]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="Peer3Color" type="ColorRect" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer3Box" unique_id=806961632]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Peer4Box" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox" unique_id=480641836]
+layout_mode = 2
+
+[node name="Peer4Name" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer4Box" unique_id=1013814814]
+custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 text = "Peer 4:"
+
+[node name="Peer4Ready" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer4Box" unique_id=1320539490]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="Peer4Team" type="Label" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer4Box" unique_id=1709402274]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="Peer4Color" type="ColorRect" parent="CanvasLayer/LobbyGUI/LobbyData/LobbyBox/Peer4Box" unique_id=736114414]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
 
 [node name="LobbyControls" type="Control" parent="CanvasLayer/LobbyGUI" unique_id=756443179]
 layout_mode = 1
@@ -81,34 +151,53 @@ anchors_preset = 10
 anchor_right = 1.0
 grow_horizontal = 2
 
-[node name="ColorHBox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=2009249289]
+[node name="TeamPickerHbox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=2009249289]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/ColorHBox" unique_id=293318454]
+[node name="TeamLabel" type="Label" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/TeamPickerHbox" unique_id=293318454]
 layout_mode = 2
-text = "Team Color"
+text = "Team Color: "
 
-[node name="ColorPickerButton" type="OptionButton" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/ColorHBox" unique_id=36471339]
+[node name="TeamDropdown" type="OptionButton" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/TeamPickerHbox" unique_id=36471339]
 custom_minimum_size = Vector2(0, 35)
 layout_mode = 2
-item_count = 4
-popup/item_0/text = "Green"
-popup/item_0/id = 0
-popup/item_1/text = "Red"
-popup/item_1/id = 1
-popup/item_2/text = "Blue"
-popup/item_2/id = 2
-popup/item_3/text = "Yellow"
-popup/item_3/id = 3
+item_count = 5
+popup/item_0/text = "TEAM"
+popup/item_0/id = 999
+popup/item_0/separator = true
+popup/item_1/text = "Blue"
+popup/item_1/id = 0
+popup/item_2/text = "Red"
+popup/item_2/id = 1
+popup/item_3/text = "Green"
+popup/item_3/id = 2
+popup/item_4/text = "Purple"
+popup/item_4/id = 3
+
+[node name="RacePickerHbox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=1398626036]
+layout_mode = 2
+
+[node name="RaceLabel" type="Label" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/RacePickerHbox" unique_id=798545846]
+layout_mode = 2
+text = "Race:"
+
+[node name="RaceDropdown" type="OptionButton" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/RacePickerHbox" unique_id=1931938903]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+item_count = 2
+popup/item_0/text = "RACE"
+popup/item_0/id = 999
+popup/item_0/separator = true
+popup/item_1/text = "Dwarves"
+popup/item_1/id = 0
 
 [node name="ReadyBox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=1948425708]
 layout_mode = 2
 alignment = 1
 
-[node name="ReadyButton" type="Button" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/ReadyBox" unique_id=1209954372]
+[node name="ReadyButton" type="CheckButton" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/ReadyBox" unique_id=756434974]
 layout_mode = 2
 disabled = true
-toggle_mode = true
 text = "Ready"
 
 [node name="StartBox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=575310932]
@@ -276,6 +365,7 @@ text = "IP Address:"
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
+text = "127.0.0.1"
 placeholder_text = "127.0.0.1"
 tab_input_mode = false
 
@@ -285,3 +375,5 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Join Lobby"
 metadata/_edit_use_anchors_ = true
+
+[node name="GameHolder" type="Node" parent="." unique_id=879181187]

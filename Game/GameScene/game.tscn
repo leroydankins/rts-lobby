@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://1vvyuea6fq3v"]
+
+[ext_resource type="Script" uid="uid://ftqg5nqjmn5o" path="res://Game/GameScene/game.gd" id="1_4ps3p"]
+[ext_resource type="PackedScene" uid="uid://bptf5uredviv6" path="res://Game/GameCamera/game_camera.tscn" id="2_scjwl"]
+
+[node name="Game" type="Node2D" unique_id=632394247]
+script = ExtResource("1_4ps3p")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1271359654]
+
+[node name="GameClock" type="Label" parent="CanvasLayer" unique_id=849916887]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "CLOCK"
+
+[node name="ResourceBox" type="HBoxContainer" parent="CanvasLayer" unique_id=408343488]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -76.0
+offset_bottom = 23.0
+grow_horizontal = 0
+alignment = 2
+
+[node name="MineralsLabel" type="Label" parent="CanvasLayer/ResourceBox" unique_id=1529508212]
+layout_mode = 2
+text = "Minerals: "
+
+[node name="GasLabel" type="Label" parent="CanvasLayer/ResourceBox" unique_id=1248298286]
+layout_mode = 2
+text = "Gas: "
+
+[node name="EntityHolder" type="Node2D" parent="." unique_id=223181684]
+
+[node name="GameCamera" parent="." unique_id=1155224191 instance=ExtResource("2_scjwl")]
+
+[node name="SpawnHolder" type="Node2D" parent="." unique_id=1898056339]
+
+[node name="Spawn1" type="Marker2D" parent="SpawnHolder" unique_id=1775701390]
+position = Vector2(1200, 1200)
+gizmo_extents = 64.0
+
+[node name="Label" type="Label" parent="SpawnHolder/Spawn1" unique_id=354062767]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Spawn1"
+
+[node name="Spawn2" type="Marker2D" parent="SpawnHolder" unique_id=15867352]
+gizmo_extents = 64.0
+
+[node name="Label" type="Label" parent="SpawnHolder/Spawn2" unique_id=1614130738]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Spawn2
+"
+
+[node name="Spawn3" type="Marker2D" parent="SpawnHolder" unique_id=112716049]
+position = Vector2(1200, 0)
+gizmo_extents = 64.0
+
+[node name="Label" type="Label" parent="SpawnHolder/Spawn3" unique_id=1946329892]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Spawn3"
+
+[node name="Spawn4" type="Marker2D" parent="SpawnHolder" unique_id=1564120586]
+position = Vector2(0, 1200)
+gizmo_extents = 64.0
+
+[node name="Label" type="Label" parent="SpawnHolder/Spawn4" unique_id=1375282650]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Spawn4"

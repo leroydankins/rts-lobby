@@ -5,6 +5,9 @@ extends Node
 ### Lobby GUI will collect this information and contain buttons for joining or creating lobby.
 ### Works in tandem with another local autoload called LocalPlayerData, this data gets sent out to the server on connecting
 ### and will request the lobby update this information for all clients
+
+###RPC Calls to start the game will be handled here, but for modularity I will attempt to keep actual code for loading level in outside script
+###Main will subscribe to set of signals from this lobby, which will handle the actual gameplay
 ##############
 
 
@@ -15,6 +18,9 @@ signal upnp_completed(error: Error);
 #upnp thread
 var upnp_thread: Thread = null;
 
+#signals for Main scene to subscribe to
+signal initialize_game(file_path: String);
+signal start_game();
 #signals for when data is updated
 signal data_updated;
 
@@ -48,12 +54,12 @@ var lobby_player_dictionary: Dictionary[String, Dictionary]:
 		lobby_player_dictionary = dict;
 		data_updated.emit();
 
-var players_loaded: int = 0:
-	get:
-		return players_loaded;
-	set(value):
-		players_loaded = value;
-		data_updated.emit();
+var players_loaded: int = 0
+	#get:
+		#return players_loaded;
+	#set(value):
+		#players_loaded = value;
+		#data_updated.emit();
 
 var multiplayer_server_id: int = 1;
 
@@ -67,18 +73,13 @@ func _ready() -> void:
 	multiplayer.connected_to_server.connect(on_connected_ok);
 	multiplayer.connection_failed.connect(on_connected_fail);
 	multiplayer.server_disconnected.connect(on_server_disconnected);
-
-	##TODO
-	##ESTABLISH HOW YOU TELL LOBBY WE ARE GOOD TO GO
-	#_connect_butt.pressed.connect(on_connect_button);
-	#_host_butt.pressed.connect(on_host_button);
 	return;
 
 
 
 
 #join game function, requires address in current implementation
-func join_game(address: String = "") -> Error:
+func join_lobby(address: String = "") -> Error:
 	#player data is initialzed before this method is called
 
 	#if we do not have an IP address input
@@ -108,7 +109,7 @@ func join_game(address: String = "") -> Error:
 	return error;
 
 #create game function
-func create_game(lob_name: String) -> Error:
+func create_lobby(lob_name: String) -> Error:
 	#player data is initialzed before this method is called
 	#create a multiplayer peer and set this instance to be this peer
 	var peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new();
@@ -126,7 +127,6 @@ func create_game(lob_name: String) -> Error:
 
 	var peer_id: String = str(multiplayer.get_unique_id());
 
-	##TODO
 	##add the player information to the server data holder here
 	local_register_player.rpc_id(1,peer_id,LocalPlayerData.local_player);
 
@@ -152,7 +152,6 @@ func remove_multiplayer_peer() -> Error:
 	#get rid of player references
 
 
-
 func upnp_setup(server_port: int) -> void:
 	#upnp queries take time
 	var upnp: UPNP = UPNP.new();
@@ -166,27 +165,21 @@ func upnp_setup(server_port: int) -> void:
 		push_error(str(mapping_err));
 		printerr("issue at mapping");
 
-#originally called on start and join, but now will only call this when the game is ready to start!! RTS Lobby system
-func start_game() -> void:
-	#hide the lobby UI, ask the server to change the level
-	if multiplayer.is_server():
-		change_level.call_deferred(load("res://game.tscn"));
+@rpc("any_peer","call_local","reliable")
+func game_scene_loaded() -> void:
+	if (!multiplayer.is_server()):
+		return;
+	players_loaded += 1;
+	if players_loaded == lobby_player_dictionary.size():
+		start_game.emit()
+		players_loaded = 0;
 
 #when the server starts a game from a UI scene, do Lobby.load_game.rpc(filepath)
 @rpc("authority","call_local","reliable")
 func load_game(game_scene_path: String) -> void:
+	#The local main scene will then add the scene and hide the UI
+	initialize_game.emit(game_scene_path);
 	pass;
-
-# Call this function deferred and only on the main authority (server).
-func change_level(_scene: PackedScene) -> void:
-	# Remove old level if any.
-	##TODO SINCE SETUP ISNT SETUP YET
-	##if game_node has a child, remove it
-	## Add new level (original isnt an RPC and is instead add child with multiplayer spawner)
-	pass;
-
-
-
 
 
 #the connecting player will call this when they connect
@@ -255,7 +248,7 @@ func on_connected_fail() -> void:
 	var err: Error = remove_multiplayer_peer();
 
 
-##TODO update
+##This function currently doesn't do anything because the player connects sends their information to the server
 func on_peer_connected(id: int) -> void:
 	print(str("player connected, id is ", id, " my id is ", multiplayer.get_unique_id()));
 	#When a peer connects, add them to the lobby scene UI and send any sort of information you need to send to update them
@@ -279,25 +272,6 @@ func on_server_disconnected() -> void:
 	lobby_player_dictionary.clear();
 	connection_ended.emit();
 
-
-##DEPRECATED
-#This button will be outside of lobby autoload and in the lobby system, it will just request to connect to lobby
-func on_connect_button() -> void:
-	#player data will come from singleton autoload that has internal players information
-	#get player data from LocalPlayerData
-	#LocalPlayerData.local_dictionary["username"] = "Placeholder Username";
-	#request to join game
-	#join_game(_connect_address.text);
-	pass;
-
-##DEPRECATED
-#This button will be outside of lobby autoload and in the lobby system, it will just request to connect to lobby
-func on_host_button() -> void:
-	#get player data from LocalPlayerData
-	#request to create game
-	#create_game();
-	pass;
-
 func _exit_tree() -> void:
-	if (upnp_thread):
+	if (upnp_thread && upnp_thread.is_alive()):
 		upnp_thread.wait_to_finish();

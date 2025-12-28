@@ -2,17 +2,27 @@ extends Node
 
 var local_player: Dictionary[String, Variant];
 
+const USERNAME_KEY: String = "username";
+const READY_KEY: String = "ready";
+const TEAM_KEY: String = "team";
+const COLOR_KEY: String = "color"
+const RACE_KEY: String = "race";
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#initialize the dictionary with what we know will be in it
 	local_player = {
 		"username" = "",
 		"ready" = false,
+		"team" = 0,
+		"color" = 0,
+		"race" = 0
 	};
 	pass # Replace with function body.
 
 
 func update_dictionary_data(key: String, data: Variant) -> void:
+	if (!local_player.has(key)):
+		push_error("attempted to add new key to dictionary, this should not be done in runtime")
 	var success: bool = local_player.set(key, data)
 	if !success:
 		push_error("couldnt update dictionary data")
