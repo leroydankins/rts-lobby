@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://dm6nkl2orudho"]
+
+[ext_resource type="Script" uid="uid://oa0d0635puw6" path="res://Game/EntityList/UnitList/worker.gd" id="1_6y8cc"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_8lfae"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8lfae"]
+size = Vector2(32, 32)
+
+[node name="Worker" type="Area2D" unique_id=482429156]
+script = ExtResource("1_6y8cc")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1061534164]
+texture = SubResource("PlaceholderTexture2D_8lfae")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1055624738]
+shape = SubResource("RectangleShape2D_8lfae")
+
+[node name="Label" type="Label" parent="." unique_id=1321594048]
+offset_left = -20.0
+offset_top = 8.0
+offset_right = 20.0
+offset_bottom = 31.0
+text = "Text"

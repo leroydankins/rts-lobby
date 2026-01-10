@@ -45,7 +45,7 @@ var lobby_name: String:
 		return lobby_name;
 	set(name):
 		lobby_name = name;
-		data_updated.emit();
+
 
 var lobby_player_dictionary: Dictionary[String, Dictionary]:
 	get:
@@ -63,16 +63,16 @@ var players_loaded: int = 0
 
 var multiplayer_server_id: int = 1;
 
-
+var _null_var: int;
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Replace with function body.
-	multiplayer.peer_connected.connect(on_peer_connected);
-	multiplayer.peer_disconnected.connect(on_peer_disconnected);
-	multiplayer.connected_to_server.connect(on_connected_ok);
-	multiplayer.connection_failed.connect(on_connected_fail);
-	multiplayer.server_disconnected.connect(on_server_disconnected);
+	_null_var = multiplayer.peer_connected.connect(on_peer_connected);
+	_null_var = multiplayer.peer_disconnected.connect(on_peer_disconnected);
+	_null_var = multiplayer.connected_to_server.connect(on_connected_ok);
+	_null_var = multiplayer.connection_failed.connect(on_connected_fail);
+	_null_var = multiplayer.server_disconnected.connect(on_server_disconnected);
 	return;
 
 
@@ -183,6 +183,7 @@ func load_game(game_scene_path: String) -> void:
 
 
 #the connecting player will call this when they connect
+#Assign them a team color as well and send that information back to them
 @rpc("any_peer","call_local", "reliable")
 func local_register_player(sender_id: String, new_player_info: Dictionary[String, Variant]) -> void:
 	if (!multiplayer.is_server()):
@@ -190,6 +191,32 @@ func local_register_player(sender_id: String, new_player_info: Dictionary[String
 	#only register the player on the server, you will then send this information out on update_player_list function
 	if (lobby_player_dictionary.has(sender_id)):
 		push_error("Recieved register player request on a player that already exists, overwriting previous entry");
+	#IMPLEMENTATION SPECIFIC DATA GOES HERE
+	#choose the color of the player for them when they join
+	var color_int: int = 0;
+	var color_arr: Array[int] = [];
+	#go over the list of players, get array of the colors
+	for player: String in lobby_player_dictionary:
+		color_arr.append(lobby_player_dictionary[player][GlobalConstants.COLOR_KEY])
+	while (color_arr.has(color_int)):
+		color_int += 1;
+		if (color_int >= GlobalConstants.COLORS.size()):
+			push_error("color outside of bounds!");
+			break;
+
+	var team_int: int = 0;
+	var team_arr: Array[Variant] = GlobalFunctions.get_player_property_array(lobby_player_dictionary, GlobalConstants.TEAM_KEY);
+	while (team_arr.has(team_int)):
+		team_int += 1;
+		if (team_int >= GlobalConstants.TEAMS.size()):
+			push_error("team number outside of bounds!");
+			break;
+
+	#PUT IN IMPLEMENTATION SPECIFIC DATA HERE
+	#Initialize assigned data to the player who is registering
+	new_player_info[GlobalConstants.COLOR_KEY] = color_int;
+	new_player_info[GlobalConstants.TEAM_KEY] = team_int;
+
 	#add player information to dictionary of dictionaries
 	lobby_player_dictionary[sender_id] = new_player_info;
 	#send information to all others connected
@@ -204,7 +231,7 @@ func local_update_peer_information(sender_id: String, updated_dictionary: Dictio
 		return;
 		#only update the player on the server, you will then send this information out on update_player_list function
 	if (!lobby_player_dictionary.has(sender_id)):
-		push_error("Recieved update player data request on a player that does not exist, creating new entry");
+		push_error("Recieved update player data request on a player that does not exist");
 	#add player information to dictionary of dictionaries
 	lobby_player_dictionary[sender_id] = updated_dictionary;
 	#send information to all others connected
@@ -217,8 +244,15 @@ func server_update_player_list(lobby_dict: Dictionary)-> void:
 	#Multiplayer server ID is 1
 	if(multiplayer.get_remote_sender_id() != multiplayer_server_id):
 		return;
-	#update our lobby's reference to palyers to be the same as the
+
+	#in case the server has updated our character, update that information first so we can call local data in GUI updates
+	var local_player: Dictionary[String, Variant] = lobby_dict[str(multiplayer.get_unique_id())];
+	LocalPlayerData.lobby_update_dictionary(local_player);
+
+	#update our lobby's reference to players to be the same as the lobby
 	lobby_player_dictionary = lobby_dict;
+
+
 
 #the multiplayer server will call this on all players to update the information of the lobby name
 @rpc("authority","call_local","reliable")
@@ -228,6 +262,7 @@ func server_update_lobby_name(lob_name: String)-> void:
 		return;
 	#update our lobby's reference to palyers to be the same as the
 	lobby_name = lob_name;
+
 
 
 #when you connect, send your information to the server and then wait for it to add you to lobby scene

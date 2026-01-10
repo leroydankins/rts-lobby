@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://di7iorex3uwvo"]
+
+[ext_resource type="Script" uid="uid://decdtr7dovg0g" path="res://Autoloads/InputController/input_controller.gd" id="1_jq8tf"]
+
+[node name="ControllerAutoload" type="Node2D" unique_id=1525354607]
+script = ExtResource("1_jq8tf")

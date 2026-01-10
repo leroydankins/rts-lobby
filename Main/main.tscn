@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://uq2xxe87qrg3" path="res://Main/main.gd" id="1_2w1kt"]
 [ext_resource type="Script" uid="uid://ny1k5n1wesmp" path="res://Main/lobby_gui.gd" id="1_yh5la"]
 
-[node name="Main" type="Node" unique_id=863003041]
+[node name="Main" type="Node" unique_id=863003041 groups=["Main"]]
 script = ExtResource("1_2w1kt")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=802540709]
@@ -156,23 +156,42 @@ layout_mode = 2
 
 [node name="TeamLabel" type="Label" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/TeamPickerHbox" unique_id=293318454]
 layout_mode = 2
-text = "Team Color: "
+text = "Team:"
 
 [node name="TeamDropdown" type="OptionButton" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/TeamPickerHbox" unique_id=36471339]
 custom_minimum_size = Vector2(0, 35)
 layout_mode = 2
-item_count = 5
-popup/item_0/text = "TEAM"
-popup/item_0/id = 999
-popup/item_0/separator = true
-popup/item_1/text = "Blue"
-popup/item_1/id = 0
-popup/item_2/text = "Red"
-popup/item_2/id = 1
-popup/item_3/text = "Green"
-popup/item_3/id = 2
-popup/item_4/text = "Purple"
-popup/item_4/id = 3
+disabled = true
+item_count = 4
+popup/item_0/text = "1"
+popup/item_0/id = 0
+popup/item_1/text = "2"
+popup/item_1/id = 1
+popup/item_2/text = "3"
+popup/item_2/id = 2
+popup/item_3/text = "4"
+popup/item_3/id = 3
+
+[node name="ColorPickerHbox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=1330478786]
+layout_mode = 2
+
+[node name="ColorLabel" type="Label" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/ColorPickerHbox" unique_id=2082353766]
+layout_mode = 2
+text = "Color:"
+
+[node name="ColorDropdown" type="OptionButton" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/ColorPickerHbox" unique_id=1191409921]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+disabled = true
+item_count = 4
+popup/item_0/text = "Blue"
+popup/item_0/id = 0
+popup/item_1/text = "Red"
+popup/item_1/id = 1
+popup/item_2/text = "Green"
+popup/item_2/id = 2
+popup/item_3/text = "Purple"
+popup/item_3/id = 3
 
 [node name="RacePickerHbox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=1398626036]
 layout_mode = 2
@@ -184,12 +203,10 @@ text = "Race:"
 [node name="RaceDropdown" type="OptionButton" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer/RacePickerHbox" unique_id=1931938903]
 custom_minimum_size = Vector2(0, 35)
 layout_mode = 2
-item_count = 2
-popup/item_0/text = "RACE"
-popup/item_0/id = 999
-popup/item_0/separator = true
-popup/item_1/text = "Dwarves"
-popup/item_1/id = 0
+disabled = true
+item_count = 1
+popup/item_0/text = "Dwarves"
+popup/item_0/id = 0
 
 [node name="ReadyBox" type="HBoxContainer" parent="CanvasLayer/LobbyGUI/LobbyControls/VBoxContainer" unique_id=1948425708]
 layout_mode = 2

@@ -1,0 +1,302 @@
+[gd_scene format=3 uid="uid://1vvyuea6fq3v"]
+
+[ext_resource type="Script" uid="uid://ftqg5nqjmn5o" path="res://Game/GameScene/game.gd" id="1_4ps3p"]
+[ext_resource type="Script" uid="uid://decdtr7dovg0g" path="res://Autoloads/InputController/input_controller.gd" id="2_4ffoq"]
+[ext_resource type="PackedScene" uid="uid://bptf5uredviv6" path="res://Game/GameCamera/game_camera.tscn" id="2_scjwl"]
+[ext_resource type="Script" uid="uid://dlfuxm2pfrjea" path="res://Game/GameScene/input_gui.gd" id="3_5dn4a"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_5dn4a"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_4ibma"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_7qilr"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_tkqup"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_kkurq"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hd5sn"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_j8ish"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_4ffoq"]
+size = Vector2(48, 48)
+
+[node name="Game" type="Node2D" unique_id=632394247 groups=["Game"]]
+script = ExtResource("1_4ps3p")
+
+[node name="InputController" type="Node2D" parent="." unique_id=747681721 groups=["InputController"]]
+script = ExtResource("2_4ffoq")
+
+[node name="UI_Layer" type="CanvasLayer" parent="." unique_id=1271359654]
+
+[node name="GameClock" type="Label" parent="UI_Layer" unique_id=849916887]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "CLOCK"
+
+[node name="ResourceBox" type="HBoxContainer" parent="UI_Layer" unique_id=408343488]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -76.0
+offset_bottom = 23.0
+grow_horizontal = 0
+alignment = 2
+
+[node name="MineralsLabel" type="Label" parent="UI_Layer/ResourceBox" unique_id=1529508212]
+layout_mode = 2
+text = "Minerals: "
+
+[node name="GasLabel" type="Label" parent="UI_Layer/ResourceBox" unique_id=1248298286]
+layout_mode = 2
+text = "Gas: "
+
+[node name="InputGUI" type="Control" parent="UI_Layer" unique_id=740576202]
+layout_mode = 3
+anchor_top = 0.8
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -37.400024
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_5dn4a")
+
+[node name="Control" type="Control" parent="UI_Layer/InputGUI" unique_id=1260502671]
+layout_mode = 1
+anchor_left = 0.25
+anchor_right = 0.75
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="UI_Layer/InputGUI/Control" unique_id=1826296491]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.3732639
+anchor_top = -0.06508045
+anchor_right = 0.08506945
+anchor_bottom = -0.06508044
+offset_top = -0.6749878
+offset_right = 255.0
+offset_bottom = 159.32501
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+metadata/_edit_use_anchors_ = true
+
+[node name="Panel" type="Panel" parent="UI_Layer/InputGUI/Control/MarginContainer" unique_id=149049162]
+layout_mode = 2
+
+[node name="HFlowContainer" type="HFlowContainer" parent="UI_Layer/InputGUI/Control/MarginContainer" unique_id=926315165]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="UI_Layer/InputGUI/Control/MarginContainer/HFlowContainer" unique_id=825052129]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_5dn4a")
+stretch_mode = 2
+
+[node name="TextureRect2" type="TextureRect" parent="UI_Layer/InputGUI/Control/MarginContainer/HFlowContainer" unique_id=850478103]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_4ibma")
+stretch_mode = 2
+
+[node name="TextureRect3" type="TextureRect" parent="UI_Layer/InputGUI/Control/MarginContainer/HFlowContainer" unique_id=1745595792]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_7qilr")
+stretch_mode = 2
+
+[node name="TextureRect4" type="TextureRect" parent="UI_Layer/InputGUI/Control/MarginContainer/HFlowContainer" unique_id=1036044526]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_tkqup")
+stretch_mode = 2
+
+[node name="TextureRect5" type="TextureRect" parent="UI_Layer/InputGUI/Control/MarginContainer/HFlowContainer" unique_id=427147827]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_kkurq")
+stretch_mode = 2
+
+[node name="TextureRect6" type="TextureRect" parent="UI_Layer/InputGUI/Control/MarginContainer/HFlowContainer" unique_id=1341655413]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_hd5sn")
+stretch_mode = 2
+
+[node name="TextureRect7" type="TextureRect" parent="UI_Layer/InputGUI/Control/MarginContainer/HFlowContainer" unique_id=1956776093]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_j8ish")
+stretch_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="UI_Layer/InputGUI/Control" unique_id=1142001162]
+layout_mode = 0
+offset_left = 444.0
+offset_top = -11.0
+offset_right = 597.0
+offset_bottom = 149.0
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Panel" type="Panel" parent="UI_Layer/InputGUI/Control/MarginContainer2" unique_id=1739124765]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI_Layer/InputGUI/Control/MarginContainer2" unique_id=1850315216]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="UI_Layer/InputGUI/Control/MarginContainer2/HBoxContainer" unique_id=78310236]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_4ffoq")
+stretch_mode = 2
+
+[node name="UnitLabel" type="Label" parent="UI_Layer/InputGUI/Control/MarginContainer2/HBoxContainer" unique_id=190146611]
+layout_mode = 2
+text = "CurrentUnit"
+
+[node name="MarginContainer3" type="MarginContainer" parent="UI_Layer/InputGUI/Control" unique_id=1564590853]
+layout_mode = 0
+offset_left = 644.0
+offset_top = -28.0
+offset_right = 834.0
+offset_bottom = 153.0
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Panel" type="Panel" parent="UI_Layer/InputGUI/Control/MarginContainer3" unique_id=672066554]
+layout_mode = 2
+
+[node name="CommandContainer" type="GridContainer" parent="UI_Layer/InputGUI/Control/MarginContainer3" unique_id=1213861258]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+columns = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer" unique_id=237537395]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="TextureButton" type="Button" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer/PanelContainer" unique_id=1241307444]
+layout_mode = 2
+
+[node name="PanelContainer2" type="PanelContainer" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer" unique_id=421222824]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="TextureButton" type="Button" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer/PanelContainer2" unique_id=44074534]
+layout_mode = 2
+
+[node name="PanelContainer3" type="PanelContainer" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer" unique_id=546989423]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="TextureButton" type="Button" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer/PanelContainer3" unique_id=1443719018]
+layout_mode = 2
+
+[node name="PanelContainer4" type="PanelContainer" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer" unique_id=1636202288]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="TextureButton" type="Button" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer/PanelContainer4" unique_id=383194304]
+layout_mode = 2
+
+[node name="PanelContainer5" type="PanelContainer" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer" unique_id=1199501835]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="TextureButton" type="Button" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer/PanelContainer5" unique_id=47956492]
+layout_mode = 2
+
+[node name="PanelContainer6" type="PanelContainer" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer" unique_id=151722170]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="TextureButton" type="Button" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer/PanelContainer6" unique_id=978925951]
+layout_mode = 2
+
+[node name="PanelContainer7" type="PanelContainer" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer" unique_id=540966841]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="TextureButton" type="Button" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer/PanelContainer7" unique_id=335255585]
+layout_mode = 2
+
+[node name="PanelContainer8" type="PanelContainer" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer" unique_id=1827185208]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="TextureButton" type="Button" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer/PanelContainer8" unique_id=1231284219]
+layout_mode = 2
+
+[node name="PanelContainer9" type="PanelContainer" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer" unique_id=430983008]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="TextureButton" type="Button" parent="UI_Layer/InputGUI/Control/MarginContainer3/CommandContainer/PanelContainer9" unique_id=1881193569]
+layout_mode = 2
+
+[node name="EntityHolder" type="Node2D" parent="." unique_id=223181684]
+
+[node name="GameCamera" parent="." unique_id=1155224191 instance=ExtResource("2_scjwl")]
+
+[node name="SpawnHolder" type="Node2D" parent="." unique_id=1898056339]
+
+[node name="Spawn1" type="Marker2D" parent="SpawnHolder" unique_id=1775701390]
+position = Vector2(1200, 1200)
+gizmo_extents = 64.0
+
+[node name="Label" type="Label" parent="SpawnHolder/Spawn1" unique_id=354062767]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Spawn1"
+
+[node name="Spawn2" type="Marker2D" parent="SpawnHolder" unique_id=15867352]
+gizmo_extents = 64.0
+
+[node name="Label" type="Label" parent="SpawnHolder/Spawn2" unique_id=1614130738]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Spawn2
+"
+
+[node name="Spawn3" type="Marker2D" parent="SpawnHolder" unique_id=112716049]
+position = Vector2(1200, 0)
+gizmo_extents = 64.0
+
+[node name="Label" type="Label" parent="SpawnHolder/Spawn3" unique_id=1946329892]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Spawn3"
+
+[node name="Spawn4" type="Marker2D" parent="SpawnHolder" unique_id=1564120586]
+position = Vector2(0, 1200)
+gizmo_extents = 64.0
+
+[node name="Label" type="Label" parent="SpawnHolder/Spawn4" unique_id=1375282650]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Spawn4"

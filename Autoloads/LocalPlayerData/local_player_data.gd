@@ -41,7 +41,8 @@ func update_dictionary_batch(new_dict: Dictionary) -> void:
 		print("we are online");
 		Lobby.local_update_peer_information.rpc_id(1,str(Lobby.multiplayer.get_unique_id()), local_player);
 
-#called by the Lobby instance when we have received updated dictionary from server, called as separate function to prevent a loop of updates
+
+#called by the Lobby instance when we have received updated dictionary from server, called as separate function at the end of Lobby.server_update_list to prevent a loop of updates
 func lobby_update_dictionary(new_dict: Dictionary) -> void:
 	if (new_dict.is_empty()):
 		push_error("why are you adding an empty dictionary? Denied function call of lobby_update_dictionary");

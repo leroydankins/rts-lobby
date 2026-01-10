@@ -14,6 +14,7 @@ extends Control
 @onready var ready_button: Button = $LobbyControls/VBoxContainer/ReadyBox/ReadyButton
 @onready var start_button: Button = $LobbyControls/VBoxContainer/StartBox/StartButton
 @onready var team_dropdown: OptionButton = $LobbyControls/VBoxContainer/TeamPickerHbox/TeamDropdown
+@onready var color_dropdown: OptionButton = $LobbyControls/VBoxContainer/ColorPickerHbox/ColorDropdown
 @onready var race_dropdown: OptionButton = $LobbyControls/VBoxContainer/RacePickerHbox/RaceDropdown
 
 
@@ -43,7 +44,7 @@ var peer_colors: Array[ColorRect];
 @onready var peer_4_color: ColorRect = $LobbyData/LobbyBox/Peer4Box/Peer4Color
 
 
-
+var _null_var: int;
 
 
 # Called when the node enters the scene tree for the first time.
@@ -55,19 +56,21 @@ func _ready() -> void:
 	for color_control: ColorRect in peer_colors:
 		color_control.hide();
 	#Subscription to Lobby Signals
-	Lobby.data_updated.connect(on_lobby_update);
-	Lobby.connection_ended.connect(on_connection_ended);
-	Lobby.connection_started.connect(on_connection_started);
+	_null_var = Lobby.data_updated.connect(on_lobby_update);
+	_null_var = Lobby.connection_ended.connect(on_connection_ended);
+	_null_var = Lobby.connection_started.connect(on_connection_started);
 
-	create_lobby_button.pressed.connect(on_create_lobby_pressed);
-	join_lobby_button.pressed.connect(on_join_lobby_pressed);
-	disconnect_button.pressed.connect(on_disconnect_pressed);
-	start_button.pressed.connect(on_start_pressed);
-	ready_button.toggled.connect(on_ready_toggled);
-	team_dropdown.item_selected.connect(on_team_select);
-	race_dropdown.item_selected.connect(on_race_select);
+	_null_var = create_lobby_button.pressed.connect(on_create_lobby_pressed);
+	_null_var = join_lobby_button.pressed.connect(on_join_lobby_pressed);
+	_null_var = disconnect_button.pressed.connect(on_disconnect_pressed);
+	_null_var = start_button.pressed.connect(on_start_pressed);
+	_null_var = ready_button.toggled.connect(on_ready_toggled);
+	_null_var = team_dropdown.item_selected.connect(on_team_select);
+	_null_var = color_dropdown.item_selected.connect(on_color_select);
+	_null_var = race_dropdown.item_selected.connect(on_race_select);
 
 
+#MAJOR FUNCTION
 func on_lobby_update() -> void:
 	#Lobby Name
 	lobby_label.text = "Lobby: %s" % Lobby.lobby_name;
@@ -103,7 +106,20 @@ func on_lobby_update() -> void:
 				peer_ready_labels[i].text = "";
 				peer_team_labels[i].text = "";
 				peer_colors[i].hide();
+		#update local controls if things change
 
+		#DISABLE AVAILABLE COLORS IF IT IS ALREADY BEING USED
+		var colors_in_use_arr: Array[Variant] = GlobalFunctions.get_player_property_array(Lobby.lobby_player_dictionary, GlobalConstants.COLOR_KEY) #get array of used colors
+		for i: int in GlobalConstants.COLORS.size():
+			#if someone is currently using the color, disable the button
+			if colors_in_use_arr.has(i):
+				color_dropdown.set_item_disabled(i, true)
+			else:
+				color_dropdown.set_item_disabled(i, false);
+
+		color_dropdown.selected = Lobby.lobby_player_dictionary[str(Lobby.multiplayer.get_unique_id())][GlobalConstants.COLOR_KEY];
+		team_dropdown.selected = Lobby.lobby_player_dictionary[str(Lobby.multiplayer.get_unique_id())][GlobalConstants.TEAM_KEY];
+		race_dropdown.selected = Lobby.lobby_player_dictionary[str(Lobby.multiplayer.get_unique_id())][GlobalConstants.RACE_KEY];
 		if (!Lobby.multiplayer.is_server()):
 			return;
 
@@ -115,7 +131,7 @@ func on_lobby_update() -> void:
 			start_button.disabled = false;
 		else:
 			start_button.disabled = true;
-		#if Lobby.is_connected END
+	#if Lobby.is_connected END
 
 func on_ready_toggled(toggle: bool) -> void:
 	print(toggle);
@@ -130,7 +146,16 @@ func on_team_select(index: int) -> void:
 		push_error("team wasn't in index");
 		return;
 	print(GlobalConstants.TEAMS[id]);
+	#Update Teams, called function will send info to lobby
 	LocalPlayerData.update_dictionary_data(GlobalConstants.TEAM_KEY, id);
+
+func on_color_select(index: int) -> void:
+	var id: int = color_dropdown.get_item_id(index);
+	if (!GlobalConstants.COLORS.has(id)):
+		push_error("team wasn't in index");
+		return;
+	print(GlobalConstants.COLORS[id]);
+	#Update colors
 	LocalPlayerData.update_dictionary_data(GlobalConstants.COLOR_KEY, id);
 
 func on_race_select(index: int) -> void:
@@ -169,10 +194,15 @@ func on_disconnect_pressed() -> void:
 func on_connection_started() ->void:
 	if(!visible):
 		return;
+	#Start assigning team to each player as they enter
 	join_lobby_button.disabled = true;
 	create_lobby_button.disabled = true;
 	disconnect_button.disabled = false;
 	ready_button.disabled = false;
+	#options for customizing beforehand
+	team_dropdown.disabled = false;
+	color_dropdown.disabled = false;
+	race_dropdown.disabled = false;
 
 
 func on_connection_ended() -> void:
@@ -183,6 +213,10 @@ func on_connection_ended() -> void:
 	disconnect_button.disabled = true;
 	ready_button.disabled = true;
 	start_button.disabled = true;
+	#customizing options
+	team_dropdown.disabled = true;
+	color_dropdown.disabled = true;
+	race_dropdown.disabled = true;
 	connection_status.text = "Status: Not Connected"
 
 

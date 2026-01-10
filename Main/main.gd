@@ -1,3 +1,4 @@
+
 extends Node
 
 ###Handles implementation of actual level loading, menu, etc.
@@ -5,7 +6,6 @@ extends Node
 @onready var game_holder: Node = $GameHolder
 var in_game: bool = false;
 
-var player_count: int = 0;
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

@@ -8,19 +8,20 @@ size = Vector2(128, 128)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tjb1v"]
 size = Vector2(128, 128)
 
-[node name="CommandCenter" type="Node2D" unique_id=1946725597]
+[node name="CommandCenter" type="Area2D" unique_id=899178283]
 script = ExtResource("1_600yg")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1446288744]
 texture = SubResource("PlaceholderTexture2D_tjb1v")
-
-[node name="Area2D" type="Area2D" parent="." unique_id=1817736740]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1117005363]
-shape = SubResource("RectangleShape2D_tjb1v")
 
 [node name="TempTeamLabel" type="Label" parent="." unique_id=351489716]
 offset_left = -19.0
 offset_top = 66.0
 offset_right = 21.0
 offset_bottom = 89.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1117005363]
+shape = SubResource("RectangleShape2D_tjb1v")
+
+[node name="Marker2D" type="Marker2D" parent="." unique_id=338332599]
+position = Vector2(0, 100)
