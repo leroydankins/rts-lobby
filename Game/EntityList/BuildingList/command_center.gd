@@ -1,16 +1,34 @@
 extends Area2D
 
 const BUILD_COMPLETE: int = 60;
+const QUEUE_LIMIT: int = 4;
 @onready var temp_team_label: Label = $TempTeamLabel
 @onready var marker: Marker2D = $Marker2D
 
+var build_worker_cmd: Dictionary = {
+	"mnemonic" : "CC001",
+	"name" : "Dwarf Worker",
+	"description" : "Builds a worker",
+	"file_path" : GlobalConstants.WORKER_FILEPATH,
+	"build_time" : 5,
+	"sprite_path" : "res://Resources/CommandSprites/placeholder_unit.png"
+}
 
 #Shows commands that the unit can take
 var cmd_dict: Dictionary[int, Dictionary] = {
-	5 : GlobalConstants.BUILD_WORKER_DICTIONARY,
+	5 : build_worker_cmd,
 	6 : GlobalConstants.CANCEL_ACTION_DICTIONARY,
-	7 : GlobalConstants.HALT_ACTION_DICTIONARY,
-	8 : GlobalConstants.RESUME_ACTION_DICTIONARY
+}
+
+
+var cmd_dict2: Dictionary = {
+	"CC001" : {
+		"name" : "Worker",
+		"description" : "Builds a worker",
+		"file_path" : GlobalConstants.WORKER_FILEPATH,
+		"build_time" : 10,
+		"sprite_path" : "res://Resources/CommandSprites/placeholder_unit.png"
+		}
 }
 
 var build_dictionary: Dictionary[int, Dictionary]
@@ -20,7 +38,7 @@ var color: int = 0;
 var game: Game;
 var build_time: int;
 var build_item: Dictionary;
-var build_queue: Array[int];
+var build_queue: Array[Dictionary];
 var build_progress: float;
 var build_speed_mult: float = 1;
 
@@ -54,7 +72,7 @@ func _process(delta: float) -> void:
 		#if we are active
 		BuildingState.ACTIVE:
 			#If we dont have an item to build, return
-			if (build_item == null):
+			if (build_item == null || build_item.is_empty()):
 				#if we have something in the queue, start it
 				if(!build_queue.is_empty()):
 					start_build();
@@ -66,6 +84,7 @@ func _process(delta: float) -> void:
 			#add to progress of build
 			build_progress += 1 * delta * build_speed_mult;
 			if build_progress >= build_time:
+				print("finish build")
 				#rpc call build item
 				finish_build();
 				pass;
@@ -73,12 +92,13 @@ func _process(delta: float) -> void:
 
 func start_build() -> void:
 	#When we start a build, assign the dictionary to build_item and get rid of it in the queue
-	build_item = cmd_dict[build_queue.pop_front()]
+	build_item = build_queue.pop_front()
+	print(build_item)
 	#if there was nothing in the queue then we just close out our build data
 	if (build_item == null || build_item.is_empty()):
 		build_time = 0;
 		build_progress = 0;
-	print(build_item);
+		return;
 	assert (build_item.has("build_time")) #assert to make sure no bug occurred from building
 	build_time = build_item.build_time;
 	current_state = BuildingState.ACTIVE
@@ -90,13 +110,10 @@ func pause_build() -> void:
 func finish_build() -> void:
 	if (!multiplayer.is_server()):
 		return;
-	if (build_item.has("is_unit")):
-		if (build_item.is_unit == true):
-			spawn_unit(build_item.file_path);
+	spawn_unit(build_item["file_path"]);
+	print("got here the first time")
 	#Else finish research technology or whatever
-	else:
-		pass
-	build_item.clear();
+	build_item = {};
 	build_time = 0;
 	build_progress = 0;
 	if (!build_queue.is_empty()):
@@ -105,9 +122,14 @@ func finish_build() -> void:
 
 
 
-
+@rpc("authority","call_local","reliable")
 func cancel_build() ->void:
+	current_state = BuildingState.IDLE
+	build_item = {};
+	build_time = 0;
 	build_progress = 0;
+	build_queue.clear();
+
 
 
 
@@ -133,6 +155,35 @@ func spawn_unit(filepath: String) -> void:
 	pass;
 
 @rpc("any_peer","call_local","reliable")
+func request_cmd(data: Dictionary) -> void:
+	if(!multiplayer.is_server()):
+		return
+	if !data.has("mnemonic"):
+		push_error("command invalid");
+		return;
+	var cmd: String = data["mnemonic"]
+	match cmd:
+		#Target unit
+		"GC001":
+			print("Targeting unit does nothing for buildings")
+			return;
+		#Cancel action
+		"GC002":
+			if(build_item != null):
+				cancel_build.rpc();
+			return;
+		#Target location
+		"GC003":
+			if (!data.has("location")):
+				return;
+			#need to set up unit command queueing for pre-setting first command
+			var location: Vector2 = data["location"];
+		#Build Dwarf
+		"CC001":
+			build_queue.append(build_worker_cmd);
+			pass;
+
+@rpc("any_peer","call_local","reliable")
 func request_command(command: int) ->void:
 	if(!multiplayer.is_server()):
 		return
@@ -153,6 +204,9 @@ func request_command(command: int) ->void:
 			game.add_entity_from_dict.rpc(spawn_dict);
 			return
 		5:
+			if (build_queue.size() >= QUEUE_LIMIT):
+				print("queue limit, cannot queue more")
+				return;
 			build_queue.append(5);
 		6:
 			if(build_item != null):

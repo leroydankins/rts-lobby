@@ -19,40 +19,41 @@ const GAME_PATH: String = "res://Game/GameScene/game.tscn";
 
 #ENTITY FILEPATHS
 const COMMAND_CENTER_FILEPATH: String = "res://Game/EntityList/BuildingList/command_center.tscn"
-const WORKER_FILEPATH: String = "res://Game/EntityList/UnitList/worker.scn"
+const WORKER_FILEPATH: String = "res://Game/EntityList/UnitList/worker.tscn"
 
-const RESUME_ACTION_DICTIONARY: Dictionary[String, Variant] = {
-	"name": "Resume",
-	"description" : "Resumes queued actions",
-	"file_path" : "",
-	"build_time" : 0,
-	"sprite" : ""
+const MOVE_TO_DICTIONARY: Dictionary[String, Variant] = {
+	"name" : "Target Location",
+	"mnemonic" : "GC003",
+	"description" : "Targets location",
+	"sprite_path" : ""
 }
-
-const HALT_ACTION_DICTIONARY: Dictionary[String, Variant] = {
-	"name" : "Halt",
-	"description" : "Halts the current action, does not remove actions from queue",
+const TARGET_DICTIONARY : Dictionary[String, Variant] = {
+	"name" : "Target",
+	"mnemonic" : "GC001",
+	"description" : "Targets object",
 	"file_path" : "",
 	"build_time" : 0,
-	"sprite" : ""
+	"sprite_path" : ""
 }
 const CANCEL_ACTION_DICTIONARY: Dictionary[String, Variant] = {
 	"name" : "Cancel",
+	"mnemonic" : "GC002",
+	"is_unit" : false,
 	"description" : "Cancels the current action, any queued actions are canceled as well",
 	"file_path" : "",
 	"build_time" : 0,
-	"sprite" : ""
+	"sprite_path" : "res://Resources/CommandSprites/cancel_placeholder.png"
 }
 
 const BUILD_WORKER_DICTIONARY: Dictionary[String, Variant] = {
 	"name" : "Worker",
+	"mnemonic" : "CC001",
 	"is_unit" : true,
 	"description" : "Builds a dwarf worker",
 	"file_path" : WORKER_FILEPATH,
 	"build_time" : 10,
+	"sprite_path" : "res://Resources/CommandSprites/placeholder_unit.png"
 }
-
-
 
 const SPAWN_DICTIONARY: Dictionary = {
 	"filepath" = "",

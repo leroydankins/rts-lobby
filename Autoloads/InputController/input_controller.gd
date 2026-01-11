@@ -32,6 +32,10 @@ func _process(_delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if(!is_active):
 		return;
+	if(event.is_action_pressed("escape")):
+		selected.clear();
+		selected_signal.emit(null);
+		deselected_signal.emit();
 	if event is InputEventMouseButton and event.is_action("select"):
 		if event.pressed:
 			var space: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state;
@@ -59,6 +63,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			if dragging:
 				dragging = false
 				queue_redraw()
+
+	#ONLY PROCESS THESE IF WE HAVE SELECTED UNITS
+	if(selected.is_empty()):
+		return;
 	if (event.is_action_pressed("action")):
 		if (selected.size() == 1):
 			request_unit_action(selected[0], 0);

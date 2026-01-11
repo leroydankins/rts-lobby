@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://bs3rku8hs8tbe"]
+
+[ext_resource type="Script" uid="uid://by1lhu3yjenwn" path="res://cmd_gui.gd" id="1_r684o"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r684o"]
+bg_color = Color(1, 1, 1, 0.16078432)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jpbl3"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r38nu"]
+bg_color = Color(1, 1, 1, 0.42352942)
+
+[sub_resource type="Theme" id="Theme_r684o"]
+Button/styles/hover = SubResource("StyleBoxFlat_r684o")
+Button/styles/normal = SubResource("StyleBoxEmpty_jpbl3")
+Button/styles/pressed = SubResource("StyleBoxFlat_r38nu")
+
+[node name="CmdGUI" type="Control" unique_id=341317300]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_r684o")
+metadata/_edit_use_anchors_ = true
+
+[node name="Panel" type="Panel" parent="." unique_id=34818834]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1445905226]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Button" type="Button" parent="." unique_id=2095984027]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_r684o")
+
+[node name="Label" type="Label" parent="." unique_id=1472631388]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

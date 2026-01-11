@@ -74,6 +74,7 @@ func on_start() -> void:
 		"player_id" = player_id,
 		"player_username" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.USERNAME_KEY],
 		"player_race" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.RACE_KEY],
+		"player_team" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.TEAM_KEY],
 		"player_resource" = 400,
 		"player_gas" = 0
 		}

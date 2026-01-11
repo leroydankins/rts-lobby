@@ -8,6 +8,7 @@ func _ready() -> void:
 	"player_id" = 1,
 	"player_username" = "test_user",
 	"player_race" = 0,
+	"player_team" = 0,
 	"player_resource" = 400,
 	"player_gas" = 0
 	}

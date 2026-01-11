@@ -1,56 +1,118 @@
 extends Control
-@onready var unit_label: Label = $Control/SelectedUnitBox/HBoxContainer/UnitLabel
-@onready var command_container: GridContainer = $Control/CommandMarginContainer/CommandContainer
-@onready var unit_container: HFlowContainer = $Control/MarginContainer/UnitContainer
-@onready var object_being_built_control: HBoxContainer = $Control/MarginContainer/ObjectBeingBuiltControl
 
-@onready var obb_label: Label = $Control/MarginContainer/ObjectBeingBuiltControl/OBBLabel
-@onready var obb_preview_sprite: TextureRect = $Control/MarginContainer/ObjectBeingBuiltControl/OBBPreviewSprite
-@onready var obb_progress_bar: ProgressBar = $Control/MarginContainer/ObjectBeingBuiltControl/OBBProgressBar
+@onready var command_container: GridContainer = $Control/CommandMarginContainer/CommandContainer
+
+@onready var unit_container: HFlowContainer = $Control/UnitHBox/MarginContainer/UnitContainer
+@onready var object_being_built_control: HBoxContainer = $Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl
+@onready var unit_label: Label = $Control/UnitHBox/SelectedUnitBox/HBoxContainer/UnitLabel
+@onready var obb_label: Label = $Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl/OBBLabel
+@onready var obb_preview_sprite: TextureRect = $Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl/OBBPreviewSprite
+@onready var obb_progress_bar: ProgressBar = $Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl/OBBProgressBar
 
 
 var cmd_box_arr: Array = [];
 var input_controller: InputController;
+var first_selected: Node2D;
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	input_controller = get_tree().get_first_node_in_group("InputController");
-	input_controller.selected_signal.connect(on_selected_signal);
+	#initialize variables
+	var _null_var: int;
 	cmd_box_arr = command_container.get_children();
+	input_controller = get_tree().get_first_node_in_group("InputController");
+
+	#Connect to signals
+	_null_var = input_controller.selected_signal.connect(on_selected_signal);
+	for gui: CmdGUI in cmd_box_arr:
+		_null_var = gui.command_pressed.connect(on_cmd_gui_pressed);
+
+	#hide UI
 	unit_container.hide();
 	object_being_built_control.hide();
-	#for i: int in command_container.get_children().size():
-		#cmd_box_arr[i] = command_container.get_children()[i];
-	pass # Replace with function body.
 
+
+func on_cmd_gui_pressed(cmd: String)->void:
+	#ONLY PROCESS THESE IF WE HAVE SELECTED UNITS
+	if(input_controller.selected.is_empty()):
+		return;
+	print("input gui processing command")
+	var cmd_dict: Dictionary = {
+		"mnemonic": cmd
+	}
+	#For ones that will require another action like clicking a location or target, handle it differently in this spot
+	#########
+
+	#########
+	input_controller.selected[0].request_cmd.rpc_id(Lobby.multiplayer_server_id, cmd_dict);
 
 func on_selected_signal(unit: Node2D) ->void:
+	first_selected = unit;
 	if(unit == null):
 		unit_label.text = "";
 		unit_container.hide();
 		object_being_built_control.hide();
+		#Update image and data for each cmd box here
 		for i: int in cmd_box_arr.size():
-			cmd_box_arr[i].text = ""
+			cmd_box_arr[i].clear_data();
 		return;
 	unit_label.text = unit.name;
 	assert("cmd_dict" in unit);
-	for key: int in unit.cmd_dict:
-		cmd_box_arr[key].text = str(key);
-		print(key);
+	for i: int in cmd_box_arr.size():
+		if (!unit.cmd_dict.has(i) || unit.cmd_dict[i].is_empty()):
+			#if there is not a command in this box, dont do anything and hide the data in there currently
+			cmd_box_arr[i].clear_data();
+		else:
+
+			cmd_box_arr[i].update_data(unit.cmd_dict[i])
 	if (input_controller.selected.size() > 1):
 		unit_container.show();
 	else:
 		unit_container.hide();
 	#if the unit has a build item property, aka its building something
-	if ("build_item" in unit):
-		object_being_built_control.show()
-		if (!unit.build_item.is_empty()):
-			object_being_built_control.show();
-			obb_progress_bar.max_value = unit.build_time;
-			obb_progress_bar.value = unit.build_progress;
-			obb_label.text = unit.build_item.name;
-			unit_container.hide();
+
+	if ("build_item" in unit && !unit.build_item.is_empty()):
+		object_being_built_control.show();
+
+		obb_progress_bar.max_value = unit.build_time;
+
+		obb_progress_bar.value = unit.build_progress;
+
+		obb_label.text = unit.build_item.name;
+
+	else:
+		object_being_built_control.hide();
+		unit_container.show();
+		var units: Array = unit_container.get_children()
+		for i: int in units.size():
+			if i < input_controller.selected.size():
+				units[i].show();
+			else:
+				units[i].hide();
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
+	if (input_controller.selected.is_empty()):
+		return;
+	first_selected = input_controller.selected[0]
+
+	if (first_selected == null):
+		push_error("selected array is not empty, but first slot in array is null?")
+		unit_container.visible = false;
+		object_being_built_control.visible = false;
+		return;
+	if(input_controller.selected.size() > 1):
+		unit_container.show();
+	else:
+		unit_container.hide();
+	if ("build_item" in first_selected && !first_selected.build_item.is_empty()):
+		object_being_built_control.show();
+
+		obb_progress_bar.max_value = first_selected.build_time;
+
+		obb_progress_bar.value = first_selected.build_progress;
+
+		obb_label.text = first_selected.build_item.name;
+	else:
+		object_being_built_control.visible = false;
+
 	pass

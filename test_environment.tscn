@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://d30qxlq72av7c" path="res://test_environment.gd" id="1_mdi38"]
 [ext_resource type="PackedScene" uid="uid://clusn5oxit4qc" path="res://Game/EntityList/BuildingList/command_center.tscn" id="2_mdi38"]
 
-[node name="Node2D" type="Node2D" unique_id=688130628]
+[node name="TestEnvironment" type="Node2D" unique_id=688130628]
 script = ExtResource("1_mdi38")
 
 [node name="Game" parent="." unique_id=632394247 instance=ExtResource("1_hu1ts")]
