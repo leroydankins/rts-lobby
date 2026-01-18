@@ -8,6 +8,11 @@ size = Vector2(32, 32)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8lfae"]
 size = Vector2(32, 32)
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_6y8cc"]
+properties/0/path = NodePath(".:var5")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
 [node name="Worker" type="Area2D" unique_id=482429156]
 script = ExtResource("1_6y8cc")
 
@@ -23,3 +28,6 @@ offset_top = 8.0
 offset_right = 20.0
 offset_bottom = 31.0
 text = "Text"
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=641809995]
+replication_config = SubResource("SceneReplicationConfig_6y8cc")

@@ -3,7 +3,10 @@ extends Node2D
 @onready var game_clock: Label = $UI_Layer/GameClock
 @onready var minerals_label: Label = $UI_Layer/ResourceBox/MineralsLabel
 @onready var gas_label: Label = $UI_Layer/ResourceBox/GasLabel
-@onready var input_controller: Node2D = $InputController
+#TEMPORARY
+@onready var team_label: Label = $UI_Layer/ResourceBox/TeamLabel
+
+@onready var input_controller: Control = $InputController
 
 @onready var camera: Camera2D = $GameCamera
 @onready var spawn_1: Marker2D = $SpawnHolder/Spawn1
@@ -46,6 +49,7 @@ func _ready() -> void:
 	#Connect to signals from Lobby
 	Lobby.start_game.connect(on_start);
 	Lobby.game_scene_loaded.rpc_id(Lobby.multiplayer_server_id);
+	team_label.text = "Team %s" % GlobalConstants.TEAMS[LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]];
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -68,6 +72,7 @@ func on_start() -> void:
 		return
 	var init_dict: Dictionary = {};
 	var start_spot: int = 0;
+
 	for player_id: String in Lobby.lobby_player_dictionary:
 		#create the peer's local player data
 		var player_dictionary: Dictionary[String, Variant] = {

@@ -1,34 +1,25 @@
 extends Area2D
-
-const BUILD_COMPLETE: int = 60;
+const OBJECT_NAME: String = "Command Center"
 const QUEUE_LIMIT: int = 4;
+const CONSTRUCTION_COMPLETE: int = 10;
+var construction_value: float = 0;
 @onready var temp_team_label: Label = $TempTeamLabel
 @onready var marker: Marker2D = $Marker2D
+@onready var temp_state_label: Label = $TempStateLabel
+@onready var construct_label: Label = $ConstructLabel
 
-var build_worker_cmd: Dictionary = {
-	"mnemonic" : "CC001",
-	"name" : "Dwarf Worker",
-	"description" : "Builds a worker",
-	"file_path" : GlobalConstants.WORKER_FILEPATH,
-	"build_time" : 5,
-	"sprite_path" : "res://Resources/CommandSprites/placeholder_unit.png"
-}
 
 #Shows commands that the unit can take
 var cmd_dict: Dictionary[int, Dictionary] = {
-	5 : build_worker_cmd,
+	0 : {},
+	1 : {},
+	2 : {},
+	3 : {},
+	4 : {},
+	5 : GlobalConstants.BUILD_WORKER_DICTIONARY,
 	6 : GlobalConstants.CANCEL_ACTION_DICTIONARY,
-}
-
-
-var cmd_dict2: Dictionary = {
-	"CC001" : {
-		"name" : "Worker",
-		"description" : "Builds a worker",
-		"file_path" : GlobalConstants.WORKER_FILEPATH,
-		"build_time" : 10,
-		"sprite_path" : "res://Resources/CommandSprites/placeholder_unit.png"
-		}
+	7 : {},
+	8 : {}
 }
 
 var build_dictionary: Dictionary[int, Dictionary]
@@ -36,19 +27,13 @@ var build_dictionary: Dictionary[int, Dictionary]
 var team: int = 0;
 var color: int = 0;
 var game: Game;
-var build_time: int;
-var build_item: Dictionary;
-var build_queue: Array[Dictionary];
-var build_progress: float;
-var build_speed_mult: float = 1;
+@export var build_time: int;
+@export var build_item: Dictionary;
+@export var build_queue: Array[Dictionary];
+@export var build_progress: float;
+@export var build_speed_mult: float = 1;
 
-#STATE MACHINE
-enum BuildingState{
-	IDLE,
-	ACTIVE,
-	HALTED
-}
-var current_state: BuildingState = BuildingState.IDLE;
+@export var current_state: GlobalConstants.BuildingState = GlobalConstants.BuildingState.IDLE;
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -56,21 +41,31 @@ func _ready() -> void:
 	game = get_tree().get_first_node_in_group("Game");
 	var text : String = GlobalConstants.TEAMS[team];
 	temp_team_label.text = "Team: %s" % text;
+	print("my building state is %s" % current_state);
 	pass # Replace with function body.
 
 #Only process if you are the server, properties will get synced to other players across RPC calls
 func _process(delta: float) -> void:
+	temp_state_label.text = str("State:", current_state);
+	if(current_state == GlobalConstants.BuildingState.UNCONSTRUCTED):
+		construct_label.text = "Construction Progress is %s / %s" % [int(construction_value),CONSTRUCTION_COMPLETE];
+	else:
+		construct_label.text = ""
 	if (!multiplayer.is_server()):
 		return;
 	match current_state:
-		BuildingState.IDLE:
+		GlobalConstants.BuildingState.UNCONSTRUCTED:
+			if(construction_value >= CONSTRUCTION_COMPLETE):
+				current_state = GlobalConstants.BuildingState.IDLE;
+				return;
+		GlobalConstants.BuildingState.IDLE:
 			if (!build_queue.is_empty() && build_item.is_empty()):
 				start_build();
-		BuildingState.HALTED:
+		GlobalConstants.BuildingState.HALTED:
 			#we just vibe in halted state
 			return;
 		#if we are active
-		BuildingState.ACTIVE:
+		GlobalConstants.BuildingState.ACTIVE:
 			#If we dont have an item to build, return
 			if (build_item == null || build_item.is_empty()):
 				#if we have something in the queue, start it
@@ -79,7 +74,7 @@ func _process(delta: float) -> void:
 					return;
 				#Switch states
 				else:
-					current_state = BuildingState.IDLE
+					current_state = GlobalConstants.BuildingState.IDLE
 				return;
 			#add to progress of build
 			build_progress += 1 * delta * build_speed_mult;
@@ -88,6 +83,8 @@ func _process(delta: float) -> void:
 				#rpc call build item
 				finish_build();
 				pass;
+		_:
+			return;
 
 
 func start_build() -> void:
@@ -101,7 +98,7 @@ func start_build() -> void:
 		return;
 	assert (build_item.has("build_time")) #assert to make sure no bug occurred from building
 	build_time = build_item.build_time;
-	current_state = BuildingState.ACTIVE
+	current_state = GlobalConstants.BuildingState.ACTIVE
 
 
 func pause_build() -> void:
@@ -124,21 +121,17 @@ func finish_build() -> void:
 
 @rpc("authority","call_local","reliable")
 func cancel_build() ->void:
-	current_state = BuildingState.IDLE
+	current_state = GlobalConstants.BuildingState.IDLE
 	build_item = {};
 	build_time = 0;
 	build_progress = 0;
 	build_queue.clear();
-
-
-
 
 func on_input(_viewport: Node, event: InputEvent, _shape_idx :int) -> void:
 	if event.is_action_pressed("select"):
 		print(name + "was clicked");
 		if (team == LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
 			print("valid click!");
-
 
 
 func spawn_unit(filepath: String) -> void:
@@ -158,6 +151,9 @@ func spawn_unit(filepath: String) -> void:
 func request_cmd(data: Dictionary) -> void:
 	if(!multiplayer.is_server()):
 		return
+	if(current_state == GlobalConstants.BuildingState.UNCONSTRUCTED):
+		print("cannot accept commands, we arent fully fleshed yet!");
+		return;
 	if !data.has("mnemonic"):
 		push_error("command invalid");
 		return;
@@ -178,9 +174,10 @@ func request_cmd(data: Dictionary) -> void:
 				return;
 			#need to set up unit command queueing for pre-setting first command
 			var location: Vector2 = data["location"];
+			print('processed command');
 		#Build Dwarf
 		"CC001":
-			build_queue.append(build_worker_cmd);
+			build_queue.append(GlobalConstants.BUILD_WORKER_DICTIONARY);
 			pass;
 
 @rpc("any_peer","call_local","reliable")

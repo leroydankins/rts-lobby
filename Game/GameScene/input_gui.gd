@@ -30,22 +30,31 @@ func _ready() -> void:
 	object_being_built_control.hide();
 
 
-func on_cmd_gui_pressed(cmd: String)->void:
+
+func on_cmd_gui_pressed(cmd_dict: Dictionary)->void:
 	#ONLY PROCESS THESE IF WE HAVE SELECTED UNITS
 	if(input_controller.selected.is_empty()):
 		return;
 	print("input gui processing command")
-	var cmd_dict: Dictionary = {
-		"mnemonic": cmd
+	#create a new dictionary for sending data to limit data traffic and not overwrite data on the cmd gui
+	var cmd: Dictionary = {
+		"mnemonic": cmd_dict["mnemonic"],
 	}
+	if(cmd_dict.has("command")):
+		cmd["command"] = cmd_dict["command"];
+	#If there is a scene associated with this (creating unit or building)
+	if(cmd_dict.has("file_path")):
+		cmd["file_path"] = cmd_dict["file_path"];
 	#For ones that will require another action like clicking a location or target, handle it differently in this spot
 	#########
-
+	if (cmd_dict.has("argument")):
+		cmd[cmd_dict["argument"]] = null;
+		input_controller.pending_cmd = cmd;
+		return;
 	#########
-	input_controller.selected[0].request_cmd.rpc_id(Lobby.multiplayer_server_id, cmd_dict);
+	input_controller.request_unit_cmd(input_controller.selected[0], cmd);
 
 func on_selected_signal(unit: Node2D) ->void:
-	first_selected = unit;
 	if(unit == null):
 		unit_label.text = "";
 		unit_container.hide();
@@ -54,21 +63,39 @@ func on_selected_signal(unit: Node2D) ->void:
 		for i: int in cmd_box_arr.size():
 			cmd_box_arr[i].clear_data();
 		return;
-	unit_label.text = unit.name;
+	if(!"OBJECT_NAME" in unit):
+		push_error("No object name, crash this game and fix it ethab")
+		return;
+	if(unit.team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
+		unit_label.text = str(unit.OBJECT_NAME, "Enemy");
+		unit_container.hide();
+		object_being_built_control.hide();
+		for cmd: CmdGUI in cmd_box_arr:
+			cmd.clear_data();
+		return;
+	unit_label.text = unit.OBJECT_NAME;
 	assert("cmd_dict" in unit);
-	for i: int in cmd_box_arr.size():
-		if (!unit.cmd_dict.has(i) || unit.cmd_dict[i].is_empty()):
-			#if there is not a command in this box, dont do anything and hide the data in there currently
-			cmd_box_arr[i].clear_data();
-		else:
 
-			cmd_box_arr[i].update_data(unit.cmd_dict[i])
+	if ("current_state" in unit && unit.current_state == GlobalConstants.BuildingState.UNCONSTRUCTED):
+		for i: int in cmd_box_arr.size():
+			cmd_box_arr[i].clear_data();
+
+	else:
+		for i: int in cmd_box_arr.size():
+			if (!unit.cmd_dict.has(i) || unit.cmd_dict[i].is_empty()):
+				#if there is not a command in this box, dont do anything and hide the data in there currently
+				cmd_box_arr[i].clear_data();
+			else:
+				print(i);
+				cmd_box_arr[i].update_data(unit.cmd_dict[i])
+
 	if (input_controller.selected.size() > 1):
 		unit_container.show();
+
 	else:
 		unit_container.hide();
-	#if the unit has a build item property, aka its building something
 
+	#if the unit has a build item property, aka its building something
 	if ("build_item" in unit && !unit.build_item.is_empty()):
 		object_being_built_control.show();
 
@@ -104,6 +131,8 @@ func _process(_delta: float) -> void:
 		unit_container.show();
 	else:
 		unit_container.hide();
+	if (first_selected.team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
+		return;
 	if ("build_item" in first_selected && !first_selected.build_item.is_empty()):
 		object_being_built_control.show();
 
@@ -114,5 +143,3 @@ func _process(_delta: float) -> void:
 		obb_label.text = first_selected.build_item.name;
 	else:
 		object_being_built_control.visible = false;
-
-	pass

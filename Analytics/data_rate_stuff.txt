@@ -1,0 +1,10 @@
+convert vector2 to packedbytearray = 15Byte RPC
+convert vector2 into packed 32 bit array and reconstruct = 20Byte RPC
+data sync from mult syncronizer uses 12 bytes per call and can choose to update on change
+
+Multiplayer sync sending a 4 entry PackedInt32Array uses 24 Bytes
+RPC of PackedInt32Array uses 28Byes
+
+PackedByteArray
+MultSync sends 4 entry PackedInt32Array 24 bytes
+Rpc converting to PackedByteArray uses 27Bytes

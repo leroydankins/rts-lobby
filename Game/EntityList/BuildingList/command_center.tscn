@@ -8,6 +8,26 @@ size = Vector2(128, 128)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tjb1v"]
 size = Vector2(128, 128)
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_600yg"]
+properties/0/path = NodePath(".:build_time")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:build_item")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:build_queue")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:build_progress")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:build_speed_mult")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:current_state")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+
 [node name="CommandCenter" type="Area2D" unique_id=899178283]
 script = ExtResource("1_600yg")
 
@@ -25,3 +45,21 @@ shape = SubResource("RectangleShape2D_tjb1v")
 
 [node name="Marker2D" type="Marker2D" parent="." unique_id=338332599]
 position = Vector2(0, 100)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=104750715]
+delta_interval = 0.032
+replication_config = SubResource("SceneReplicationConfig_600yg")
+
+[node name="TempStateLabel" type="Label" parent="." unique_id=1889713967]
+offset_left = -19.0
+offset_top = -90.0
+offset_right = 21.0
+offset_bottom = -67.0
+horizontal_alignment = 1
+
+[node name="ConstructLabel" type="Label" parent="." unique_id=1058354800]
+offset_left = -19.0
+offset_top = -115.0
+offset_right = 21.0
+offset_bottom = -92.0
+horizontal_alignment = 1

@@ -21,15 +21,30 @@ const GAME_PATH: String = "res://Game/GameScene/game.tscn";
 const COMMAND_CENTER_FILEPATH: String = "res://Game/EntityList/BuildingList/command_center.tscn"
 const WORKER_FILEPATH: String = "res://Game/EntityList/UnitList/worker.tscn"
 
-const MOVE_TO_DICTIONARY: Dictionary[String, Variant] = {
-	"name" : "Target Location",
-	"mnemonic" : "GC003",
-	"description" : "Targets location",
-	"sprite_path" : ""
+#BUILDING STATE ENUM
+enum BuildingState{
+	IDLE,
+	ACTIVE,
+	HALTED,
+	UNCONSTRUCTED,
 }
+
+enum Commands
+{
+	CANCEL,
+	MOVE,
+	TARGET,
+	BUILD,
+	HOLD,
+	RETURN,
+}
+
+#COMMAND DICTIONARIES
 const TARGET_DICTIONARY : Dictionary[String, Variant] = {
 	"name" : "Target",
 	"mnemonic" : "GC001",
+	"command" : Commands.TARGET,
+	"argument" : "target_node_path",
 	"description" : "Targets object",
 	"file_path" : "",
 	"build_time" : 0,
@@ -38,23 +53,41 @@ const TARGET_DICTIONARY : Dictionary[String, Variant] = {
 const CANCEL_ACTION_DICTIONARY: Dictionary[String, Variant] = {
 	"name" : "Cancel",
 	"mnemonic" : "GC002",
+	"command" : Commands.CANCEL,
 	"is_unit" : false,
 	"description" : "Cancels the current action, any queued actions are canceled as well",
 	"file_path" : "",
 	"build_time" : 0,
 	"sprite_path" : "res://Resources/CommandSprites/cancel_placeholder.png"
 }
-
+const MOVE_TO_DICTIONARY: Dictionary[String, Variant] = {
+	"name" : "Target Location",
+	"mnemonic" : "GC003",
+	"command" : Commands.MOVE,
+	"argument" : "location",
+	"description" : "Targets location",
+	"sprite_path" : ""
+}
 const BUILD_WORKER_DICTIONARY: Dictionary[String, Variant] = {
 	"name" : "Worker",
 	"mnemonic" : "CC001",
-	"is_unit" : true,
+	"command" : Commands.BUILD,
+	"cost" : [50],
 	"description" : "Builds a dwarf worker",
 	"file_path" : WORKER_FILEPATH,
-	"build_time" : 10,
+	"build_time" : 5,
 	"sprite_path" : "res://Resources/CommandSprites/placeholder_unit.png"
 }
-
+const BUILD_BASE_DICTIONARY  : Dictionary = {
+	"name" : "Build Base",
+	"mnemonic" : "WK003",
+	"command" : Commands.BUILD,
+	"cost" : [400],
+	"description" : "Builds Dwarven Base",
+	"file_path" : COMMAND_CENTER_FILEPATH,
+	"argument" : "location",
+	"sprite_path" : "res://Resources/CommandSprites/building_placeholder.png"
+}
 const SPAWN_DICTIONARY: Dictionary = {
 	"filepath" = "",
 	"team" = 0,
