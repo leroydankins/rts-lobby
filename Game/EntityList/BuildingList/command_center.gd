@@ -26,7 +26,9 @@ var build_dictionary: Dictionary[int, Dictionary]
 
 var team: int = 0;
 var color: int = 0;
+@export var player_id: String = "";
 var game: Game;
+
 @export var build_time: int;
 @export var build_item: Dictionary;
 @export var build_queue: Array[Dictionary];
@@ -41,7 +43,7 @@ func _ready() -> void:
 	game = get_tree().get_first_node_in_group("Game");
 	var text : String = GlobalConstants.TEAMS[team];
 	temp_team_label.text = "Team: %s" % text;
-	print("my building state is %s" % current_state);
+
 	pass # Replace with function body.
 
 #Only process if you are the server, properties will get synced to other players across RPC calls
@@ -141,6 +143,7 @@ func spawn_unit(filepath: String) -> void:
 	#temp use of a direct constant, the filepath will depend on starting race
 	"file_path" = filepath,
 	"team" = team,
+	"player_id" = player_id,
 	"position" = marker.global_position,
 	"color" = color
 	}
@@ -172,9 +175,7 @@ func request_cmd(data: Dictionary) -> void:
 		"GC003":
 			if (!data.has("location")):
 				return;
-			#need to set up unit command queueing for pre-setting first command
-			var location: Vector2 = data["location"];
-			print('processed command');
+			print('target command for command center');
 		#Build Dwarf
 		"CC001":
 			build_queue.append(GlobalConstants.BUILD_WORKER_DICTIONARY);

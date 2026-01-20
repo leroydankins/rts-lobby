@@ -39,6 +39,11 @@ layout_mode = 3
 anchors_preset = 0
 script = ExtResource("2_4ffoq")
 
+[node name="InputController2" type="Control" parent="." unique_id=52917717 groups=["InputController"]]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("2_4ffoq")
+
 [node name="UI_Layer" type="CanvasLayer" parent="." unique_id=1271359654]
 
 [node name="GameClock" type="Label" parent="UI_Layer" unique_id=849916887]

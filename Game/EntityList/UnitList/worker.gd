@@ -4,6 +4,7 @@ const MOVE_SPEED: float = 250;
 
 var team: int = 0;
 var color: int = 0;
+@export var player_id: String = "";
 var game: Game;
 
 
@@ -129,10 +130,6 @@ func _process(delta: float) -> void:
 			print(cmd_queue[0]);
 			finish_cmd();
 
-	#sync data? location
-	if (!multiplayer.is_server()):
-		return;
-
 	pass
 
 
@@ -146,17 +143,19 @@ func spawn_building_rpc(dict: Dictionary) -> void:
 		return;
 	var obj: Node2D = load(dict["file_path"]).instantiate();
 	obj.team = dict["team"];
+	obj.player_id = dict["player_id"];
 	obj.global_position = dict["position"];
 	#color is an int, the object will access the actual color via GlobalConstants
 	obj.color = dict["color"];
 	building = obj;
 	building.current_state = GlobalConstants.BuildingState.UNCONSTRUCTED;
 	game.entity_holder.add_child(obj);
-	print("we built", building.OBJECT_NAME)
 	wait_bool = false;
 	target_pos = Vector2.ZERO;
 	pass;
 
+
+#this only gets called by the multiplayer host because it is called from process, which is only done by the host
 func spawn_building(filepath: String) -> void:
 	if (!multiplayer.is_server()):
 		return;
@@ -164,6 +163,7 @@ func spawn_building(filepath: String) -> void:
 	#temp use of a direct constant, the filepath will depend on starting race
 	"file_path" = filepath,
 	"team" = team,
+	"player_id" = player_id,
 	"position" = cmd_queue[0]["location"],
 	"color" = color,
 	}
@@ -195,6 +195,21 @@ func request_cmd(cmd_data: Dictionary) -> void:
 	if !cmd_data.has("mnemonic"):
 		push_error("command invalid");
 		return;
+	#This logic doesnt work because it is  being called on the SERVER DUMBASS
+	for i: int in cmd_queue.size():
+		if(cmd_queue[i].has("cost")):
+			if (i == 0 && !build_started):
+				#backwards way of doing this if statement lol, fix later
+				pass;
+			else:
+				continue;
+			#refund the cost if you are clearing out the queue
+			var minerals: int = cmd_queue[i]["cost"][0];
+			var gas: int = cmd_queue[i]["cost"][1];
+			#for those reading this, I know this is probably bad code smell or whatever to be calling a parent method but whatever dude
+			game.request_player_data_update.rpc(player_id,game.PLAYER_RESOURCE_KEY, minerals)
+			game.request_player_data_update.rpc(player_id,game.PLAYER_GAS_KEY, gas)
+		pass;
 	cmd_queue.clear();
 	var cmd: String = cmd_data["mnemonic"]
 	match cmd:
@@ -226,8 +241,6 @@ func request_cmd(cmd_data: Dictionary) -> void:
 			#these are resetting state of command but not letting it finish the current command
 			wait_bool = false;
 			build_started = false;
-			#clear out the current command queue since we are not queueing this command
-			print(str(cmd_data["command"], "is now in the cmd queue!!"))
 			cmd_queue.append(cmd_data);
 
 @rpc("any_peer","call_local","reliable")
@@ -254,7 +267,6 @@ func queue_cmd(cmd_data: Dictionary) -> void:
 		"GC003":
 			if (!cmd_data.has("location")):
 				return;
-			print('procssed command')
 			cmd_queue.append(cmd_data)
 		#Build Base at Vector2
 		"WK003":
@@ -265,24 +277,4 @@ func queue_cmd(cmd_data: Dictionary) -> void:
 			if(!cmd_data.has("file_path")):
 				"command dictionary did not have file path"
 				return;
-			print(str(cmd_data["command"], "is now in the cmd queue!!"))
 			cmd_queue.append(cmd_data);
-
-@rpc("any_peer","call_local","reliable")
-func request_command(command: int) ->void:
-	if(!multiplayer.is_server()):
-		return
-	print("requesting command %s" % command);
-	#if command is something that has to request game, like spawn a unit, request here and dont process command
-	match command:
-		0:
-			return;
-	process_command.rpc(command);
-	pass;
-
-@rpc("authority","call_local","reliable")
-func process_command(command: int) ->void:
-	print("processing command %s" % command)
-	match command:
-		0:
-			pass; #build a dictionary for the unit to create and ask the game scene to add it

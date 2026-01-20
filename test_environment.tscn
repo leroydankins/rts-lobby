@@ -11,3 +11,4 @@ script = ExtResource("1_mdi38")
 
 [node name="CommandCenter" parent="Game" unique_id=899178283 instance=ExtResource("2_mdi38")]
 position = Vector2(514, 237)
+player_id = "1"

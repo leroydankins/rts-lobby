@@ -31,6 +31,10 @@ gdscript/warnings/return_value_discarded=1
 
 window/stretch/mode="canvas_items"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/MarchingSquaresTerrain/plugin.cfg")
+
 [global_group]
 
 Main="Used to get Main"

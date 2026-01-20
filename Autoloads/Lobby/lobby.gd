@@ -280,7 +280,7 @@ func on_connected_ok() -> void: #Set player information if you are the authority
 func on_connected_fail() -> void:
 	is_connected = false;
 	connection_ended.emit();
-	var err: Error = remove_multiplayer_peer();
+	var _err: Error = remove_multiplayer_peer();
 
 
 ##This function currently doesn't do anything because the player connects sends their information to the server

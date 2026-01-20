@@ -29,30 +29,11 @@ func _ready() -> void:
 	unit_container.hide();
 	object_being_built_control.hide();
 
-
-
-func on_cmd_gui_pressed(cmd_dict: Dictionary)->void:
-	#ONLY PROCESS THESE IF WE HAVE SELECTED UNITS
-	if(input_controller.selected.is_empty()):
-		return;
-	print("input gui processing command")
-	#create a new dictionary for sending data to limit data traffic and not overwrite data on the cmd gui
-	var cmd: Dictionary = {
-		"mnemonic": cmd_dict["mnemonic"],
-	}
-	if(cmd_dict.has("command")):
-		cmd["command"] = cmd_dict["command"];
-	#If there is a scene associated with this (creating unit or building)
-	if(cmd_dict.has("file_path")):
-		cmd["file_path"] = cmd_dict["file_path"];
-	#For ones that will require another action like clicking a location or target, handle it differently in this spot
-	#########
-	if (cmd_dict.has("argument")):
-		cmd[cmd_dict["argument"]] = null;
-		input_controller.pending_cmd = cmd;
-		return;
-	#########
-	input_controller.request_unit_cmd(input_controller.selected[0], cmd);
+#See on_selected_signal for how cmd_gui's have command dictionary data
+#Command dictionary gets delivered to this function when cmd_gui is pressed
+func on_cmd_gui_pressed(p_cmd: Dictionary)->void:
+	#Universal function for handling commands before RPC to server in input_controller
+	input_controller.handle_cmd(p_cmd)
 
 func on_selected_signal(unit: Node2D) ->void:
 	if(unit == null):
@@ -135,11 +116,8 @@ func _process(_delta: float) -> void:
 		return;
 	if ("build_item" in first_selected && !first_selected.build_item.is_empty()):
 		object_being_built_control.show();
-
 		obb_progress_bar.max_value = first_selected.build_time;
-
 		obb_progress_bar.value = first_selected.build_progress;
-
 		obb_label.text = first_selected.build_item.name;
 	else:
 		object_being_built_control.visible = false;

@@ -27,7 +27,7 @@ var time: float = 0;
 var start_time: float = 0;
 var started: bool = false;
 var hr: int = 0;
-var min: int = 0;
+var minutes: int = 0;
 var sec: int = 0;
 
 const PLAYER_ID_KEY: String = "player_id";
@@ -47,24 +47,24 @@ func _ready() -> void:
 	spawns = [spawn_1, spawn_2, spawn_3,  spawn_4]
 	multiplayer.multiplayer_peer = Lobby.multiplayer.multiplayer_peer;
 	#Connect to signals from Lobby
-	Lobby.start_game.connect(on_start);
+	var _null_var: int = Lobby.start_game.connect(on_start);
 	Lobby.game_scene_loaded.rpc_id(Lobby.multiplayer_server_id);
 	team_label.text = "Team %s" % GlobalConstants.TEAMS[LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]];
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if (!started):
 		return;
 	if (local_game_dict.is_empty()):
-		local_game_dict[PLAYER_RESOURCE_KEY]
+		return;
 	minerals_label.text = "Minerals: %s" % local_game_dict[PLAYER_RESOURCE_KEY]
 	gas_label.text = "Gas: %s" % local_game_dict[PLAYER_GAS_KEY];
 	time = Time.get_ticks_msec() - start_time;
 	sec = int(time / 1000) % 60
-	min = int(time/ (1000 * 60)) % 60
+	minutes = int(time/ (1000 * 60)) % 60
 	hr = int(time/ (1000 * 60 * 60)) % 24
-	game_clock.text = "%s: %s: %s" % [hr, min, sec]
+	game_clock.text = "%s: %s: %s" % [hr, minutes, sec]
 	pass
 
 func on_start() -> void:
@@ -94,6 +94,7 @@ func on_start() -> void:
 		#temp use of a direct constant, the filepath will depend on starting race
 		"file_path" = GlobalConstants.COMMAND_CENTER_FILEPATH,
 		"team" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.TEAM_KEY],
+		"player_id" = player_id,
 		"position" = spawn_loc,
 		"color" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY]
 		}
@@ -117,6 +118,7 @@ func add_entity_from_dict(dict: Dictionary) -> void:
 		return;
 	var obj: Node2D = load(dict["file_path"]).instantiate();
 	obj.team = dict["team"];
+	obj.player_id = dict["player_id"];
 	obj.global_position = dict["position"];
 	#color is an int, the object will access the actual color via GlobalConstants
 	obj.color = dict["color"];
@@ -145,14 +147,24 @@ func request_player_data_update(player_id: String, key: String, data: Variant) -
 		return;
 	if (!player_game_dict.has(player_id)):
 		return;
+	if(key == PLAYER_RESOURCE_KEY || key == PLAYER_GAS_KEY):
+
+		var val: int = player_game_dict[player_id][key];
+
+		var new_val: int = val + data;
+		if (val <= 0):
+			val = 0;
+		data = new_val;
+
 	player_game_dict[player_id][key] = data;
-	push_player_data_update.rpc
+
+	push_player_data_update.rpc(player_id,key,data);
 
 
 
 ##TODO
 @rpc("any_peer", "call_local", "reliable")
-func request_player_data_update_batch(player_id: String, new_dict: Dictionary[String,Variant]) ->void:
+func request_player_data_update_batch(_player_id: String, _new_dict: Dictionary[String,Variant]) ->void:
 	#send a full local player dictionary to that player
 	pass;
 
@@ -168,14 +180,14 @@ func push_player_data_update(updated_player: String, key: String, data: Variant)
 		push_error("not a valid player in dictionary");
 		return;
 	#update our player_game_dictionary
+
 	player_game_dict[updated_player][key] = data;
 
 	#if we are updating the local player's information
 	if (updated_player == local_game_dict[PLAYER_ID_KEY]):
-		#if we dont have this key in our dicitionary return;
-		if (!local_game_dict.has(key)):
-			return;
+
 		local_game_dict[key] = data;
+		print(local_game_dict[key]);
 	pass;
 
 @rpc("authority", "call_local", "reliable")
