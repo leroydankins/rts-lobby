@@ -21,6 +21,24 @@ const GAME_PATH: String = "res://Game/GameScene/game.tscn";
 const COMMAND_CENTER_FILEPATH: String = "res://Game/EntityList/BuildingList/command_center.tscn"
 const WORKER_FILEPATH: String = "res://Game/EntityList/UnitList/worker.tscn"
 
+#ENTIY_TYPE
+enum EntityType {
+	UNIT,
+	BUILDING,
+	RESOURCE
+}
+#BUILDING TYPE ENUM
+enum BuildingType
+{
+	CENTER,
+	RESOURCE_DEPOT,
+	GARRISON
+}
+#RESOURCE TYPE
+enum ResourceType{
+	MINERAL,
+	GAS
+}
 #BUILDING STATE ENUM
 enum BuildingState{
 	IDLE,
@@ -28,15 +46,16 @@ enum BuildingState{
 	HALTED,
 	UNCONSTRUCTED,
 }
-
 enum Commands
 {
 	CANCEL,
 	MOVE,
-	TARGET,
-	BUILD,
 	HOLD,
-	RETURN,
+	TARGET,
+	ATTACK,
+	FOLLOW,
+	MINE,
+	BUILD,
 }
 
 #COMMAND DICTIONARIES
@@ -93,4 +112,24 @@ const SPAWN_DICTIONARY: Dictionary = {
 	"team" = 0,
 	"position" = Vector2.ZERO,
 	"color" = 0
+}
+#command dictionaries need to be initialized before cmd_dict or in GlobalConstants otherwise it will be empty
+const BUILD_BREWERY: Dictionary = {
+	"name" : "Build Brewery",
+	"mnemonic" : "WK003",
+	"command" : Commands.BUILD,
+	"cost" : [150,100],
+	"description" : "Builds Dwarven Base",
+	"file_path" : null,
+	"argument" : "location",
+	"sprite_path" : "res://Resources/CommandSprites/building_placeholder.png"
+}
+const BUILD_BARRACKS : Dictionary = {
+	"name" : "Build Barracks",
+	"command" : Commands.BUILD,
+	"cost" : [200,0],
+	"description" : "Builds Dwarven Base",
+	"file_path" : null,
+	"argument" : "location",
+	"sprite_path" : "res://Resources/CommandSprites/building_placeholder.png"
 }

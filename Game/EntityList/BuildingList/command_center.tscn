@@ -63,3 +63,8 @@ offset_top = -115.0
 offset_right = 21.0
 offset_bottom = -92.0
 horizontal_alignment = 1
+
+[node name="TargetLine" type="Line2D" parent="." unique_id=169204528]
+points = PackedVector2Array(0, 0, 0, 0)
+width = 4.0
+default_color = Color(0.32156864, 0.76862746, 0.6117647, 0.79607844)

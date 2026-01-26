@@ -9,8 +9,8 @@ func _ready() -> void:
 	"player_username" = "test_user",
 	"player_race" = 0,
 	"player_team" = 0,
-	"player_resource" = 400,
-	"player_gas" = 0
+	"player_resource" = 20000,
+	"player_gas" = 500
 	}
 	game.player_game_dict["1"] = player_dictionary;
 	game.local_game_dict = player_dictionary;

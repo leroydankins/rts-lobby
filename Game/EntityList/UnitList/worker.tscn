@@ -9,9 +9,21 @@ size = Vector2(32, 32)
 size = Vector2(32, 32)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_6y8cc"]
-properties/0/path = NodePath(".:var5")
+properties/0/path = NodePath(".:cmd_queue")
 properties/0/spawn = true
-properties/0/replication_mode = 1
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:cmd_history")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:target_pos")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:held_resource")
+properties/4/spawn = true
+properties/4/replication_mode = 2
 
 [node name="Worker" type="Area2D" unique_id=482429156]
 script = ExtResource("1_6y8cc")
@@ -31,3 +43,5 @@ text = "Text"
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=641809995]
 replication_config = SubResource("SceneReplicationConfig_6y8cc")
+
+[node name="WaitTimer" type="Timer" parent="." unique_id=1882387666]

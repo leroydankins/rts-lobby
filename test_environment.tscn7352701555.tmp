@@ -11,7 +11,7 @@ script = ExtResource("1_mdi38")
 [node name="Game" parent="." unique_id=632394247 instance=ExtResource("1_hu1ts")]
 
 [node name="CommandCenter" parent="Game" unique_id=899178283 instance=ExtResource("2_mdi38")]
-position = Vector2(221, 157)
+position = Vector2(514, 237)
 player_id = "1"
 
 [node name="MineralDeposit" parent="Game" unique_id=33176053 instance=ExtResource("4_uc33h")]

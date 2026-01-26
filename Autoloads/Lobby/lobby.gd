@@ -119,11 +119,14 @@ func create_lobby(lob_name: String) -> Error:
 	if error != OK:
 		push_error("Error on creating a client, error code: %s" % error);
 		return error;
-	is_connected = true;
-	connection_started.emit();
-	lobby_name = lob_name;
+
 	#set this instance's multiplayer peer to this peer
 	multiplayer.multiplayer_peer = peer;
+
+	is_connected = true;
+	connection_started.emit();
+
+	lobby_name = lob_name;
 
 	var peer_id: String = str(multiplayer.get_unique_id());
 

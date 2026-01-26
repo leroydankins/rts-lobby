@@ -221,6 +221,36 @@ func push_game_data_batch(dict: Dictionary[String, Dictionary]) ->void:
 	local_game_dict = player_game_dict[local_game_dict[PLAYER_ID_KEY]]
 	print(local_game_dict, Time.get_ticks_msec());
 
+#array has a slot for each resource type because it has to pass both as checks for spending
+#Array cannot be typed due to functionality of originating Dictionary (See GlobalConstants CMD Dictionaries)
+func spend_resources(player_id: String, cost_arr: Array) -> bool:
+	var mineral_cost: int = cost_arr[0];
+	var gas_cost: int = cost_arr[1];
+	#final check on resources
+	if (mineral_cost > player_game_dict[player_id][PLAYER_RESOURCE_KEY]):
+		return false;
+	if (gas_cost> player_game_dict[player_id][PLAYER_GAS_KEY]):
+		return false;
+
+	request_player_data_update.rpc(player_id, PLAYER_RESOURCE_KEY, -1 * mineral_cost);
+	request_player_data_update.rpc(player_id, PLAYER_GAS_KEY, -1 * gas_cost);
+	return true;
+
+#check which resource to supply in this scenario, different than spend s
+func gain_resources(player_id: String, resource_arr: Array) -> bool:
+	#slot 1 is amount, slot 2 is resource type
+	match(resource_arr[1]):
+		GlobalConstants.ResourceType.MINERAL:
+			var mineral_cost: int = resource_arr[0];
+			request_player_data_update.rpc(player_id, PLAYER_RESOURCE_KEY, mineral_cost);
+			return true;
+		GlobalConstants.ResourceType.GAS:
+			var gas_cost: int = resource_arr[0];
+			request_player_data_update.rpc(player_id, PLAYER_GAS_KEY, gas_cost);
+			return true;
+		_:
+			print("not valid resource type, returning  false")
+			return false;
 
 #function that server does to set everyone's information
 #iterate over the Lobby dictionary and establish their information

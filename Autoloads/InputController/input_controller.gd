@@ -118,15 +118,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if(selected.is_empty()):
 		return;
 
-	#create commands vars outside of logic since they all use it i guess?
-	var cmd_dict: Dictionary = selected[active_unit].cmd_dict
-	var cmd: Dictionary = {};
-	if (selected[active_unit].team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
-		print("not my team");
+	if(!"cmd_dict" in selected[active_unit]):
 		return;
 
 	#RIGHT CLICK LOGIC
 	if (event.is_action_pressed("action")):
+		#create commands vars outside of logic since they all use it i guess?
+		var cmd_dict: Dictionary = selected[active_unit].cmd_dict
+		var cmd: Dictionary = {};
+		if (selected[active_unit].team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
+			print("not my team");
+			return;
 		if(!pending_cmd.is_empty()):
 			print("clearing pending command");
 			pending_cmd = {};
@@ -152,9 +154,15 @@ func _unhandled_input(event: InputEvent) -> void:
 			var location : Vector2 = get_global_mouse_position();
 			cmd["location"] = location;
 		#TEMPORARY
-		request_unit_cmd(selected[active_unit], cmd);
+		handle_cmd(cmd);
 
 	if (event.is_action_pressed("action_5")):
+		#create commands vars outside of logic since they all use it i guess?
+		var cmd_dict: Dictionary = selected[active_unit].cmd_dict
+		var cmd: Dictionary = {};
+		if (selected[active_unit].team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
+			print("not my team");
+			return;
 		var pressed_cmd: Dictionary = cmd_dict[5];
 		handle_cmd(pressed_cmd);
 
@@ -164,27 +172,28 @@ func handle_cmd(p_cmd: Dictionary) -> void:
 	if(selected.is_empty()):
 		return;
 	print("input gui processing command")
-	#create a new dictionary for sending data to limit data traffic and not overwrite data on the cmd gui
-	var cmd: Dictionary = {
-		"mnemonic": p_cmd["mnemonic"],
-	}
-	if(p_cmd.has("cost")):
-		cmd["cost"] = p_cmd["cost"];
-	if(p_cmd.has("command")):
-		cmd["command"] = p_cmd["command"];
-	#If there is a scene associated with this (creating unit or building)
-	if(p_cmd.has("file_path")):
-		cmd["file_path"] = p_cmd["file_path"];
-
+	#create a new dictionary to not overwrite data on the cmd gui
+	var cmd_d: Dictionary = p_cmd.duplicate();
+	#var cmd: Dictionary = {
+		#"mnemonic": p_cmd["mnemonic"],
+	#}
+	#if(p_cmd.has("cost")):
+		#cmd["cost"] = p_cmd["cost"];
+	#if(p_cmd.has("command")):
+		#cmd["command"] = p_cmd["command"];
+	##If there is a scene associated with this (creating unit or building)
+	#if(p_cmd.has("file_path")):
+		#cmd["file_path"] = p_cmd["file_path"];
 	#########
-	#For ones that will require an arguyment like a location or target, set up so unhandled input will pick up the cmd
+	#For ones that will require an argument like a location or target, set up so unhandled input will pick up the cmd
 	if (p_cmd.has("argument")):
-		cmd[p_cmd["argument"]] = null;
-		pending_cmd = cmd;
+		print(true);
+		cmd_d[p_cmd["argument"]] = null;
+		pending_cmd = cmd_d;
 		return;
 	#########
 	#No argument needed, request the command
-	request_unit_cmd(selected[active_unit], cmd);
+	request_unit_cmd(selected[active_unit], cmd_d);
 
 #client RPCs server/host to start the action, final checks here before sending command
 func request_unit_cmd(unit: Node2D, cmd: Dictionary) ->void:
@@ -198,8 +207,11 @@ func request_unit_cmd(unit: Node2D, cmd: Dictionary) ->void:
 		if (gas_cost > game.local_game_dict[game.PLAYER_GAS_KEY]):
 			#Cannot do the command, play an error sound to show they couldnt do it yet
 			return;
-		game.request_player_data_update(game.local_game_dict["player_id"],game.PLAYER_RESOURCE_KEY, -1 * mineral_cost);
-		game.request_player_data_update(game.local_game_dict["player_id"],game.PLAYER_GAS_KEY, -1 * gas_cost);
+
+	##we do not actually request player data update on RPC, this occurs after the unit accepts the command
+		#print(game.local_game_dict["player_id"]);
+		#game.request_player_data_update.rpc(game.local_game_dict["player_id"],game.PLAYER_RESOURCE_KEY, -1 * mineral_cost);
+		#game.request_player_data_update.rpc(game.local_game_dict["player_id"],game.PLAYER_GAS_KEY, -1 * gas_cost);
 	if (Input.is_action_pressed("shift")):
 		if(unit.has_method("queue_cmd")):
 			unit.queue_cmd.rpc_id(Lobby.multiplayer_server_id, cmd);
