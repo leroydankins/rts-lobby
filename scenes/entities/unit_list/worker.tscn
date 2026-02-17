@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://dm6nkl2orudho"]
+
+[ext_resource type="Script" uid="uid://oa0d0635puw6" path="res://scenes/entities/unit_list/worker.gd" id="1_6y8cc"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_8lfae"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8lfae"]
+size = Vector2(32, 32)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_6y8cc"]
+properties/0/path = NodePath(".:cmd_queue")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:cmd_history")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:target_pos")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:held_resource")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+
+[sub_resource type="Animation" id="Animation_gaj3j"]
+resource_name = "extract_resource"
+step = 0.0333333
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.8),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"extract_resources"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_trjsp"]
+_data = {
+&"extract_resource": SubResource("Animation_gaj3j")
+}
+
+[node name="Worker" type="Area2D" unique_id=482429156]
+script = ExtResource("1_6y8cc")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1061534164]
+texture = SubResource("PlaceholderTexture2D_8lfae")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1055624738]
+shape = SubResource("RectangleShape2D_8lfae")
+
+[node name="Label" type="Label" parent="." unique_id=1321594048]
+offset_left = -20.0
+offset_top = 8.0
+offset_right = 20.0
+offset_bottom = 31.0
+text = "Text"
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=641809995]
+replication_config = SubResource("SceneReplicationConfig_6y8cc")
+
+[node name="WaitTimer" type="Timer" parent="." unique_id=1882387666]
+
+[node name="Anim" type="AnimationPlayer" parent="." unique_id=1176342753]
+libraries/ = SubResource("AnimationLibrary_trjsp")

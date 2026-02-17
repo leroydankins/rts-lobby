@@ -1,0 +1,454 @@
+[gd_scene format=3 uid="uid://dcrsb32jubfy7"]
+
+[ext_resource type="Script" uid="uid://cj63nfo41t2ou" path="res://scenes/3D/game_scene/game_scene.gd" id="1_htyio"]
+[ext_resource type="PackedScene" uid="uid://4eb3wijjcde2" path="res://functional/command_controller/command_controller.tscn" id="2_htyio"]
+[ext_resource type="Script" uid="uid://8bicp453oas5" path="res://scenes/3D/game_ui/input_gui.gd" id="3_htyio"]
+[ext_resource type="PackedScene" uid="uid://bs3rku8hs8tbe" path="res://scenes/user_interface/cmd_gui/cmd_gui.tscn" id="4_8hkwk"]
+[ext_resource type="Texture2D" uid="uid://d21leem0rbb68" path="res://assets/placeholder/icon.svg" id="5_d7lub"]
+[ext_resource type="PackedScene" uid="uid://dorecgrnqs4b3" path="res://scenes/user_interface/build_slot/build_slot.tscn" id="6_l0ewv"]
+[ext_resource type="Script" uid="uid://b44m5w6m8g27k" path="res://scenes/3D/game_scene/game_resource_panel.gd" id="7_htyio"]
+[ext_resource type="PackedScene" uid="uid://cnwcd7by7h4xh" path="res://scenes/3D/camera/camera_holder.tscn" id="9_htyio"]
+[ext_resource type="Script" uid="uid://bdllmkufli582" path="res://functional/entity_holder/entity_holder.gd" id="9_wmxar"]
+[ext_resource type="PackedScene" uid="uid://ccb4v6cwse3fm" path="res://assets/placeholder/level/level_ramp.tscn" id="10_wmxar"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_htyio"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_wmxar"]
+sky_material = SubResource("ProceduralSkyMaterial_htyio")
+
+[sub_resource type="Environment" id="Environment_417fi"]
+background_mode = 2
+sky = SubResource("Sky_wmxar")
+tonemap_mode = 2
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_1m0tl"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_0rkmp"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6n0iw"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_aoxnv"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_q6uga"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_55a1q"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_q6pmg"]
+size = Vector2(48, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_300to"]
+size = Vector2(48, 48)
+
+[sub_resource type="LabelSettings" id="LabelSettings_y4wg2"]
+font_size = 12
+
+[sub_resource type="LabelSettings" id="LabelSettings_8taj1"]
+font_size = 12
+
+[sub_resource type="MeshLibrary" id="MeshLibrary_htyio"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_wmxar"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_wmxar"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_htyio"]
+albedo_color = Color(0.47788018, 0.47788012, 0.47788012, 1)
+
+[node name="GameScene" type="Node3D" unique_id=2086082315 groups=["Game"]]
+script = ExtResource("1_htyio")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1058617474]
+transform = Transform3D(-0.34202006, 0.85371846, -0.39266658, 0, 0.41786703, 0.9085082, 0.9396927, 0.310728, -0.14291891, 0, 0, 0)
+light_color = Color(0.92099476, 0.9209946, 0.9209946, 1)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1176272252]
+environment = SubResource("Environment_417fi")
+
+[node name="CommandController" parent="." unique_id=93029543 instance=ExtResource("2_htyio")]
+
+[node name="UI_Layer" type="CanvasLayer" parent="." unique_id=1393648557]
+
+[node name="GameClock" type="Label" parent="UI_Layer" unique_id=987352568]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "CLOCK"
+
+[node name="ResourceBox" type="HBoxContainer" parent="UI_Layer" unique_id=1345797882]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -76.0
+offset_bottom = 23.0
+grow_horizontal = 0
+alignment = 2
+
+[node name="MineralsLabel" type="Label" parent="UI_Layer/ResourceBox" unique_id=386228503]
+layout_mode = 2
+text = "Minerals: "
+
+[node name="GasLabel" type="Label" parent="UI_Layer/ResourceBox" unique_id=1886761181]
+layout_mode = 2
+text = "Gas: "
+
+[node name="TeamLabel" type="Label" parent="UI_Layer/ResourceBox" unique_id=1687290350]
+layout_mode = 2
+text = "Team: "
+
+[node name="InputGUI" type="Control" parent="UI_Layer" unique_id=1011680915]
+layout_mode = 3
+anchor_top = 0.74200004
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 0.18395996
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_htyio")
+
+[node name="Control" type="Control" parent="UI_Layer/InputGUI" unique_id=2019282043]
+layout_mode = 1
+anchor_left = 0.25
+anchor_right = 0.75
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="CommandMarginContainer" type="MarginContainer" parent="UI_Layer/InputGUI/Control" unique_id=831888129]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.118
+anchor_top = -0.17600001
+anchor_right = 1.4480001
+anchor_bottom = 0.96400005
+offset_left = 0.031982422
+offset_top = -0.07759857
+offset_right = -0.048034668
+offset_bottom = 0.061401367
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Panel" type="Panel" parent="UI_Layer/InputGUI/Control/CommandMarginContainer" unique_id=1386810572]
+layout_mode = 2
+
+[node name="CommandContainer" type="GridContainer" parent="UI_Layer/InputGUI/Control/CommandMarginContainer" unique_id=1436028651]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+columns = 3
+
+[node name="CmdGUI" parent="UI_Layer/InputGUI/Control/CommandMarginContainer/CommandContainer" unique_id=341317300 instance=ExtResource("4_8hkwk")]
+layout_mode = 2
+
+[node name="CmdGUI2" parent="UI_Layer/InputGUI/Control/CommandMarginContainer/CommandContainer" unique_id=667436410 instance=ExtResource("4_8hkwk")]
+layout_mode = 2
+
+[node name="CmdGUI3" parent="UI_Layer/InputGUI/Control/CommandMarginContainer/CommandContainer" unique_id=791985337 instance=ExtResource("4_8hkwk")]
+layout_mode = 2
+
+[node name="CmdGUI4" parent="UI_Layer/InputGUI/Control/CommandMarginContainer/CommandContainer" unique_id=987697369 instance=ExtResource("4_8hkwk")]
+layout_mode = 2
+
+[node name="CmdGUI5" parent="UI_Layer/InputGUI/Control/CommandMarginContainer/CommandContainer" unique_id=692223723 instance=ExtResource("4_8hkwk")]
+layout_mode = 2
+
+[node name="CmdGUI6" parent="UI_Layer/InputGUI/Control/CommandMarginContainer/CommandContainer" unique_id=762487800 instance=ExtResource("4_8hkwk")]
+layout_mode = 2
+
+[node name="CmdGUI7" parent="UI_Layer/InputGUI/Control/CommandMarginContainer/CommandContainer" unique_id=1051845611 instance=ExtResource("4_8hkwk")]
+layout_mode = 2
+
+[node name="CmdGUI8" parent="UI_Layer/InputGUI/Control/CommandMarginContainer/CommandContainer" unique_id=1173001282 instance=ExtResource("4_8hkwk")]
+layout_mode = 2
+
+[node name="CmdGUI9" parent="UI_Layer/InputGUI/Control/CommandMarginContainer/CommandContainer" unique_id=2022557068 instance=ExtResource("4_8hkwk")]
+layout_mode = 2
+
+[node name="UnitHBox" type="HBoxContainer" parent="UI_Layer/InputGUI/Control" unique_id=1750061319]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.16840278
+anchor_top = -0.1512764
+anchor_right = 0.9357639
+anchor_bottom = 0.8487236
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="SelectedUnitBox" type="MarginContainer" parent="UI_Layer/InputGUI/Control/UnitHBox" unique_id=1670278067]
+custom_minimum_size = Vector2(192, 0)
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+metadata/_edit_use_anchors_ = true
+
+[node name="Panel" type="Panel" parent="UI_Layer/InputGUI/Control/UnitHBox/SelectedUnitBox" unique_id=1683033704]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI_Layer/InputGUI/Control/UnitHBox/SelectedUnitBox" unique_id=738416266]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="UnitPreview" type="TextureRect" parent="UI_Layer/InputGUI/Control/UnitHBox/SelectedUnitBox/HBoxContainer" unique_id=1556179650]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_1m0tl")
+stretch_mode = 2
+
+[node name="UnitLabel" type="Label" parent="UI_Layer/InputGUI/Control/UnitHBox/SelectedUnitBox/HBoxContainer" unique_id=671069139]
+layout_mode = 2
+text = "CurrentUnit"
+
+[node name="MarginContainer" type="MarginContainer" parent="UI_Layer/InputGUI/Control/UnitHBox" unique_id=326874998]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+metadata/_edit_use_anchors_ = true
+
+[node name="Panel" type="Panel" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer" unique_id=1028838982]
+layout_mode = 2
+
+[node name="UnitContainer" type="HFlowContainer" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer" unique_id=121723564]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/UnitContainer" unique_id=359007036]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_0rkmp")
+stretch_mode = 2
+
+[node name="TextureRect2" type="TextureRect" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/UnitContainer" unique_id=1044881260]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_6n0iw")
+stretch_mode = 2
+
+[node name="TextureRect3" type="TextureRect" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/UnitContainer" unique_id=1186145153]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_aoxnv")
+stretch_mode = 2
+
+[node name="TextureRect4" type="TextureRect" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/UnitContainer" unique_id=811312883]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_q6uga")
+stretch_mode = 2
+
+[node name="TextureRect5" type="TextureRect" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/UnitContainer" unique_id=573729787]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_55a1q")
+stretch_mode = 2
+
+[node name="TextureRect6" type="TextureRect" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/UnitContainer" unique_id=1947152405]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_q6pmg")
+stretch_mode = 2
+
+[node name="TextureRect7" type="TextureRect" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/UnitContainer" unique_id=2100879365]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_300to")
+stretch_mode = 2
+
+[node name="ObjectBeingBuiltControl" type="HBoxContainer" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer" unique_id=1175447135]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="OBBPreviewSprite" type="TextureRect" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl" unique_id=1984001868]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("5_d7lub")
+expand_mode = 1
+
+[node name="OBBLabel" type="Label" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl" unique_id=1707880018]
+layout_mode = 2
+text = "Unit"
+
+[node name="OBBProgressBar" type="ProgressBar" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl" unique_id=1742125880]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="BuildQueueContainer" type="HBoxContainer" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer" unique_id=1592856342]
+layout_mode = 2
+size_flags_horizontal = 13
+size_flags_vertical = 8
+
+[node name="BuildSlot9" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/BuildQueueContainer" unique_id=72825355 instance=ExtResource("6_l0ewv")]
+layout_mode = 2
+
+[node name="BuildSlot10" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/BuildQueueContainer" unique_id=1678855047 instance=ExtResource("6_l0ewv")]
+layout_mode = 2
+
+[node name="BuildSlot11" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/BuildQueueContainer" unique_id=1970302246 instance=ExtResource("6_l0ewv")]
+layout_mode = 2
+
+[node name="BuildSlot12" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/BuildQueueContainer" unique_id=1666918359 instance=ExtResource("6_l0ewv")]
+layout_mode = 2
+
+[node name="BuildSlot13" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/BuildQueueContainer" unique_id=101170249 instance=ExtResource("6_l0ewv")]
+layout_mode = 2
+
+[node name="BuildSlot14" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/BuildQueueContainer" unique_id=509290314 instance=ExtResource("6_l0ewv")]
+layout_mode = 2
+
+[node name="BuildSlot15" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/BuildQueueContainer" unique_id=239577745 instance=ExtResource("6_l0ewv")]
+layout_mode = 2
+
+[node name="BuildSlot16" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/BuildQueueContainer" unique_id=1319213355 instance=ExtResource("6_l0ewv")]
+layout_mode = 2
+
+[node name="GameResourcePanel" type="PanelContainer" parent="UI_Layer" unique_id=2134463555]
+visible = false
+self_modulate = Color(1, 1, 1, 0.7921569)
+anchors_preset = -1
+anchor_right = 0.1451389
+anchor_bottom = 0.19481482
+offset_right = -0.2000122
+offset_bottom = -0.2400055
+script = ExtResource("7_htyio")
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI_Layer/GameResourcePanel" unique_id=569764600]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="UI_Layer/GameResourcePanel/VBoxContainer" unique_id=943439706]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 12
+icon_alignment = 1
+
+[node name="Label" type="Label" parent="UI_Layer/GameResourcePanel/VBoxContainer/Button" unique_id=101656266]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "X"
+label_settings = SubResource("LabelSettings_y4wg2")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_trim_flags = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI_Layer/GameResourcePanel/VBoxContainer" unique_id=1252143417]
+visible = false
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI_Layer/GameResourcePanel/VBoxContainer/HBoxContainer" unique_id=16727311]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI_Layer/GameResourcePanel/VBoxContainer/HBoxContainer" unique_id=803269120]
+layout_mode = 2
+text = "Username - Min: X Gas: X"
+label_settings = SubResource("LabelSettings_8taj1")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="UI_Layer/GameResourcePanel/VBoxContainer" unique_id=1415683702]
+visible = false
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI_Layer/GameResourcePanel/VBoxContainer/HBoxContainer2" unique_id=1764345316]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI_Layer/GameResourcePanel/VBoxContainer/HBoxContainer2" unique_id=1870509986]
+layout_mode = 2
+text = "Username - Min: X Gas: X"
+label_settings = SubResource("LabelSettings_8taj1")
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="UI_Layer/GameResourcePanel/VBoxContainer" unique_id=461096301]
+visible = false
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI_Layer/GameResourcePanel/VBoxContainer/HBoxContainer3" unique_id=536599723]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI_Layer/GameResourcePanel/VBoxContainer/HBoxContainer3" unique_id=1630696139]
+layout_mode = 2
+text = "Username - Min: X Gas: X"
+label_settings = SubResource("LabelSettings_8taj1")
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="UI_Layer/GameResourcePanel/VBoxContainer" unique_id=882130897]
+visible = false
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI_Layer/GameResourcePanel/VBoxContainer/HBoxContainer4" unique_id=1471837263]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI_Layer/GameResourcePanel/VBoxContainer/HBoxContainer4" unique_id=2116056438]
+layout_mode = 2
+text = "Username - Min: X Gas: X"
+label_settings = SubResource("LabelSettings_8taj1")
+
+[node name="CameraBase" parent="." unique_id=1309490017 instance=ExtResource("9_htyio")]
+
+[node name="SpawnHolder" type="Node3D" parent="." unique_id=1490039800]
+
+[node name="Spawn1" type="Marker3D" parent="SpawnHolder" unique_id=1798815161]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 0, 50)
+gizmo_extents = 2.0
+
+[node name="Spawn2" type="Marker3D" parent="SpawnHolder" unique_id=745380647]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 0, -50)
+gizmo_extents = 2.0
+
+[node name="EntityHolder" type="Node3D" parent="." unique_id=667208127]
+script = ExtResource("9_wmxar")
+
+[node name="GridMap" type="GridMap" parent="." unique_id=1220639098]
+mesh_library = SubResource("MeshLibrary_htyio")
+physics_material = SubResource("PhysicsMaterial_wmxar")
+cell_size = Vector3(5, 0.1, 5)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=1713604329]
+navigation_mesh = SubResource("NavigationMesh_wmxar")
+
+[node name="Floor" type="CSGBox3D" parent="NavigationRegion3D" unique_id=16406912]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.008529663, -0.11425686, 0.023767948)
+use_collision = true
+size = Vector3(150, 0.25, 150)
+material = SubResource("StandardMaterial3D_htyio")
+
+[node name="CSGCylinder3D" parent="NavigationRegion3D" unique_id=2065644791 instance=ExtResource("10_wmxar")]
+transform = Transform3D(0.4226182, 0, -0.90630776, 0, 1, 0, 0.90630776, 0, 0.4226182, 50, 1.25, 50)
+
+[node name="CSGCylinder3D4" parent="NavigationRegion3D" unique_id=1483626812 instance=ExtResource("10_wmxar")]
+transform = Transform3D(-0.4226183, 0, 0.9063077, 0, 1, 0, -0.9063077, 0, -0.4226183, -50, 1.25, -50)
+
+[node name="CSGCylinder3D3" parent="NavigationRegion3D" unique_id=1819934826 instance=ExtResource("10_wmxar")]
+transform = Transform3D(0.90630776, 0, 0.42261827, 0, 1, 0, -0.42261827, 0, 0.90630776, 50, 1.25, -50)
+
+[node name="CSGCylinder3D2" parent="NavigationRegion3D" unique_id=737871458 instance=ExtResource("10_wmxar")]
+transform = Transform3D(-0.9060714, 0, -0.42312437, 0, 1, 0, 0.42312437, 0, -0.9060714, -50, 1.25, 50)

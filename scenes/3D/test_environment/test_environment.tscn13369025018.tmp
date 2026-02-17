@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dr24xqjec44iy"]
+
+[ext_resource type="Script" uid="uid://crmx45hikdc1h" path="res://scenes/3D/test_environment/test_environment.gd" id="1_gh877"]
+[ext_resource type="PackedScene" uid="uid://dcrsb32jubfy7" path="res://scenes/3D/game_scene/game_scene.tscn" id="2_f78vd"]
+[ext_resource type="PackedScene" uid="uid://bk5soe7dxxfcm" path="res://scenes/entities/unit_list/dwarf_worker/dwarf_worker.tscn" id="3_75w43"]
+[ext_resource type="PackedScene" uid="uid://bif7vwlmrd4j0" path="res://scenes/entities/building_list/dwarf_settlement/dwarf_settlement.tscn" id="4_h2la2"]
+
+[node name="TestEnvironment" type="Node3D" unique_id=529187176]
+script = ExtResource("1_gh877")
+
+[node name="GameScene" parent="." unique_id=2086082315 instance=ExtResource("2_f78vd")]
+
+[node name="DwarfWorker" parent="." unique_id=753404995 instance=ExtResource("3_75w43")]
+player_id = "1"
+
+[node name="DwarfSettlement" parent="." unique_id=1146713369 instance=ExtResource("4_h2la2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.926, 0, 4.371)

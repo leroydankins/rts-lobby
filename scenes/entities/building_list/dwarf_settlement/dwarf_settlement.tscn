@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://bif7vwlmrd4j0"]
+
+[ext_resource type="Script" uid="uid://ciowi2ihl7xpm" path="res://scenes/entities/building_list/dwarf_settlement/dwarf_settlement.gd" id="1_efaj4"]
+[ext_resource type="PackedScene" uid="uid://14s0usu8vx7j" path="res://resources/highlight_mesh/highlight_mesh.tscn" id="2_24p8b"]
+[ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="3_wgkab"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vblcw"]
+size = Vector3(2.5, 2.5, 2.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_24p8b"]
+albedo_color = Color(0.58363324, 0.21232674, 0.1670669, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_wgkab"]
+material = SubResource("StandardMaterial3D_24p8b")
+size = Vector3(2.5, 2.5, 2.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bpprt"]
+render_priority = 0
+shader = ExtResource("3_wgkab")
+shader_parameter/line_color = Vector3(0, 1, 0.15)
+shader_parameter/radius = 0.5
+shader_parameter/line_width = 0.05
+shader_parameter/alpha = 0.75
+shader_parameter/hollow = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_27gdb"]
+material = SubResource("ShaderMaterial_bpprt")
+size = Vector2(4, 4)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_24p8b"]
+properties/0/path = NodePath(".:is_constructed")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:build_time")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:build_item")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:build_queue")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:build_progress")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+
+[node name="DwarfSettlement" type="Area3D" unique_id=1146713369 groups=["Building", "Entity"]]
+script = ExtResource("1_efaj4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=512416355]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("BoxShape3D_vblcw")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=549104639]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+mesh = SubResource("PrismMesh_wgkab")
+
+[node name="Marker3D" type="Marker3D" parent="." unique_id=382978170]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
+
+[node name="HighlightMesh" parent="." unique_id=2073616164 instance=ExtResource("2_24p8b")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("PlaneMesh_27gdb")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1789013543]
+replication_config = SubResource("SceneReplicationConfig_24p8b")

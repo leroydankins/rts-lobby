@@ -1,0 +1,47 @@
+Todo
+Isometric Grid System for objects
+
+COMPLETED
+Worker:
+	Build buildings
+		Click build building option on worker, select location
+		send command to build at given location for worker
+		worker moves to location, calls "place object" to server
+		develops object until finished building
+	Collect Resources from minerals
+		deliver in-game resources to the player
+	Command Queue
+	When command is compelte, log command completion time and command data in command_history
+	Remove command from queue
+	Play next command if another is in queue
+
+1/30/26
+Create Forge prototype
+	Selectable✔️
+	Buildable
+		Attempt semaphore for construction
+	Contains Cmd_Dict
+	Implements request_cmd rpc (cmd_data: Dictionary)
+	Forge specific command mnemonics
+		Constant: Target commands
+		Forge: Build Infantry
+		Forge: Research Armor
+			Emit signal for player_id to get armor upgrade
+	Build placeholder infantry unit
+	Can research single use upgrade
+
+
+Create prototype infantry unit
+	Contains unit type array
+	selectable
+	Contains Cmd_Dict
+	Implements request_cmd rpc (cmd_data: Dictionary)
+	Implement worker command queue system
+	moves, attacks enemy units
+
+
+Player technology
+	Array of bools associated with GlobalConstants.Research which determines what technology is available to the player and what units can be built
+	Rankorian_Research = Array[bool] [false, false, false, false]
+	Dwarf_Research = Array[bool] = [false,false,false,false,false,false,false]
+	Array of bools associated with globalconstants.upgrades

@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://4eb3wijjcde2"]
+
+[ext_resource type="Script" uid="uid://b54457h476tw3" path="res://functional/command_controller/command_controller.gd" id="1_pbo1w"]
+
+[node name="CommandController" type="Node" unique_id=93029543 groups=["CommandController"]]
+script = ExtResource("1_pbo1w")
+
+[node name="SelectionRect" type="ColorRect" parent="." unique_id=822038570]
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 1
+color = Color(0.035809424, 0.45938838, 0.28883553, 0.34117648)
+
+[node name="Target" type="MeshInstance3D" parent="." unique_id=563521807]
+visible = false

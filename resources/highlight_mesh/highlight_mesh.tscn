@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://14s0usu8vx7j"]
+
+[ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_shader.gdshader" id="1_npqbe"]
+[ext_resource type="Script" uid="uid://vkncus0raspm" path="res://resources/highlight_mesh.gd" id="2_vlrtx"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_npqbe"]
+render_priority = 0
+shader = ExtResource("1_npqbe")
+shader_parameter/line_color = Vector3(0, 0.8, 0.15)
+shader_parameter/radius = 0.5
+shader_parameter/line_width = 0.05
+shader_parameter/alpha = 1.0
+shader_parameter/hollow = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_npqbe"]
+material = SubResource("ShaderMaterial_npqbe")
+
+[node name="HighlightMesh" type="MeshInstance3D"]
+mesh = SubResource("PlaneMesh_npqbe")
+script = ExtResource("2_vlrtx")

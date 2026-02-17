@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://ccb4v6cwse3fm"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wmxar"]
+albedo_color = Color(0.15320012, 0.27471235, 0.1694907, 1)
+
+[node name="BasePlatform" type="CSGCylinder3D" unique_id=2065644791]
+use_collision = true
+radius = 10.0
+height = 2.5
+sides = 10
+smooth_faces = false
+material = SubResource("StandardMaterial3D_wmxar")
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="." unique_id=1358939272]
+transform = Transform3D(0.95105654, 0, 0.309017, 0, 1, 0, -0.309017, 0, 0.95105654, -12.913189, -1.25, 7.2197075)
+polygon = PackedVector2Array(0, 0, 5, 2.5, 5, 0)
+depth = 5.0

@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://dp33esxstb72s"]
+
+[ext_resource type="PackedScene" uid="uid://1vvyuea6fq3v" path="res://scenes/game/game_scene/game.tscn" id="1_hu1ts"]
+[ext_resource type="Script" uid="uid://d30qxlq72av7c" path="res://scenes/test_environment/test_environment.gd" id="1_mdi38"]
+[ext_resource type="PackedScene" uid="uid://clusn5oxit4qc" path="res://scenes/entities/building_list/command_center/command_center.tscn" id="2_mdi38"]
+[ext_resource type="PackedScene" uid="uid://d2wb0mcxb001o" path="res://scenes/entities/resource_list/mineral_deposit.tscn" id="4_uc33h"]
+
+[node name="TestEnvironment" type="Node2D" unique_id=688130628]
+script = ExtResource("1_mdi38")
+
+[node name="Game" parent="." unique_id=632394247 instance=ExtResource("1_hu1ts")]
+
+[node name="CommandCenter" parent="Game" unique_id=899178283 instance=ExtResource("2_mdi38")]
+position = Vector2(12, 313)
+is_constructed = true
+player_id = "1"
+
+[node name="MineralDeposit" parent="Game" unique_id=33176053 instance=ExtResource("4_uc33h")]
+position = Vector2(218, 602)
+
+[node name="MineralDeposit2" parent="Game" unique_id=645441377 instance=ExtResource("4_uc33h")]
+position = Vector2(286, 552)
+
+[node name="MineralDeposit3" parent="Game" unique_id=150071052 instance=ExtResource("4_uc33h")]
+position = Vector2(73, 650)
+
+[node name="MineralDeposit4" parent="Game" unique_id=743163356 instance=ExtResource("4_uc33h")]
+position = Vector2(343, 486)
+
+[node name="MineralDeposit5" parent="Game" unique_id=267546185 instance=ExtResource("4_uc33h")]
+position = Vector2(148, 634)

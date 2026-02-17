@@ -1,0 +1,100 @@
+[gd_scene format=3 uid="uid://cqbpinxp7uyt6"]
+
+[ext_resource type="Script" uid="uid://cstloejbpfg57" path="res://scenes/entities/resource_list/mineral_deposit.gd" id="1_ng1ny"]
+[ext_resource type="PackedScene" uid="uid://14s0usu8vx7j" path="res://resources/highlight_mesh/highlight_mesh.tscn" id="2_te7c8"]
+
+[sub_resource type="Shader" id="Shader_oihbh"]
+code = "shader_type spatial;
+
+uniform vec3 line_color = vec3(1.0, 1.0, 0.0);
+uniform float radius = 0.5;
+uniform float line_width = 0.01;
+uniform float alpha = 1;
+uniform bool hollow = false;
+float circle(vec2 position, float rad, float feather) {
+	return smoothstep(radius, rad + feather, dot(position, position) * 4.0);
+}
+
+void fragment() {
+	float dist = length(UV - vec2(0.5));
+	if (hollow)
+	{
+		if (dist > radius - line_width && dist < radius)
+		{
+			circle(UV, radius, 0.005);
+			ALBEDO = line_color;
+			ALPHA = alpha;
+		}
+			else {
+		ALPHA = 0.0;
+		}
+	}
+	else
+	{
+		if (dist < radius)
+		{
+		circle(UV, radius, 0.005);
+		ALBEDO = line_color;
+		ALPHA = alpha;
+		}
+		else {
+		ALPHA = 0.0;
+		}
+	}
+
+
+}
+
+void vertex() {
+	// Called for every vertex the material is visible on.
+}
+
+//void light() {
+//	// Called for every pixel for every light affecting the material.
+//	// Uncomment to replace the default light processing function with this one.
+//}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_g1rkk"]
+render_priority = 0
+shader = SubResource("Shader_oihbh")
+shader_parameter/line_color = Vector3(0.5, 0.5, 0)
+shader_parameter/radius = 0.45
+shader_parameter/line_width = 0.05
+shader_parameter/alpha = 0.75
+shader_parameter/hollow = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jmuq1"]
+material = SubResource("ShaderMaterial_g1rkk")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oihbh"]
+albedo_color = Color(0.062409595, 0.46012878, 0.72096574, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_oihbh"]
+material = SubResource("StandardMaterial3D_oihbh")
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_tu6al"]
+height = 1.0
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_oihbh"]
+properties/0/path = NodePath(".:resource_amount")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+
+[node name="MineralDeposit" type="Area3D" unique_id=938880175 groups=["Entity", "Resource"]]
+script = ExtResource("1_ng1ny")
+
+[node name="HighlightMesh" parent="." unique_id=254663810 instance=ExtResource("2_te7c8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("PlaneMesh_jmuq1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1556280096]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("PrismMesh_oihbh")
+
+[node name="CollisionBody" type="CollisionShape3D" parent="." unique_id=1662873682]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CylinderShape3D_tu6al")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1260025209]
+replication_config = SubResource("SceneReplicationConfig_oihbh")

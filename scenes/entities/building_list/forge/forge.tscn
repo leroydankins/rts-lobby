@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://clyx8tbh0jeq3"]
+
+[ext_resource type="Script" uid="uid://grlqihghqiga" path="res://scenes/entities/building_list/forge/forge.gd" id="1_otf4s"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_m2txg"]
+size = Vector2(128, 128)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_otf4s"]
+size = Vector2(128, 128)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_613oc"]
+
+[node name="Forge" type="Area2D" unique_id=424120532]
+script = ExtResource("1_otf4s")
+player_id = null
+current_state = null
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=593660980]
+texture = SubResource("PlaceholderTexture2D_m2txg")
+
+[node name="TempTeamLabel" type="Label" parent="." unique_id=212658997]
+offset_left = -19.0
+offset_top = 66.0
+offset_right = 21.0
+offset_bottom = 89.0
+metadata/_edit_use_anchors_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=268811509]
+shape = SubResource("RectangleShape2D_otf4s")
+
+[node name="Marker2D" type="Marker2D" parent="." unique_id=1896164345]
+position = Vector2(0, 100)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1905989143]
+delta_interval = 0.032
+replication_config = SubResource("SceneReplicationConfig_613oc")
+
+[node name="TempStateLabel" type="Label" parent="." unique_id=665995436]
+offset_left = -19.0
+offset_top = -90.0
+offset_right = 21.0
+offset_bottom = -67.0
+horizontal_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="ConstructLabel" type="Label" parent="." unique_id=2065346137]
+offset_left = -19.0
+offset_top = -115.0
+offset_right = 21.0
+offset_bottom = -92.0
+horizontal_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="TargetLine" type="Line2D" parent="." unique_id=447050185]
+points = PackedVector2Array(0, 0, 0, 0)
+width = 4.0
+default_color = Color(0.32156864, 0.76862746, 0.6117647, 0.79607844)
+
+[node name="ConstructionBar" type="ProgressBar" parent="." unique_id=442693187]
+offset_left = -64.0
+offset_top = 70.0
+offset_right = 64.0
+offset_bottom = 97.0

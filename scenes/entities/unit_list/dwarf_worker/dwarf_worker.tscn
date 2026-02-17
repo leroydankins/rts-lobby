@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://bk5soe7dxxfcm"]
+
+[ext_resource type="Script" uid="uid://ceb5gf4ushwyn" path="res://scenes/entities/unit_list/dwarf_worker/dwarf_worker.gd" id="1_f2n24"]
+[ext_resource type="PackedScene" uid="uid://14s0usu8vx7j" path="res://resources/highlight_mesh/highlight_mesh.tscn" id="2_phyvn"]
+[ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="3_g1rkk"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_g1rkk"]
+render_priority = 0
+shader = ExtResource("3_g1rkk")
+shader_parameter/line_color = Vector3(0, 1, 0.15)
+shader_parameter/radius = 0.25
+shader_parameter/line_width = 0.05
+shader_parameter/alpha = 0.75
+shader_parameter/hollow = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_t7rom"]
+material = SubResource("ShaderMaterial_g1rkk")
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_i2bmf"]
+radius = 0.25
+height = 1.0
+
+[sub_resource type="Animation" id="Animation_gaj3j"]
+resource_name = "extract_resource"
+step = 0.0333333
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.8),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"extract_resources"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_f2n24"]
+_data = {
+&"extract_resource": SubResource("Animation_gaj3j")
+}
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_g1rkk"]
+height = 1.0
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_g1rkk"]
+properties/0/path = NodePath(".:held_resource")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:target_pos")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+
+[node name="DwarfWorker" type="Area3D" unique_id=519513024 groups=["Entity", "Unit"]]
+script = ExtResource("1_f2n24")
+
+[node name="HighlightMesh" parent="." unique_id=532118709 instance=ExtResource("2_phyvn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("PlaneMesh_t7rom")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1184654598]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("CapsuleMesh_i2bmf")
+
+[node name="WaitTimer" type="Timer" parent="." unique_id=1478943420]
+
+[node name="Anim" type="AnimationPlayer" parent="." unique_id=1830062704]
+libraries/ = SubResource("AnimationLibrary_f2n24")
+
+[node name="CollisionBody" type="CollisionShape3D" parent="." unique_id=802037494]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CylinderShape3D_g1rkk")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1926167555]
+replication_config = SubResource("SceneReplicationConfig_g1rkk")
