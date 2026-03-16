@@ -4,6 +4,9 @@ const ENTITY_TYPE: GlobalConstants.EntityType = GlobalConstants.EntityType.RESOU
 const PREVIEW: Texture2D = preload(GlobalConstants.MINERAL_PLACEHOLDER_TEXTURE);
 const RESOURCE_TYPE: GlobalConstants.ResourceType = GlobalConstants.ResourceType.MINERAL
 
+@onready var highlight_mesh: MeshInstance3D = $HighlightMesh
+
+var is_selected : bool = false;
 
 @export var resource_amount: int = 1200;
 var return_amt: int = 25;
@@ -25,3 +28,11 @@ func extract_resource() -> Array:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass;
+
+func set_selected() -> void:
+	is_selected = true;
+	highlight_mesh.set_deferred("visible", true);
+
+func unset_selected() -> void:
+	is_selected = false;
+	highlight_mesh.set_deferred("visible", false);

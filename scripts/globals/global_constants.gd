@@ -25,10 +25,17 @@ const FORGE_FILEPATH: String = "uid://clyx8tbh0jeq3" #building_list/forge/forge.
 const DWARF_SETTLEMENT_FILEPATH: String = "uid://bif7vwlmrd4j0" #building_list/dwarf_settlement.tscn
 const DWARF_WORKER_FILEPATH: String = "uid://bk5soe7dxxfcm" #unit_list/dwarf_worker/
 const DWARF_BLUNDERBUSS_FILEPATH: String = "";
+const DWARF_BARRACKS_FILEPATH: String = "uid://sa4f355jrmcj"; #building_list/dwarf_barracks
+
 #IMAGE FILEPATHS
 const BUILDING_PLACEHOLDER_TEXTURE: String = "uid://drsrhq5glvf4f" #building_placeholder.png
 const UNIT_PLACEHOLDER_TEXTURE: String = "uid://xdy8auqusfq" #unit_placeholder.png
-const MINERAL_PLACEHOLDER_TEXTURE: String = "uid://hkqpxnf6hhsj" #ninerals.png
+const MINERAL_PLACEHOLDER_TEXTURE: String = "uid://hkqpxnf6hhsj" #minerals.png
+const ATTACK_PLACEHOLDER_TEXTURE: String = "uid://cq7inrylelcos"
+const MOVE_TO_PLACEHOLDER_TEXTURE: String = "uid://cvuy57vyaik8l"
+const UPGRADE_PLACEHOLDER_TEXTURE: String = "uid://cokfc1ue0hkgq"
+const CANCEL_PLACEHOLDER_TEXTURE: String = "uid://cvmj363eynq28"
+
 
 
 ###ENUMS
@@ -63,13 +70,17 @@ enum Commands
 	TARGET,
 	ATTACK,
 	FOLLOW,
-	MINE,
+	GET_RESOURCE,
 	BUILD,
+	ATTACK_MOVE,
+	RETURN_RESOURCE,
 }
+##TODO
 enum Dwarf_Research
 {
 
 }
+##TODO
 enum Rancorian_Research
 {
 
@@ -83,60 +94,232 @@ enum Upgrades
 }
 ### END ENUMS
 
-#Each playe
-
+#command dictionaries in GlobalConstants otherwise it will be empty
 ###COMMAND DICTIONARIES
 const TARGET_UNIT_DICTIONARY : Dictionary[String, Variant] = {
-	"name" : "Target Unit",
+	#Required command data
 	"mnemonic" : "GC001",
 	"command" : Commands.TARGET,
+	"hotkey" : "T",
+	"is_group" : true,
+	"can_queue" : true,
+
+	#command specific data
 	"argument" : "target_node_path",
+
+	#command metadata
+	"name" : "Target Unit",
 	"description" : "Targets object",
-	"file_path" : "",
-	"build_time" : 0,
-	"sprite_path" : ""
+	"sprite_path" : "",
 }
 const CANCEL_ACTION_DICTIONARY: Dictionary[String, Variant] = {
-	"name" : "Cancel",
+	#Required command data
 	"mnemonic" : "GC002",
 	"command" : Commands.CANCEL,
-	"is_unit" : false,
-	"description" : "Cancels the current action, buildings stop building current unit",
-	"file_path" : "",
-	"build_time" : 0,
-	"sprite_path" : "uid://cvmj363eynq28", #cancel_placeholder.png
-	"hotkey" : Key.KEY_BACKSPACE,
+	"hotkey" : "X",
+	"is_group" : true,
+	"can_queue" : false,
+
+	#command specific data
+
+	#Command Metadata
+	"name" : "Cancel",
+	"description" : "Cancels the current action",
+	"sprite_path" : CANCEL_PLACEHOLDER_TEXTURE, #cancel_placeholder.png
 }
+
 const MOVE_TO_DICTIONARY: Dictionary[String, Variant] = {
-	"name" : "Move To Location",
+	#Required command data
 	"mnemonic" : "GC003",
 	"command" : Commands.MOVE,
+	"hotkey" : "M",
+	"is_group" : true,
+	"can_queue" : true,
+
+	#Command specific data
 	"argument" : "location",
+
+	#command metadata
+	"name" : "Move To",
 	"description" : "Targets location",
-	"sprite_path" : ""
+	"sprite_path" : MOVE_TO_PLACEHOLDER_TEXTURE,
 }
-const BUILD_WORKER_DICTIONARY: Dictionary[String, Variant] = {
-	"name" : "Worker",
-	"mnemonic" : "CC001",
-	"command" : Commands.BUILD,
-	"cost" : [50,0],
-	"description" : "Builds a dwarf worker",
-	"file_path" : WORKER_FILEPATH,
-	"build_time" : 5,
-	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
-	"hotkey" : Key.KEY_E,
+const CANCEL_QUEUED_DICTIONARY: Dictionary [String, Variant] = {
+	#Required command data
+	"mnemonic" : "GC004",
+	"command" : Commands.CANCEL,
+	"hotkey" : "X",
+	"is_group" : false,
+	"can_queue" : false,
+
+	#command specific data
+	"int": 0,
+
+	#Command Metadata
+	"name" : "Cancel",
+	"description" : "Cancels building specific unit", #only called from clicking on queue icon in UI
+	"sprite_path" : CANCEL_PLACEHOLDER_TEXTURE, #cancel_placeholder.png
+}
+#I dont think we ever use this directly, but attack move can be converted to this if it targets a unit
+const ATTACK_TARGET_DICTIONARY: Dictionary [String, Variant] = {
+	#Required command data
+	"mnemonic" : "GC005",
+	"command" : Commands.ATTACK,
+	"hotkey" : "X",
+	"is_group" : true,
+	"can_queue" : true,
+
+	#command specific data
+	"argument" : "target_node_path",
+
+	#Command Metadata
+	"name" : "Attack",
+	"description" : "Direct selected units to attack a specific target",
+	"sprite_path" : ATTACK_PLACEHOLDER_TEXTURE
+}
+const ATTACK_MOVE_DICTIONARY: Dictionary [String, Variant] = {
+	#Required command data
+	"mnemonic" : "GC006",
+	"command" : Commands.ATTACK_MOVE,
+	"hotkey" : "A",
+	"is_group" : true,
+	"can_queue" : true,
+
+	#command specific data
+	"argument" : "location",
+
+	#Command Metadata
+	"name" : "Attack Move",
+	"description" : "Move to location, attacking anything it sees",
+	"sprite_path" : ATTACK_PLACEHOLDER_TEXTURE
 }
 const BUILD_DWARF_WORKER_DICTIONARY: Dictionary[String, Variant] = {
-	"name" : "Worker",
-	"mnemonic" : "CC001",
+	#Required command data
+	"mnemonic" : "DS001",
 	"command" : Commands.BUILD,
+	"hotkey" : "E",
+	"is_group" : false,
+	"can_queue" : false,
+
+	#command specific data
 	"cost" : [50,0],
-	"description" : "Builds a dwarf worker",
 	"file_path" : DWARF_WORKER_FILEPATH,
 	"build_time" : 5,
+
+	#Command Metadata
+	"name" : "Worker",
+	"description" : "Builds a dwarf worker",
 	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
-	"hotkey" : Key.KEY_E,
 }
+
+const BUILD_DWARF_SETTLEMENT_DICTIONARY  : Dictionary = {
+	#required command data
+	"mnemonic" : "DW001",
+	"command" : Commands.BUILD,
+	"hotkey" : "E",
+	"is_group" : false,
+	"can_queue" : true,
+
+	#command specific data
+	"cost" : [400,0],
+	"argument" : "location",
+	"file_path" : DWARF_SETTLEMENT_FILEPATH,
+
+	#command metadata
+	"name" : "Build Base",
+	"description" : "Builds Dwarven Settlement",
+	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
+}
+
+const BUILD_DWARF_BARRACKS_DICTIONARY: Dictionary = {
+	#required command data
+	"mnemonic" : "DW003",
+	"command" : Commands.BUILD,
+	"hotkey" : "B",
+	"is_group" : false,
+	"can_queue" : true,
+
+	#command specific data
+	"cost" : [150,0],
+	"argument" : "location",
+	"file_path" : DWARF_BARRACKS_FILEPATH,
+
+	#command metadata
+	"name" : "Dwarf Barracks",
+	"description" : "Build dwarven barracks, can create warriors",
+	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
+}
+##INCOMPLETE
+const BUILD_FORGE_DICTIONARY : Dictionary = {
+	#Required command data
+	"mnemonic" : "DW002",
+	"command" : Commands.BUILD,
+	"hotkey" : "F",
+	"is_group" : false,
+	"can_queue" : true,
+
+	#command specific data
+	"cost" : [200,0],
+	"argument" : "location",
+	"file_path" : FORGE_FILEPATH,
+
+	#command metadata
+	"name" : "Forge",
+	"description" : "Build dwarven forge for weapon research",
+	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
+}
+const RESEARCH_DWARF_BLUNDERBUSS_DICTIONARY : Dictionary = {
+	#Required command data
+	"mnemonic" : "F003",
+	"command" : Commands.BUILD,
+	"hotkey" : "B",
+	"is_group" : false,
+	"can_queue" : false,
+
+	#command specific data
+	"cost" : [350,200],
+	"file_path" : DWARF_BLUNDERBUSS_FILEPATH,
+
+	#command metadata
+	"name" : "Research Blunderbusses",
+	"description" : "Researches Armor Upgrade Level 1",
+	"sprite_path" : "uid://cokfc1ue0hkgq" #upgrade_placeholder.png
+}
+const UPGRADE_ARMOR_1_DICTIONARY : Dictionary = {
+	#Required Command Data
+	"mnemonic" : "F003",
+	"command" : Commands.BUILD,
+	"hotkey" : "G",
+	"is_group" : false,
+	"can_queue" : false,
+
+	#Command specific data
+	"cost" : [350,200],
+	"research" : Upgrades.ARMOR_1,
+
+	#command metadata
+	"name" : "Upgrade Armor Level 1",
+	"description" : "Researches Armor Upgrade Level 1",
+	"sprite_path" : "uid://cokfc1ue0hkgq" #upgrade_placeholder.png
+}
+const UPGRADE_ARMOR_2_DICTIONARY : Dictionary = {
+	#Required Command Data
+	"mnemonic" : "F004",
+	"command" : Commands.BUILD,
+	"hotkey" : "G",
+	"is_group" : false,
+	"can_queue" : false,
+
+	#Command specific data
+	"cost" : [350,200],
+	"upgrade" : Upgrades.ARMOR_2,
+	#command metadata
+	"name" : "Upgrade Armor Level 2",
+	"description" : "Researches Armor Upgrade Level 2",
+	"sprite_path" : "uid://cokfc1ue0hkgq" #upgrade_placeholder.png
+}
+
+###DEPRECATED
 const BUILD_BASE_DICTIONARY  : Dictionary = {
 	"name" : "Build Base",
 	"mnemonic" : "WK001",
@@ -147,70 +330,15 @@ const BUILD_BASE_DICTIONARY  : Dictionary = {
 	"argument" : "location",
 	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
 }
-const BUILD_DWARF_SETTLEMENT_DICTIONARY  : Dictionary = {
-	"name" : "Build Base",
-	"mnemonic" : "WK001",
+##DEPRECATED
+const BUILD_WORKER_DICTIONARY: Dictionary[String, Variant] = {
+	"name" : "Worker",
+	"mnemonic" : "CC001",
 	"command" : Commands.BUILD,
-	"cost" : [300,0],
-	"description" : "Builds Dwarven Settlement",
-	"file_path" : DWARF_SETTLEMENT_FILEPATH,
-	"argument" : "location",
-	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
-}
-
-#command dictionaries need to be initialized before cmd_dict or in GlobalConstants otherwise it will be empty
-const BUILD_BREWERY: Dictionary = {
-	"name" : "Build Brewery",
-	"mnemonic" : "WK003",
-	"command" : Commands.BUILD,
-	"cost" : [150,100],
-	"description" : "Builds Dwarven Base",
-	"file_path" : null,
-	"argument" : "location",
-	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
-}
-const BUILD_FORGE_DICTIONARY : Dictionary = {
-	"name" : "Build Forge",
-	"mnemonic" : "WK002",
-	"command" : Commands.BUILD,
-	"cost" : [200,0],
-	"description" : "Forges can create Hammer Dwarves and can upgrade infantry armor and weapons",
-	"file_path" : FORGE_FILEPATH,
-	"argument" : "location",
-	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
-}
-#3D
-const RESEARCH_DWARF_BLUNDERBUSS_DICTIONARY : Dictionary = {
-	"name" : "Upgrade Armor Level 1",
-	"mnemonic" : "F003",
-	"command" : Commands.BUILD,
-	"cost" : [350,200],
-	"description" : "Researches Armor Upgrade Level 1",
-	#research params in race specific RESEARCH ENUM
-	"file_path" : DWARF_BLUNDERBUSS_FILEPATH,
-	"argument" : "location",
-	"sprite_path" : "uid://cokfc1ue0hkgq" #upgrade_placeholder.png
-}
-
-const UPGRADE_ARMOR_1_DICTIONARY : Dictionary = {
-	"name" : "Upgrade Armor Level 1",
-	"mnemonic" : "F003",
-	"command" : Commands.BUILD,
-	"cost" : [350,200],
-	"description" : "Researches Armor Upgrade Level 1",
-	#research params in race specific RESEARCH ENUM
-	"research" : Upgrades.ARMOR_1,
-	"argument" : "location",
-	"sprite_path" : "uid://cokfc1ue0hkgq" #upgrade_placeholder.png
-}
-const UPGRADE_ARMOR_2_DICTIONARY : Dictionary = {
-	"name" : "Build Forge",
-	"mnemonic" : "F004",
-	"command" : Commands.BUILD,
-	"cost" : [350,200],
-	"description" : "Researches Armor Upgrade Level 2",
-	#research params in race specific RESEARCH ENUM
-	"upgrade" : Upgrades.ARMOR_2,
-	"argument" : "location",
-	"sprite_path" : "uid://cokfc1ue0hkgq" #upgrade_placeholder.png
+	"cost" : [50,0],
+	"description" : "Builds a dwarf worker",
+	"file_path" : WORKER_FILEPATH,
+	"build_time" : 5,
+	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
+	"hotkey" : "E",
 }

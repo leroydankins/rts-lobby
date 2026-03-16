@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://b25o6ctlk0w71"]
+
+[ext_resource type="Script" uid="uid://53lmtrwwpby2" path="res://components/health_component/health_component.gd" id="1_ol33d"]
+[ext_resource type="StyleBox" uid="uid://13cokopx1lfh" path="res://resources/healthbar_resource/player_healthbar_back.tres" id="2_gunwg"]
+[ext_resource type="StyleBox" uid="uid://bskkp8d15ek8w" path="res://resources/healthbar_resource/player_healthbar.tres" id="3_qi36u"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_n5rls"]
+
+[node name="HealthComponent" type="Node3D" unique_id=378400957]
+script = ExtResource("1_ol33d")
+health = null
+max_health = null
+
+[node name="HPSprite" type="Sprite3D" parent="." unique_id=1806707282]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6714654, 0)
+billboard = 1
+texture = SubResource("ViewportTexture_n5rls")
+
+[node name="SubViewport" type="SubViewport" parent="." unique_id=1164087689]
+disable_3d = true
+transparent_bg = true
+size = Vector2i(96, 8)
+
+[node name="Healthbar" type="ProgressBar" parent="SubViewport" unique_id=1429475855]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = ExtResource("2_gunwg")
+theme_override_styles/fill = ExtResource("3_qi36u")
+value = 35.0
+show_percentage = false

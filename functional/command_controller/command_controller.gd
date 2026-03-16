@@ -4,7 +4,7 @@ extends Node
 ##Used by the local player to initiate commands and send commands to the units
 ##Keeps arrays of all selected units, can have hotkeys for multiple units, uses Input to read inputs before anything else and then stops their input
 ##this should not have to RPC its own functions, only the people it makes do things
-
+##Selectable layer is on LAYER 5!
 #reference Game because we need that for updating data
 var game: GameScene;
 var entity_holder: EntityHolder;
@@ -29,8 +29,12 @@ var pending_cmd: Dictionary = {};
 func _ready() -> void:
 	game = get_tree().get_first_node_in_group("Game");
 	entity_holder = get_tree().get_first_node_in_group("EntityHolder");
+	target.hide();
 	pass # Replace with function body.
 
+func _process(_delta: float) -> void:
+	if (selected.is_empty()):
+		return;
 
 func select_units_2d_projected() -> void:
 	if(!Input.is_action_pressed("control") || selected[0].player_id != game.local_game_dict[game.PLAYER_ID_KEY]):
@@ -41,11 +45,11 @@ func select_units_2d_projected() -> void:
 	rect.size = selection_rect.size;
 	var all_entities: Array[Node3D] = entity_holder.entity_array;
 	var all_units : Array[Node3D] = entity_holder.unit_array;
-	for unit: Node3D in all_entities:
-		print(unit);
+	for unit: Node3D in all_units:
 		if(rect.has_point(cam.unproject_position(unit.global_position))):
 			if(unit.player_id == game.local_game_dict[game.PLAYER_ID_KEY]):
 				unit.set_selected();
+				print("what")
 				selected.append(unit);
 	if(selected.is_empty()):
 		for unit: Node3D in all_entities:
@@ -54,6 +58,7 @@ func select_units_2d_projected() -> void:
 				selected.append(unit);
 				return;
 	if(!selected.is_empty()):
+		print("selected uniuts!!")
 		selected_signal.emit(selected[0])
 	pass;
 
@@ -66,88 +71,75 @@ func _unhandled_input(event: InputEvent) -> void:
 		if(event.is_action_pressed("select")):
 			#Pending Command Block
 			if(!pending_cmd.is_empty() && !selected.is_empty()):
-				if (selected[active_unit].team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
+				if (selected[active_unit].team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY] && !DebugGlobal.master_control):
 					pending_cmd = {};
 					return;
 
 				if(pending_cmd.has("cost")):
 					if(pending_cmd["cost"][0] > game.local_game_dict[game.PLAYER_RESOURCE_KEY] || pending_cmd["cost"][1] > game.local_game_dict[game.PLAYER_GAS_KEY]):
-						print("cannot accept command, but not removing the pending command from selection");
 						return;
 
 				#the pending command requires a location input
 				if(pending_cmd.has("location")):
-					var pos : Vector3 = get_click_pos();
-					if(!pos == Vector3.ZERO):
-						pending_cmd["location"] = get_click_pos();
-						request_unit_cmd(selected[active_unit], pending_cmd);
-					else: return;
-
+					var attack_move: bool = false; #If we are attack move, we switch to regular attack command for command
+					if(pending_cmd["command"] == GlobalConstants.Commands.ATTACK_MOVE):
+						attack_move = true;
+					var result: Dictionary = get_world_click(); #returns null if object is empty
+					if (result.is_empty()):
+						return;
+					var obj: Node3D = result["collider"];
+					if ("ENTITY_TYPE" in obj && attack_move):
+						var node_path : String = obj.get_path();
+						pending_cmd = GlobalConstants.ATTACK_TARGET_DICTIONARY.duplicate();
+						pending_cmd["target_node_path"] = node_path;
+						handle_cmd(pending_cmd);
+					else:
+						var location : Vector3 = result["position"];
+						pending_cmd["location"] = location;
+						handle_cmd(pending_cmd);
 				#the pending command is targeting a node
 				elif(pending_cmd.has("target_node_path")):
-					var mouse_pos: Vector2 = get_viewport().get_mouse_position()
-					var ray_length: int = 100
-					var camera: Camera3D = get_viewport().get_camera_3d();
-					var from: Vector3 = camera.project_ray_origin(mouse_pos)
-					var to: Vector3 = from + camera.project_ray_normal(mouse_pos) * ray_length
-					var space: PhysicsDirectSpaceState3D = get_viewport().get_world_3d().direct_space_state;
-					var ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
-					ray_query.from = from
-					ray_query.to = to
-					ray_query.collide_with_areas = true
-					var raycast_result: Dictionary = space.intersect_ray(ray_query)
-					if (raycast_result.is_empty()):
+					var result: Dictionary = get_world_click(); #returns null if object is empty
+					if (result.is_empty()):
 						return;
-					var entity: Node3D = raycast_result["collider"];
-					var node_path: String = entity.get_path();
-					pending_cmd["target_node_path"] = node_path;
-					request_unit_cmd(selected[active_unit], pending_cmd);
+					var obj: Node3D = result["collider"];
+					if "ENTITY_TYPE" in obj:
+						var node_path : String = obj.get_path();
+						pending_cmd["target_node_path"] = node_path;
+						handle_cmd(pending_cmd);
 				pending_cmd = {};
 				return
 			#end pending command block
+
 			#Check if we clicked on an object
-			var mouse_pos: Vector2 = get_viewport().get_mouse_position()
-			var ray_length: int = 100
-			var camera: Camera3D = get_viewport().get_camera_3d();
-			var from: Vector3 = camera.project_ray_origin(mouse_pos)
-			var to: Vector3 = from + camera.project_ray_normal(mouse_pos) * ray_length
-			var space: PhysicsDirectSpaceState3D = get_viewport().get_world_3d().direct_space_state;
-			var ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
-			ray_query.from = from
-			ray_query.to = to
-			ray_query.collide_with_areas = true
-			var raycast_result: Dictionary = space.intersect_ray(ray_query)
 			var _err: Error
 			var cntrl: bool = Input.is_action_pressed("control");
-			#if we didnt hit anything
-			if(raycast_result.is_empty()):
-				if(!cntrl):
-					clear_selection();
-			#if we did hit something
-			else:
-				var entity: Node3D = raycast_result["collider"]
-				#Entity is a unit
-				if("ENTITY_NAME" in entity):
+			var result: Dictionary = get_world_click(); #returns null if object is empty
+			#if we hit something
+			if (!result.is_empty()):
+				var obj: Node3D = result["collider"];
+				if("ENTITY_NAME" in obj):
 					#if we are not control click, or its not our unit, clear out our selection
-					if(!cntrl  || entity.team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
+					if(!cntrl  || obj.team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
 						clear_selection();
 					var has_entity_in_selected: bool = false;
 					for i:int in range(selected.size(),0, -1):
-						if(is_same(selected[i-1], entity)):
-							print("we hajve this unit in our group already!");
+						if(is_same(selected[i-1],obj)):
 							var e: Node3D = selected[i-1];
 							e.unset_selected();
 							selected.remove_at(i-1);
 							has_entity_in_selected = true;
 					if(!has_entity_in_selected):
-						entity.set_selected();
-						selected.append(entity);
+						obj.set_selected();
+						selected.append(obj);
 					_err  = emit_signal("selected_signal", selected[0]);
-					print("We have this many units in this array %s" % selected.size())
 					return;
-				else:
-					if(!cntrl):
-						clear_selection();
+
+			#if we didn't hit anything
+			else:
+				if (!cntrl):
+					clear_selection();
+
 			#entity is not a unit aka, its scenery or doesnt exist, lets set start dragging
 			#we made it through and we didnt select anything
 			mouse_dragging = true;
@@ -186,42 +178,31 @@ func _unhandled_input(event: InputEvent) -> void:
 	#RIGHT CLICK LOGIC
 	if (event.is_action_pressed("action")):
 		#create commands vars outside of logic since they all use it i guess?
-		var cmd_dict: Dictionary = selected[active_unit].cmd_dict
 		var cmd: Dictionary = {};
-		if (selected[active_unit].team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
-			print("not my team");
+		if (selected[active_unit].team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY] && !DebugGlobal.master_control):
 			clear_selection();
 			return;
 		if(!pending_cmd.is_empty()):
-			print("clearing pending command");
 			pending_cmd = {};
 			return;
-		var mouse_pos: Vector2 = get_viewport().get_mouse_position()
-		var ray_length: int = 100
-		var camera: Camera3D = get_viewport().get_camera_3d();
-		var from: Vector3 = camera.project_ray_origin(mouse_pos)
-		var to: Vector3 = from + camera.project_ray_normal(mouse_pos) * ray_length
-		var space: PhysicsDirectSpaceState3D = get_viewport().get_world_3d().direct_space_state;
-		var ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
-		ray_query.from = from
-		ray_query.to = to
-		ray_query.collide_with_areas = true
-		var raycast_result: Dictionary = space.intersect_ray(ray_query)
-		if (raycast_result.is_empty()):
-			print("empty")
+		var result: Dictionary = get_world_click();
+		if (result.is_empty()):
+			target.hide();
 			return;
-		var entity: Node3D = raycast_result["collider"];
-		if ("ENTITY_TYPE" in entity):
-			var target_node_path: String = entity.get_path();
+		var obj: Node3D = result["collider"];
+		if ("ENTITY_TYPE" in obj):
+			var target_node_path: String = obj.get_path();
 			#duplication of command dictionary can be redundant since handle_cmd does this as well
 			cmd = GlobalConstants.TARGET_UNIT_DICTIONARY.duplicate();
 			cmd["target_node_path"] = target_node_path;
+			target.hide();
 			#unit
 		else:
 			cmd = GlobalConstants.MOVE_TO_DICTIONARY.duplicate();
-			var location: Vector3 = raycast_result["position"]
+			var location: Vector3 = result["position"]
 			cmd["location"] = location;
-		#location
+			target.global_position = location;
+			target.show();
 		handle_cmd(cmd);
 
 
@@ -231,7 +212,7 @@ func handle_cmd(p_cmd: Dictionary) -> void:
 	if(selected.is_empty()):
 		return;
 	#create a new dictionary to not overwrite data incase this comes from the cmd gui
-	var cmd_d: Dictionary = p_cmd.duplicate();
+	var cmd: Dictionary = p_cmd.duplicate();
 
 	#########
 	#For ones that will require an argument like a location or target, set up so unhandled input will pick up the cmd
@@ -239,36 +220,65 @@ func handle_cmd(p_cmd: Dictionary) -> void:
 	if (p_cmd.has("argument")):
 		#Only make it a pending command if this does not have an entry for the argument in question
 		if(!p_cmd.has(p_cmd["argument"])):
-			cmd_d[p_cmd["argument"]] = null;
-			pending_cmd = cmd_d;
+			cmd[p_cmd["argument"]] = null;
+			pending_cmd = cmd;
 			return;
 	#########
-	#No argument needed, request the command
-	request_unit_cmd(selected[active_unit], cmd_d);
+	#No argument needed or argument is filled, request the command
+	var unit_path_arr: Array[String] = [];
+	if(cmd["is_group"] == true):
+		#group command
+		for i: int in selected.size():
+			unit_path_arr.append(selected[i].get_path())
+	else:
+		#individual command
+		var unit_path: String = selected[active_unit].get_path();
+		unit_path_arr.append(unit_path);
+		if(active_unit < selected.size() - 1):
+			active_unit+= 1;
+		else:
+			active_unit = 0
+	##We must check if the command is queueable and we are queueing when we HANDLE the command, because doing it in RPC will not read local input
+	if (Input.is_action_pressed("shift") && cmd["can_queue"] == true):
+			#queue not an initialized term in each command, only created in this scenario
+			cmd["queue"] = true;
+	request_unit_cmd.rpc_id(Lobby.multiplayer_server_id, unit_path_arr, cmd);
+
 
 #client RPCs server/host to start the action, final checks here before sending command
-func request_unit_cmd(unit: Node3D, cmd: Dictionary) ->void:
-	if("ENTITY_TYPE" not in unit):
-		return;
-	#check if cmd has a cost to it and deny if cant afford
-	if(cmd.has("cost")):
-		var mineral_cost: int = cmd["cost"][0];
-		var gas_cost: int = cmd["cost"][1];
-		if (mineral_cost > game.local_game_dict[game.PLAYER_RESOURCE_KEY]):
-			#Cannot do the command, play an error sound to show they couldnt do it yet
-			return;
-		if (gas_cost > game.local_game_dict[game.PLAYER_GAS_KEY]):
-			#Cannot do the command, play an error sound to show they couldnt do it yet
-			return;
+@rpc("any_peer","call_local","reliable")
+func request_unit_cmd(unit_path_arr: Array[String], cmd: Dictionary) ->void:
+	var requestor_id: String = str(multiplayer.get_remote_sender_id());
+	for unit_path: String in unit_path_arr:
+		var unit: Node3D = get_tree().root.get_node(unit_path)
+		if("ENTITY_TYPE" not in unit):
+			continue;
+		#check if cmd has a cost to it and deny if cant afford
+		if(cmd.has("cost")):
+			var mineral_cost: int = cmd["cost"][0];
+			var gas_cost: int = cmd["cost"][1];
+			if (mineral_cost > game.player_game_dict[requestor_id][game.PLAYER_RESOURCE_KEY]):
+				#Cannot do the command, play an error sound to show they couldnt do it yet
+				continue;
+			if (gas_cost > game.player_game_dict[requestor_id][game.PLAYER_GAS_KEY]):
+				#Cannot do the command, play an error sound to show they couldnt do it yet
+				continue;
 
-	##we do not actually request player data update on RPC, this occurs after the unit accepts the command
 
-	if (Input.is_action_pressed("shift")):
-		if(unit.has_method("queue_cmd")):
-			unit.queue_cmd.rpc_id(Lobby.multiplayer_server_id, cmd);
-			return;
-	unit.request_cmd.rpc_id(Lobby.multiplayer_server_id, cmd);
-	pass;
+		var node_path: String = unit.get_path();
+		var cmd_time: float = game.get_elapsed_time();
+		unit.request_cmd.rpc_id(Lobby.multiplayer_server_id, cmd);
+
+		var logged_cmd: Dictionary = {
+			#ReplayConstants.TIME_KEY
+			"time" = cmd_time,
+			#ReplayConstants.PATH_KEY
+			"path" = node_path,
+			#ReplayConstants.COMMAND_KEY
+			"command" = cmd,
+		}
+		ReplayManager.log_cmd(logged_cmd)
+
 
 
 func get_click_pos() -> Vector3:
@@ -280,9 +290,7 @@ func get_click_pos() -> Vector3:
 	var space: PhysicsDirectSpaceState3D = get_viewport().get_world_3d().direct_space_state;
 
 	#To get intersection with colliders
-	var ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
-	ray_query.from = from
-	ray_query.to = to
+	var ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from,to,1);
 	ray_query.collide_with_areas = true
 	var raycast_result: Dictionary = space.intersect_ray(ray_query)
 	var arr: Array;
@@ -292,7 +300,7 @@ func get_click_pos() -> Vector3:
 		return raycast_result["position"]
 
 
-func get_world_click() -> Node3D:
+func get_world_click() -> Dictionary:
 	var mouse_pos: Vector2 = get_viewport().get_mouse_position()
 	var ray_length: int = 100
 	var camera: Camera3D = get_viewport().get_camera_3d();
@@ -300,21 +308,17 @@ func get_world_click() -> Node3D:
 	var from: Vector3 = camera.project_ray_origin(mouse_pos)
 	var to: Vector3 = from + camera.project_ray_normal(mouse_pos) * ray_length
 	var space: PhysicsDirectSpaceState3D = get_viewport().get_world_3d().direct_space_state;
-	var ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
-	ray_query.from = from
-	ray_query.to = to
+	var ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from,to,0x11);
 	ray_query.collide_with_areas = true
 	var raycast_result: Dictionary = space.intersect_ray(ray_query)
-	if (raycast_result.is_empty()):
-		return;
-	var obj: Node3D = raycast_result["collider"];
+	return raycast_result;
+	#if (raycast_result.is_empty()):
+		#return null;
+	#var obj: Node3D = raycast_result["collider"];
+	#return obj;
 
-	if ("ENTITY_TYPE" in obj):
-		return obj;
-	else: return null;
 
 func clear_selection() -> void:
-	print("cleared selection");
 	for node: Node3D in selected:
 		node.unset_selected();
 	selected.clear();

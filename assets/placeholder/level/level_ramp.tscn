@@ -5,6 +5,7 @@ albedo_color = Color(0.15320012, 0.27471235, 0.1694907, 1)
 
 [node name="BasePlatform" type="CSGCylinder3D" unique_id=2065644791]
 use_collision = true
+collision_layer = 5
 radius = 10.0
 height = 2.5
 sides = 10

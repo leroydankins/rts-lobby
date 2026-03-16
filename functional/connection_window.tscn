@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://mwxeq3umcy20"]
+
+[ext_resource type="Script" uid="uid://g856jm8ytq5q" path="res://functional/connection_window.gd" id="1_sjvo4"]
+
+[node name="ConnectionWindow" type="Control" unique_id=986201860]
+layout_mode = 3
+anchor_right = 0.11100001
+anchor_bottom = 0.116000004
+offset_right = 0.12799072
+offset_bottom = -0.16799927
+script = ExtResource("1_sjvo4")
+
+[node name="Panel" type="Panel" parent="." unique_id=99029525]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2101237913]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="LatencyLabel" type="Label" parent="VBoxContainer" unique_id=965897231]
+layout_mode = 2
+text = "Latency: "
+
+[node name="Peer1" type="Label" parent="VBoxContainer" unique_id=1571059861]
+layout_mode = 2
+
+[node name="Peer2" type="Label" parent="VBoxContainer" unique_id=427297403]
+layout_mode = 2
+
+[node name="Timer" type="Timer" parent="." unique_id=443289824]
+wait_time = 2.0

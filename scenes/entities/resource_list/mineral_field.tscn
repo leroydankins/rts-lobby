@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dyfwf80o0ibyn"]
+
+[ext_resource type="PackedScene" uid="uid://cqbpinxp7uyt6" path="res://scenes/entities/resource_list/mineral_deposit.tscn" id="1_6qcnb"]
+
+[node name="MineralField" type="Node3D" unique_id=458946658]
+
+[node name="MineralDeposit" parent="." unique_id=938880175 instance=ExtResource("1_6qcnb")]
+transform = Transform3D(0.52830493, 0, -0.6007445, 0, 0.8, 0, 0.6007445, 0, 0.52830493, 3.8123786, 0, 0.65562224)
+
+[node name="MineralDeposit2" parent="." unique_id=1052723477 instance=ExtResource("1_6qcnb")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, -0.6453933)
+
+[node name="MineralDeposit3" parent="." unique_id=1599091012 instance=ExtResource("1_6qcnb")]
+transform = Transform3D(0.60628223, 0, 0.52194047, 0, 0.8, 0, -0.52194047, 0, 0.60628223, -3.589405, 0, 0.4351858)
+
+[node name="MineralDeposit4" parent="." unique_id=757894993 instance=ExtResource("1_6qcnb")]
+transform = Transform3D(0.74405164, 0, 0.29391688, 0, 0.8, 0, -0.29391688, 0, 0.74405164, -1.9540905, 0, -0.41967338)
+
+[node name="MineralDeposit5" parent="." unique_id=406793997 instance=ExtResource("1_6qcnb")]
+transform = Transform3D(0.76897615, 0, -0.22062574, 0, 0.8, 0, 0.22062574, 0, 0.76897615, 2.2160316, 0, -0.5032778)

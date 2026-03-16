@@ -73,7 +73,7 @@ albedo_color = Color(0.062409595, 0.46012878, 0.72096574, 1)
 [sub_resource type="PrismMesh" id="PrismMesh_oihbh"]
 material = SubResource("StandardMaterial3D_oihbh")
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_tu6al"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_te7c8"]
 height = 1.0
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_oihbh"]
@@ -81,11 +81,19 @@ properties/0/path = NodePath(".:resource_amount")
 properties/0/spawn = true
 properties/0/replication_mode = 2
 
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_oihbh"]
+height = 1.0
+radius = 0.25
+
 [node name="MineralDeposit" type="Area3D" unique_id=938880175 groups=["Entity", "Resource"]]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
+collision_layer = 18
 script = ExtResource("1_ng1ny")
+resource_amount = 10000
 
 [node name="HighlightMesh" parent="." unique_id=254663810 instance=ExtResource("2_te7c8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+visible = false
 mesh = SubResource("PlaneMesh_jmuq1")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1556280096]
@@ -94,7 +102,13 @@ mesh = SubResource("PrismMesh_oihbh")
 
 [node name="CollisionBody" type="CollisionShape3D" parent="." unique_id=1662873682]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-shape = SubResource("CylinderShape3D_tu6al")
+shape = SubResource("CylinderShape3D_te7c8")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1260025209]
 replication_config = SubResource("SceneReplicationConfig_oihbh")
+
+[node name="Area3D" type="Area3D" parent="." unique_id=1903346398]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=1459947666]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CylinderShape3D_oihbh")

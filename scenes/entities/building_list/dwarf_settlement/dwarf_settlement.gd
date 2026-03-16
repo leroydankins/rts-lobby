@@ -1,44 +1,53 @@
 extends Area3D
-const ENTITY_NAME: String = "Command Center"
+const ENTITY_NAME: String = "Dwarf Settlement"
 const ENTITY_TYPE: GlobalConstants.EntityType = GlobalConstants.EntityType.BUILDING;
 const BUILDING_TYPE: Array[int] = [GlobalConstants.BuildingType.CENTER, GlobalConstants.BuildingType.RESOURCE_DEPOT]
 const PREVIEW: Texture2D = preload(GlobalConstants.BUILDING_PLACEHOLDER_TEXTURE) #building_placeholder.png
 @onready var highlight_mesh: MeshInstance3D = $HighlightMesh
-
-#LOCAL VARIABLE, DO NOT SYNC ACROSS PLAYERS
-var is_selected: bool = false;
-
-#constant used for spawning
-const SPAWN_DISTANCE: int = 5;
-
-const CONSTRUCTION_COMPLETE: int = 10;
-const BUILD_LIMIT: int = 8;
-var construction_value: float = 0;
-@export var is_constructed: bool = false;
 @onready var marker: Marker3D = $Marker3D
-
-#Shows commands that the unit can take
-var cmd_dict: Dictionary[int, Dictionary] = {
-	0 : {},
-	1 : {},
-	2 : {},
-	3 : {},
-	4 : {},
-	5 : GlobalConstants.BUILD_DWARF_WORKER_DICTIONARY,
-	6 : GlobalConstants.CANCEL_ACTION_DICTIONARY,
-	7 : {},
-	8 : {}
-}
-
-var build_dictionary: Dictionary[int, Dictionary]
-
-var team: int = 0;
-var color: int = 0;
-#export so that in test environment everything is ok
-@export var player_id: String = "";
+@onready var health_component: HealthComponent = $HealthComponent
+@export var unit_maker: UnitMakerComponent;
 var game: GameScene;
 var entity_holder: EntityHolder;
 
+#export so that in test environment everything is ok
+@export var player_id: String = "";
+@export var team: int = 0;
+@export var color: int = 0;
+
+#combat things
+@export var health: int = 400;
+@export var max_health: int = 400;
+@export var is_alive: bool = true;
+
+const CONSTRUCTION_COMPLETE: int = 10;
+var construction_value: float = 0;
+@export var is_constructed: bool = false;
+
+#Shows commands that the unit can take
+var cmd_dict: Dictionary[int, Dictionary] = {
+	0: {},
+	1: GlobalConstants.BUILD_DWARF_WORKER_DICTIONARY,
+	2: {},
+	3: {},
+	4: {},
+	5: {},
+	6: {},
+	7: {},
+	8: {},
+	9: {},
+	10:{},
+	11: GlobalConstants.CANCEL_ACTION_DICTIONARY,
+}
+
+
+
+
+
+##NOW IS IN UNIT MAKER COMPONENT
+#constant used for spawning
+const SPAWN_DISTANCE: int = 1;
+const BUILD_LIMIT: int = 8;
 @export var target_location: Vector3;
 @export var target: Node3D;
 
@@ -55,15 +64,11 @@ func _ready() -> void:
 	entity_holder = get_tree().get_first_node_in_group("EntityHolder");
 	pass # Replace with function body.
 
-
-
-
 #Only process if you are the server, properties will get synced to other players across RPC calls
 func _process(delta: float) -> void:
 	if(!is_constructed):
 		if(construction_value >= CONSTRUCTION_COMPLETE):
 			is_constructed = true;
-
 	if (!multiplayer.is_server()):
 		return;
 	if (is_constructed):
@@ -78,17 +83,14 @@ func _process(delta: float) -> void:
 		if build_progress >= build_time:
 			#rpc call build item
 			finish_build();
-			pass;
 
 func set_selected() -> void:
-	is_selected = true;
 	highlight_mesh.set_deferred("visible", true);
+	health_component.show_health();
 
 func unset_selected() -> void:
-	is_selected = false;
 	highlight_mesh.set_deferred("visible", false);
-
-
+	health_component.hide_health();
 
 func start_build() -> void:
 	#When we start a build, assign the dictionary to build_item and get rid of it in the queue
@@ -123,8 +125,7 @@ func finish_build() -> void:
 		start_build();
 
 #TEMPORARY, MOVE THIS TO BE ACTION CALLED VIA A COMMAND REQUEST HANDLE COMMAND
-#called when game UI
-@rpc("any_peer","call_local","reliable")
+#i did
 func cancel_queued(p_int: int) -> void:
 	#refund the cost if you are clearing out the queue
 	if(!multiplayer.is_server()):
@@ -135,8 +136,6 @@ func cancel_queued(p_int: int) -> void:
 		return;
 	var _success: int = game.refund_resources(player_id,queued["cost"]);
 
-
-@rpc("any_peer","call_local","reliable")
 func cancel_build() ->void:
 	if(!multiplayer.is_server()):
 		return;
@@ -176,6 +175,7 @@ func spawn_unit(filepath: String) -> void:
 	"color" = color
 	}
 	spawn_unit_rpc.rpc(spawn_dict)
+	print("called spawn unit from %s" % player_id)
 	pass;
 
 #special case where the object needs to add the child to keep refernce
@@ -191,11 +191,8 @@ func spawn_unit_rpc(spawn_dict: Dictionary) -> void:
 
 	#color is an int, the object will access the actual color via GlobalConstants
 	unit.color = spawn_dict["color"];
-	if("home_building" in unit):
-		unit.home_building = self;
-		#build command for object and give them that move command
-	else:
-		push_error("couldnt assign home building");
+	if("resource_depot" in unit):
+		unit.resource_depot = self;
 	entity_holder.register_entity(unit);
 	var pos: Vector3 = spawn_dict["position"];
 	print(pos);
@@ -211,7 +208,7 @@ func spawn_unit_rpc(spawn_dict: Dictionary) -> void:
 		cmd["location"] = target_location;
 		unit.request_cmd.rpc_id(Lobby.multiplayer_server_id, cmd);
 
-
+#This is the only real logic in the script
 @rpc("any_peer","call_local","reliable")
 func request_cmd(cmd_data: Dictionary) -> void:
 	if(!multiplayer.is_server()):
@@ -245,26 +242,40 @@ func request_cmd(cmd_data: Dictionary) -> void:
 			if("ENTITY_TYPE" not in target):
 				print("just an object in the scene, not an ally or neutral, ignore it");
 				return;
-
-################################################target_line.points[1] = target.global_position - global_position;
 		#Cancel action
 		"GC002":
 			if(build_item != null):
-				cancel_build.rpc();
+				cancel_build();
 			return;
 		#Target location / Move to Location
 		"GC003":
 			if (!cmd_data.has("location")):
 				return;
 			target_location = cmd_data["location"];
-
-###################################################target_line.points[1] = target_location - global_position;
+			target = null;
+		#cancel specific queued
+		"GC004":
+			if(!cmd_data.has("int")):
+				return;
+			cancel_queued(cmd_data["int"]);
 		#Build Dwarf Worker
-		"CC001":
+		"DS001":
 			if(build_queue.size() >= BUILD_LIMIT):
 				#we cant do this command
 				return;
-			build_queue.append(GlobalConstants.BUILD_DWARF_WORKER_DICTIONARY);
+			build_queue.append(cmd_data);
+
+#combat will eventually be handled outside of main script?
+func take_damage(damage_int: int, attacking_team: int) -> void:
+	if(!multiplayer.is_server() || attacking_team == team):
+		return;
+	var died: bool = health_component.take_damage(damage_int);
+	if(died):
+		var entity_path: String = get_path();
+		entity_holder.rpc("derigister unit", entity_path);
 
 
-	#The command was accepted, if it has a cost, send it back to game to handle the cost update
+func heal(heal_int: int, healing_team: int) -> void:
+	if(!multiplayer.is_server() || healing_team != team):
+		return;
+	health_component.heal(heal_int);

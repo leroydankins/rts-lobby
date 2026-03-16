@@ -1,6 +1,6 @@
-extends Node2D
+extends Node3D
 
-@onready var game: Game = $Game
+@onready var game: GameScene = $GameScene
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
