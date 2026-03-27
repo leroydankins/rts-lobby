@@ -25,6 +25,8 @@ var active_unit: int = 0;
 
 var pending_cmd: Dictionary = {};
 
+var debug_int: int = 0;
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	game = get_tree().get_first_node_in_group("Game");
@@ -37,17 +39,18 @@ func _process(_delta: float) -> void:
 		return;
 
 func select_units_2d_projected() -> void:
-	if(!Input.is_action_pressed("control") || selected[0].player_id != game.local_game_dict[game.PLAYER_ID_KEY]):
+	var loc_dict: Dictionary = game.player_data_manager.player_dict[game.player_data_manager.local_id]
+	if(!Input.is_action_pressed("control") || selected[0].team != loc_dict[PlayerDataManager.TEAM_KEY]):
 		clear_selection();
 	var cam: Camera3D = get_viewport().get_camera_3d();
 	var rect: Rect2 = Rect2();
 	rect.position = selection_rect.position;
 	rect.size = selection_rect.size;
-	var all_entities: Array[Node3D] = entity_holder.entity_array;
-	var all_units : Array[Node3D] = entity_holder.unit_array;
+	var all_entities: Array[Node3D] = entity_holder.global_entity_array;
+	var all_units : Array[Node3D] = entity_holder.global_unit_array;
 	for unit: Node3D in all_units:
 		if(rect.has_point(cam.unproject_position(unit.global_position))):
-			if(unit.player_id == game.local_game_dict[game.PLAYER_ID_KEY]):
+			if(unit.team == loc_dict[PlayerDataManager.TEAM_KEY]):
 				unit.set_selected();
 				print("what")
 				selected.append(unit);
@@ -64,19 +67,18 @@ func select_units_2d_projected() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if(event.is_action_pressed("escape")):
-		clear_selection();
 	if event is InputEventMouseButton:
+		var loc_dict: Dictionary = game.player_data_manager.player_dict[game.player_data_manager.local_id]
 		#MOUSE PRESS LOGIC
 		if(event.is_action_pressed("select")):
 			#Pending Command Block
 			if(!pending_cmd.is_empty() && !selected.is_empty()):
-				if (selected[active_unit].team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY] && !DebugGlobal.master_control):
+				if (selected[active_unit].color != loc_dict[PlayerDataManager.COLOR_KEY] && !DebugGlobal.master_control):
 					pending_cmd = {};
 					return;
 
 				if(pending_cmd.has("cost")):
-					if(pending_cmd["cost"][0] > game.local_game_dict[game.PLAYER_RESOURCE_KEY] || pending_cmd["cost"][1] > game.local_game_dict[game.PLAYER_GAS_KEY]):
+					if(pending_cmd["cost"][0] > loc_dict[PlayerDataManager.MINERAL_KEY] || pending_cmd["cost"][1] > loc_dict[PlayerDataManager.GAS_KEY]):
 						return;
 
 				#the pending command requires a location input
@@ -120,7 +122,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				var obj: Node3D = result["collider"];
 				if("ENTITY_NAME" in obj):
 					#if we are not control click, or its not our unit, clear out our selection
-					if(!cntrl  || obj.team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]):
+					if(!cntrl  || obj.team != loc_dict[PlayerDataManager.TEAM_KEY]):
 						clear_selection();
 					var has_entity_in_selected: bool = false;
 					for i:int in range(selected.size(),0, -1):
@@ -178,8 +180,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	#RIGHT CLICK LOGIC
 	if (event.is_action_pressed("action")):
 		#create commands vars outside of logic since they all use it i guess?
+		var loc_dict: Dictionary = game.player_data_manager.player_dict[game.player_data_manager.local_id]
 		var cmd: Dictionary = {};
-		if (selected[active_unit].team != LocalPlayerData.local_player[GlobalConstants.TEAM_KEY] && !DebugGlobal.master_control):
+		if (selected[active_unit].color != loc_dict[PlayerDataManager.COLOR_KEY] && !DebugGlobal.master_control):
 			clear_selection();
 			return;
 		if(!pending_cmd.is_empty()):
@@ -208,6 +211,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 #local method that is called before requesting the command over the server. If additional arguments required will defer cmd, otherwise will continue to request_unit_cmd
 func handle_cmd(p_cmd: Dictionary) -> void:
+
 	#ONLY PROCESS THESE IF WE HAVE SELECTED UNITS
 	if(selected.is_empty()):
 		return;
@@ -242,28 +246,31 @@ func handle_cmd(p_cmd: Dictionary) -> void:
 	if (Input.is_action_pressed("shift") && cmd["can_queue"] == true):
 			#queue not an initialized term in each command, only created in this scenario
 			cmd["queue"] = true;
-	request_unit_cmd.rpc_id(Lobby.multiplayer_server_id, unit_path_arr, cmd);
+
+	request_unit_cmd.rpc_id(Lobby.multiplayer_server_id, unit_path_arr, cmd,game.player_data_manager.local_id); #We will need to fix this
 
 
 #client RPCs server/host to start the action, final checks here before sending command
 @rpc("any_peer","call_local","reliable")
-func request_unit_cmd(unit_path_arr: Array[String], cmd: Dictionary) ->void:
-	var requestor_id: String = str(multiplayer.get_remote_sender_id());
+func request_unit_cmd(unit_path_arr: Array[String], cmd: Dictionary, player_id: int) ->void:
+	var player_dict: Dictionary = game.player_data_manager.player_dict[player_id];
 	for unit_path: String in unit_path_arr:
 		var unit: Node3D = get_tree().root.get_node(unit_path)
 		if("ENTITY_TYPE" not in unit):
 			continue;
+		if(unit.color != player_dict[PlayerDataManager.COLOR_KEY]): #this doesnt work because its called on the server
+			if(!DebugGlobal.master_control):
+				continue;
 		#check if cmd has a cost to it and deny if cant afford
 		if(cmd.has("cost")):
 			var mineral_cost: int = cmd["cost"][0];
 			var gas_cost: int = cmd["cost"][1];
-			if (mineral_cost > game.player_game_dict[requestor_id][game.PLAYER_RESOURCE_KEY]):
+			if (mineral_cost > player_dict[PlayerDataManager.MINERAL_KEY]):
 				#Cannot do the command, play an error sound to show they couldnt do it yet
 				continue;
-			if (gas_cost > game.player_game_dict[requestor_id][game.PLAYER_GAS_KEY]):
+			if (gas_cost > player_dict[PlayerDataManager.GAS_KEY]):
 				#Cannot do the command, play an error sound to show they couldnt do it yet
 				continue;
-
 
 		var node_path: String = unit.get_path();
 		var cmd_time: float = game.get_elapsed_time();

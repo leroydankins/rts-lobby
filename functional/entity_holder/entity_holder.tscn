@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dtuj2ryvclld2"]
+
+[ext_resource type="Script" uid="uid://bdllmkufli582" path="res://functional/entity_holder/entity_holder.gd" id="1_qcxye"]
+
+[node name="EntityHolder" type="Node3D" unique_id=1904239509 groups=["EntityHolder"]]
+script = ExtResource("1_qcxye")

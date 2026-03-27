@@ -1,64 +1,66 @@
 class_name GameScene
 extends Node3D
+
+signal quit_event();
+signal score_screen_event();
+signal game_finished();
+
 @onready var game_clock: Label = $UI_Layer/GameClock
 @onready var minerals_label: Label = $UI_Layer/ResourceBox/MineralsLabel
 @onready var gas_label: Label = $UI_Layer/ResourceBox/GasLabel
 #TEMPORARY
 @onready var team_label: Label = $UI_Layer/ResourceBox/TeamLabel
-
+@export var player_data_manager: PlayerDataManager;
 @onready var command_controller: Node = $CommandController
 
 @onready var camera: Node3D = $CameraBase
-@onready var spawn_1: Marker3D = $SpawnHolder/Spawn1
-@onready var spawn_2: Marker3D = $SpawnHolder/Spawn2
 @onready var entity_holder: EntityHolder = $EntityHolder
+@onready var spawn_holder: Node3D = $SpawnHolder
+@onready var in_game_menu: InGameMenu = $UI_Layer/InGameMenu
 
-var spawns: Array[Marker3D];
+var spawns: Array[Node3D];
 
-#dictionary of all players and their in game data (like resources)
-#currently only used by the host, but likely will keep data updated across all peers for synchronicity
-var player_game_dict: Dictionary[String, Dictionary] = {};
-#will be local player data that everything local uses to show information
-var local_game_dict: Dictionary[String, Variant] = {};
+
+
+
+var player_resource: int = 50;
+var player_gas: int = 0;
 
 var elapsed_time: float = 0;
 var start_time: float = 0;
-var started: bool = false;
+var game_is_active: bool = false;
 var hr: int = 0;
 var minutes: int = 0;
 var sec: int = 0;
-
-const PLAYER_ID_KEY: String = "player_id";
-const PLAYER_USERNAME_KEY: String = "player_username";
-const PLAYER_RESOURCE_KEY: String = "player_resource";
-const PLAYER_GAS_KEY: String = "player_gas";
-const PLAYER_RACE_KEY: String = "player_race";
-const PLAYER_COLOR_KEY: String = "player_color";
 
 #used in initialize function
 const PLAYER_DICTIONARY_KEY: String = "player_dictionary";
 
 
-
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	spawns = [spawn_1, spawn_2]
+	for spawn: Node3D in spawn_holder.get_children():
+		spawns.append(spawn);
 	multiplayer.multiplayer_peer = Lobby.multiplayer.multiplayer_peer;
 	#Connect to signals from Lobby
 	var _null_var: int = Lobby.start_game.connect(on_start);
+	_null_var = in_game_menu.quit_pressed.connect(on_quit);
+	_null_var = in_game_menu.options_pressed.connect(on_options);
+	_null_var = in_game_menu.resume_pressed.connect(on_resume);
+	_null_var = in_game_menu.return_to_game_pressed.connect(on_return);
+	_null_var = in_game_menu.score_screen_pressed.connect(on_score_screen);
 	Lobby.game_scene_loaded.rpc_id(Lobby.multiplayer_server_id);
-	team_label.text = "Team %s" % GlobalConstants.TEAMS[LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]];
+
+	player_data_manager.player_won.connect(end_game);
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	if (!started):
+	if (!game_is_active):
 		return;
-	if (local_game_dict.is_empty()):
-		return;
-	minerals_label.text = "Minerals: %s" % local_game_dict[PLAYER_RESOURCE_KEY]
-	gas_label.text = "Gas: %s" % local_game_dict[PLAYER_GAS_KEY];
+	minerals_label.text = "Minerals: %s" % player_data_manager.player_dict[player_data_manager.local_id][PlayerDataManager.MINERAL_KEY]
+	gas_label.text = "Gas: %s" % player_data_manager.player_dict[player_data_manager.local_id][PlayerDataManager.GAS_KEY];
+
 	elapsed_time = Time.get_ticks_msec() - start_time;
 	sec = int(elapsed_time / 1000) % 60
 	minutes = int(elapsed_time/ (1000 * 60)) % 60
@@ -71,56 +73,60 @@ func on_start() -> void:
 		return
 	var init_dict: Dictionary = {};
 	var start_spot: int = 0;
-
+	#before all data has been collected for each player and our dicitonary game has been created, create the player arr in entity_hjolder
+	var player_arr: Array[int] = [];
+	for player: String in Lobby.lobby_player_dictionary:
+		player_arr.append(Lobby.lobby_player_dictionary[player][GlobalConstants.COLOR_KEY])
+	print("we created the player array that the entity holder will use first")
+	print("player arr is %s" % [player_arr]);
+	entity_holder.initialize_player_arr.rpc(player_arr);
 	for player_id: String in Lobby.lobby_player_dictionary:
-		#create the peer's local player data
-		var player_dictionary: Dictionary[String, Variant] = {
-		"player_id" = player_id,
+		var player: int = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY];
+		#new version, we do not want to base unit values off peer id so we care about color/player_id instead of peer id
+		var player_dict: Dictionary[String, Variant] = { ##Data is collected from the lobby node and then we do not communicate with lobby after
+		"player_id" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY], #num int and also is the same as color
 		"player_username" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.USERNAME_KEY],
 		"player_race" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.RACE_KEY],
 		"player_team" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.TEAM_KEY],
 		"player_color" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY],
-		"player_resource" = 50,
-		"player_gas" = 0
+		"player_mineral" = player_resource,
+		"player_gas" = player_gas,
+		"player_supply" = [0,0],
+		"player_peer_id" = player_id,
+		"player_playing" = false,
 		}
 		#
-		player_game_dict[player_id] = player_dictionary;
+		player_data_manager.player_dict[player] = player_dict; #player is an int key for the
 
-		init_dict["spawn_id"] = start_spot;
-		init_dict["player_dictionary"] = player_dictionary;
+		init_dict["spawn_id"] = start_spot; #Package starting location to send in RPC
 		var spawn_loc: Vector3 = spawns[start_spot].global_position;
 		#spawn the starting player's command center via RPC to all players
-		var spawn_info: Dictionary ={
-			"team" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.TEAM_KEY],
+		var spawn_dictionary: Dictionary ={
+			"team" = player_dict[PlayerDataManager.TEAM_KEY],
 			"player_id" = player_id,
 			"position" = spawn_loc,
-			"color" =  player_dictionary[PLAYER_COLOR_KEY],
-			"race" = player_dictionary[PLAYER_RACE_KEY]
+			"color" =  player_dict[PlayerDataManager.COLOR_KEY],
+			"race" = player_dict[PlayerDataManager.RACE_KEY]
 		}
-		create_initial_player_entities.rpc(spawn_info)
+		create_initial_player_entities.rpc(spawn_dictionary)
 		start_spot += 1;
 
-		initialize_local_start.rpc_id(player_id.to_int(), init_dict);
-	#after all data has been collected for each player and our dicitonary game has been created
-
+		initialize_local_start.rpc_id(player_id.to_int(), init_dict, player_dict["player_color"]); #RPC To create local player data, data is repeated in local dict for ease of access
 	#Initialize every player's dictionary of all player data
-	push_game_data_batch.rpc(player_game_dict)
-
-
+	player_data_manager.push_game_data_batch.rpc(player_data_manager.player_dict)
 	start_game.rpc();
 
 @rpc("authority", "call_local", "reliable")
-func add_entity_from_dict(dict: Dictionary) -> void:
+func add_entity_from_dict(spawn_dictionary: Dictionary) -> void:
 	if (multiplayer.get_remote_sender_id() != Lobby.multiplayer_server_id):
 		return;
-	if (dict.is_empty()):
+	if (spawn_dictionary.is_empty()):
 		return;
-	var obj: Node3D = load(dict["file_path"]).instantiate();
-	obj.team = dict["team"];
-	obj.player_id = dict["player_id"];
-	obj.global_position = dict["position"];
-	#color is an int, the object will access the actual color via GlobalConstants
-	obj.color = dict["color"];
+	var obj: Node3D = load(spawn_dictionary["file_path"]).instantiate();
+	obj.team = spawn_dictionary["team"];
+	obj.player_id = spawn_dictionary["player_id"];
+	obj.global_position = spawn_dictionary["position"];
+	obj.color = spawn_dictionary["color"]; #color is an int, the object will access the actual color via GlobalConstants
 	entity_holder.add_child(obj);
 	pass;
 
@@ -140,7 +146,7 @@ func create_initial_player_entities(dict: Dictionary) -> void:
 			spawn_path = GlobalConstants.DWARF_SETTLEMENT_FILEPATH;
 	var start_building: Node3D = load(spawn_path).instantiate();
 	start_building.team = dict["team"];
-	start_building.player_id = dict["player_id"];
+	print("player id for starting building is %s" % dict["player_id"])
 	#color is an int, the object will access the actual color via GlobalConstants
 	start_building.color = dict["color"];
 	start_building.is_constructed = true;
@@ -151,159 +157,80 @@ func create_initial_player_entities(dict: Dictionary) -> void:
 
 #set up game for player, called by rpc_id to each specific player
 @rpc("authority", "call_local", "reliable")
-func initialize_local_start(init_dict: Dictionary) -> void:
+func initialize_local_start(init_dict: Dictionary, player_id: int) -> void:
+	player_data_manager.local_id = player_id
+	print("my local id is %s" % player_id)
 	if (init_dict.is_empty()):
 		push_error(multiplayer.get_unique_id(), "cannot initialize game start data, init dict was empty")
 		return;
 	if (init_dict.has("spawn_id")):
 		var spawn : Marker3D = spawns[init_dict["spawn_id"]];
 		camera.global_position = Vector3(spawn.global_position.x, 0, spawn.global_position.z);
-	#our local dictionary becomes the dictionary that the server created for us
-	if (init_dict.has(PLAYER_DICTIONARY_KEY)):
-		local_game_dict = init_dict[PLAYER_DICTIONARY_KEY];
-	return;
 
-
-
-@rpc("any_peer", "call_local", "reliable")
-func request_player_data_update(player_id: String, key: String, data: Variant) -> void:
-	if (!multiplayer.is_server()):
-		return;
-	if (!player_game_dict.has(player_id)):
-		return;
-	if(key == PLAYER_RESOURCE_KEY || key == PLAYER_GAS_KEY):
-
-		var val: int = player_game_dict[player_id][key];
-
-		var new_val: int = val + data;
-		if (val <= 0):
-			val = 0;
-		data = new_val;
-
-	player_game_dict[player_id][key] = data;
-
-	push_player_data_update.rpc(player_id,key,data);
-
-
-
-##TODO
-@rpc("any_peer", "call_local", "reliable")
-func request_player_data_update_batch(_player_id: String, _new_dict: Dictionary[String,Variant]) ->void:
-	#send a full local player dictionary to that player
-	pass;
-
-##TODO
-@rpc("authority", "call_local", "reliable")
-func push_player_data_update(updated_player: String, key: String, data: Variant) ->void:
-	#if this was not called by the authority return;
-	if (multiplayer.get_remote_sender_id() != Lobby.multiplayer_server_id):
-		push_error("this wasnt sent by the authority? wtf");
-		return;
-	#if this is not a valid player return;
-	if (!player_game_dict.has(updated_player)):
-		push_error("not a valid player in dictionary");
-		return;
-	#update our player_game_dictionary
-
-	player_game_dict[updated_player][key] = data;
-
-	#if we are updating the local player's information
-	if (updated_player == local_game_dict[PLAYER_ID_KEY]):
-
-		local_game_dict[key] = data;
-		print(local_game_dict[key]);
-	pass;
-
-@rpc("authority", "call_local", "reliable")
-func push_player_data_update_batch(updated_player:String, dict: Dictionary[String, Variant]) ->void:
-	#if this was not called by the authority return;
-	if (multiplayer.get_remote_sender_id() != Lobby.multiplayer_server_id):
-		push_error("this wasnt sent by the authority? wtf");
-		return;
-	#if this is not a valid player return;
-	if (!player_game_dict.has(updated_player)):
-		push_error("not a valid player in dictionary");
-		return;
-		#if we are updating the local player's information
-	#update our player_game_dictionary
-	player_game_dict[updated_player] = dict;
-
-	if (updated_player == local_game_dict[PLAYER_ID_KEY]):
-		local_game_dict = dict;
-
-
-#Called during the game initialization startup
-@rpc("authority","call_local","reliable")
-func push_game_data_batch(dict: Dictionary[String, Dictionary]) ->void:
-	#if this was not called by the authority return;
-	if (multiplayer.get_remote_sender_id() != Lobby.multiplayer_server_id):
-		push_error("this wasnt sent by the authority? wtf");
-		return;
-	player_game_dict = dict;
-
-	#also should update our local player data with this data in order to keep things synced as possible
-	local_game_dict = player_game_dict[local_game_dict[PLAYER_ID_KEY]]
-	print(local_game_dict, Time.get_ticks_msec());
-
-#array has a slot for each resource type because it has to pass both as checks for spending
-#Array cannot be typed due to functionality of originating Dictionary (See GlobalConstants CMD Dictionaries)
-func spend_resources(player_id: String, cost_arr: Array) -> bool:
-	var mineral_cost: int = cost_arr[0];
-	var gas_cost: int = cost_arr[1];
-	#final check on resources
-	if (mineral_cost > player_game_dict[player_id][PLAYER_RESOURCE_KEY]):
-		return false;
-	if (gas_cost> player_game_dict[player_id][PLAYER_GAS_KEY]):
-		return false;
-	#cost array is converted to absolute values
-	request_player_data_update.rpc(player_id, PLAYER_RESOURCE_KEY, -1 * abs(mineral_cost));
-	request_player_data_update.rpc(player_id, PLAYER_GAS_KEY, -1 * abs(gas_cost));
-	return true;
-
-#cost array is converted to absolute values
-func refund_resources(player_id: String, cost_arr: Array) ->bool:
-	var mineral_cost: int = cost_arr[0];
-	var gas_cost: int = cost_arr[1];
-	#final check on resources
-	print(player_game_dict[player_id])
-	#max allowable minerals?
-	if (mineral_cost > 99999):
-		return false;
-	#max allowable gas?
-	if (gas_cost> 99999):
-		return false;
-
-	request_player_data_update.rpc(player_id, PLAYER_RESOURCE_KEY, abs(mineral_cost));
-	request_player_data_update.rpc(player_id, PLAYER_GAS_KEY, abs(gas_cost));
-	return true;
-
-#check which resource to supply in this scenario, different than spend s
-func gain_resources(player_id: String, resource_arr: Array) -> bool:
-	print("gain resources at %s" % Time.get_ticks_msec())
-	#slot 1 is amount, slot 2 is resource type
-	match(resource_arr[1]):
-		GlobalConstants.ResourceType.MINERAL:
-			var mineral_cost: int = resource_arr[0];
-			request_player_data_update.rpc(player_id, PLAYER_RESOURCE_KEY, mineral_cost);
-			return true;
-		GlobalConstants.ResourceType.GAS:
-			var gas_cost: int = resource_arr[0];
-			request_player_data_update.rpc(player_id, PLAYER_GAS_KEY, gas_cost);
-			return true;
-		_:
-			print("not valid resource type, returning  false")
-			return false;
 
 #function that server does to set everyone's information
 #iterate over the Lobby dictionary and establish their information
 #called by the server, each local person starts the game
 @rpc("authority","call_local","reliable")
 func start_game() -> void:
-	started = true;
+	game_is_active = true;
 	game_clock.text = "00:00";
 	start_time = Time.get_ticks_msec();
+	team_label.text = "Team: %s" % player_data_manager.player_dict[player_data_manager.local_id][PlayerDataManager.TEAM_KEY];
 
+func end_game(winner_team: int) -> void:
+	if(!multiplayer.is_authority()):
+		return;
+	var dict: Dictionary = player_data_manager.player_dict;
+	for player: int in dict:
+		var peer_id: String = dict[PlayerDataManager.PEER_ID_KEY];
+		if dict[player][PlayerDataManager.TEAM_KEY] == winner_team:
+			end_game_rpc.rpc_id(int(peer_id), true); # Winner
+
+		else:
+			end_game_rpc.rpc_id(int(peer_id), false);
+
+
+@rpc("authority", "call_local", "reliable")
+func end_game_rpc(is_winner: bool) -> void:
+	process_mode = Node.PROCESS_MODE_DISABLED;
+	game_is_active = false;
+	if (is_winner):
+		in_game_menu.show_victory();
+	else:
+		in_game_menu.show_defeat();
+
+func on_quit() -> void:
+	player_data_manager.player_lost.rpc(player_data_manager.local_id);
+	process_mode = Node.PROCESS_MODE_DISABLED;
+	game_is_active = false;
+	in_game_menu.show_defeat();
+
+
+func on_resume() ->void:
+	in_game_menu.toggle_menu();
 	pass;
+
+func on_return() -> void:
+	in_game_menu.toggle_menu(); #same as resume for now until we implement paused single player gaming :3 3/25/26
+	pass;
+
+func on_score_screen() ->void:
+	#emit signal to main menu to swap to that and get the hell out of here
+	score_screen_event.emit();
+	pass;
+
+func on_options() ->void:
+	pass;
+
+#placeholder scripts for main menu
+func get_player_data() ->Dictionary:
+	return player_data_manager.player_dict;
+func get_player_history() ->Dictionary:
+	return {};
+func get_cmd_array() -> Dictionary:
+	return {};
+
 
 func get_elapsed_time() -> float:
 	var time: float = Time.get_ticks_msec() - start_time;

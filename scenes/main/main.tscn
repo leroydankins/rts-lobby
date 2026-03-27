@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://uq2xxe87qrg3" path="res://scenes/main/main.gd" id="1_2w1kt"]
 [ext_resource type="Script" uid="uid://ny1k5n1wesmp" path="res://scenes/lobby_gui/lobby_gui.gd" id="1_yh5la"]
+[ext_resource type="PackedScene" uid="uid://bitlb2ag1imd" path="res://scenes/score_screen/score_screen.tscn" id="3_k2fmo"]
 
 [node name="Main" type="Node" unique_id=863003041 groups=["Main"]]
 script = ExtResource("1_2w1kt")
@@ -392,5 +393,8 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Join Lobby"
 metadata/_edit_use_anchors_ = true
+
+[node name="ScoreScreen" parent="CanvasLayer" unique_id=1695320857 instance=ExtResource("3_k2fmo")]
+visible = false
 
 [node name="GameHolder" type="Node" parent="." unique_id=879181187]

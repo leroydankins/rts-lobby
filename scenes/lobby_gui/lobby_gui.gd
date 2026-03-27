@@ -189,7 +189,7 @@ func on_disconnect_pressed() -> void:
 	#Setting button_pressed to false will call emit the toggle signal automatically
 	ready_button.button_pressed = false;
 	#LocalPlayerData.update_dictionary_data("ready", false);
-	var err: Error = Lobby.remove_multiplayer_peer();
+	var _err: Error = Lobby.remove_multiplayer_peer();
 
 func on_connection_started() ->void:
 	if(!visible):

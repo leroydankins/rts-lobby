@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://cv673a3v7wsju"]
 
-[ext_resource type="Script" uid="uid://cmdc43xapqjlj" path="res://components/aggro_area_component.gd" id="1_c3t82"]
+[ext_resource type="Script" uid="uid://cmdc43xapqjlj" path="res://components/aggro_component/aggro_component.gd" id="1_1ue84"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_c3t82"]
 height = 10.0
 radius = 10.0
 
-[node name="AggroArea" type="Area3D" unique_id=1337634102]
+[node name="AggroComponent" type="Area3D" unique_id=1337634102]
 collision_layer = 0
 collision_mask = 2
-script = ExtResource("1_c3t82")
+script = ExtResource("1_1ue84")
 aggro_range = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=700555670]

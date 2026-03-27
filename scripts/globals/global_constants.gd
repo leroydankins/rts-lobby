@@ -1,5 +1,4 @@
 class_name GlobalConstants
-extends Node
 
 #Brother we should not have 1 2 3 4 be the team numbers but whatever
 const TEAMS: Dictionary[int, String] = {0 : "1", 1: "2", 2: "3", 3: "4", 99: "neutral"}

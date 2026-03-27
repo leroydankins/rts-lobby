@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://brswtdtnw6m5q"]
+
+[ext_resource type="Script" uid="uid://coijl3vrbg37j" path="res://functional/player_data_manager/player_data_manager.gd" id="1_wsvco"]
+
+[node name="PlayerDataManager" type="Node" unique_id=844976815 groups=["PlayerDataManager"]]
+script = ExtResource("1_wsvco")

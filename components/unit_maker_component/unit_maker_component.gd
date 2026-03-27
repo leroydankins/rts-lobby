@@ -1,9 +1,8 @@
 class_name UnitMakerComponent
 extends Node3D
 @onready var parent: Node3D = get_parent();
-@export var spawn_marker: Marker3D;
 #constant used for spawning
-const SPAWN_DISTANCE: int = 1;
+const SPAWN_DISTANCE: int = 3;
 const CONSTRUCTION_COMPLETE: int = 10;
 const BUILD_LIMIT: int = 8;
 
@@ -77,7 +76,7 @@ func cancel_queued(p_int: int) -> void:
 	var queued: Dictionary = build_queue.pop_at(p_int);
 	if(!queued.has("cost")):
 		return;
-	var _success: int = game.refund_resources(parent.player_id,queued["cost"]);
+	var _success: int = parent.player_data_manager.refund_resources(parent.color,queued["cost"]);
 
 func cancel_build() ->void:
 	if(!multiplayer.is_server()):
@@ -86,7 +85,7 @@ func cancel_build() ->void:
 		return;
 	var cost_arr : Array = build_item["cost"]
 	#call refund resources on cost  to player id
-	var _success: bool = game.refund_resources(parent.player_id,cost_arr);
+	var _success: bool = parent.player_data_manager.refund_resources(parent.color,cost_arr);
 	build_item = {};
 	build_time = 0;
 	build_progress = 0;
@@ -110,11 +109,10 @@ func spawn_unit(filepath: String) -> void:
 	var spawn_dict: Dictionary ={
 	"file_path" = filepath,
 	"team" = parent.team,
-	"player_id" = parent.player_id,
 	"position" = spawn_position,
 	"color" = parent.color
 	}
-	if(parent.BUILDING_TYPE.contains(GlobalConstants.BuildingType.RESOURCE_DEPOT)):
+	if(parent.BUILDING_TYPE.has(GlobalConstants.BuildingType.RESOURCE_DEPOT)):
 		spawn_dict["resource_depot"] = parent.get_path(); #set path of this unit in the tree for RPC call
 
 	var cmd: Dictionary = {}; # Set up any command you want the unit to have at start

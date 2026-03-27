@@ -34,7 +34,8 @@ func _ready() -> void:
 
 func _process(_delta: float) ->void:
 	if(!cost.is_empty()):
-		var resources: Array = [game.local_game_dict[game.PLAYER_RESOURCE_KEY], game.local_game_dict[game.PLAYER_GAS_KEY]];
+		var local_dict: Dictionary = game.player_data_manager.player_dict[game.player_data_manager.local_id];
+		var resources: Array = [local_dict[PlayerDataManager.MINERAL_KEY], local_dict[PlayerDataManager.GAS_KEY]];
 		if (cost[0] > resources[0] || cost[1] > resources[1]):
 			button.disabled = true;
 		else:

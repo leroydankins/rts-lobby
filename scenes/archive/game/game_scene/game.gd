@@ -46,7 +46,6 @@ const PLAYER_DICTIONARY_KEY: String = "player_dictionary";
 func _ready() -> void:
 	spawns = [spawn_1, spawn_2, spawn_3,  spawn_4]
 	multiplayer.multiplayer_peer = Lobby.multiplayer.multiplayer_peer;
-	#Connect to signals from Lobby
 	var _null_var: int = Lobby.start_game.connect(on_start);
 	Lobby.game_scene_loaded.rpc_id(Lobby.multiplayer_server_id);
 	team_label.text = "Team %s" % GlobalConstants.TEAMS[LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]];

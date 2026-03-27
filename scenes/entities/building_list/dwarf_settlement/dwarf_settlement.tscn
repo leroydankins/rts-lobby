@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://ciowi2ihl7xpm" path="res://scenes/entities/building_list/dwarf_settlement/dwarf_settlement.gd" id="1_efaj4"]
 [ext_resource type="PackedScene" uid="uid://14s0usu8vx7j" path="res://resources/highlight_mesh/highlight_mesh.tscn" id="2_24p8b"]
 [ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="3_wgkab"]
+[ext_resource type="PackedScene" uid="uid://bp1byohtd1if2" path="res://components/unit_maker_component/unit_maker_component.tscn" id="4_bpprt"]
 [ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="4_wgkab"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wgkab"]
@@ -21,41 +22,46 @@ size = Vector2(4, 4)
 [sub_resource type="BoxShape3D" id="BoxShape3D_vblcw"]
 size = Vector3(2.5, 2.5, 2.5)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bpprt"]
-albedo_color = Color(0.58363324, 0.21232674, 0.1670669, 1)
-
-[sub_resource type="PrismMesh" id="PrismMesh_wgkab"]
-material = SubResource("StandardMaterial3D_bpprt")
-size = Vector3(2.5, 2.5, 2.5)
-
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_24p8b"]
-properties/0/path = NodePath(".:is_constructed")
+properties/0/path = NodePath("UnitMakerComponent:build_time")
 properties/0/spawn = true
 properties/0/replication_mode = 2
-properties/1/path = NodePath(".:build_time")
+properties/1/path = NodePath("UnitMakerComponent:build_item")
 properties/1/spawn = true
 properties/1/replication_mode = 2
-properties/2/path = NodePath(".:build_item")
+properties/2/path = NodePath("UnitMakerComponent:build_queue")
 properties/2/spawn = true
 properties/2/replication_mode = 2
-properties/3/path = NodePath(".:build_queue")
+properties/3/path = NodePath("UnitMakerComponent:build_progress")
 properties/3/spawn = true
 properties/3/replication_mode = 2
-properties/4/path = NodePath(".:build_progress")
+properties/4/path = NodePath("UnitMakerComponent:build_speed_mult")
 properties/4/spawn = true
 properties/4/replication_mode = 2
+properties/5/path = NodePath("HealthComponent:health")
+properties/5/spawn = true
+properties/5/replication_mode = 1
+properties/6/path = NodePath("HealthComponent:max_health")
+properties/6/spawn = true
+properties/6/replication_mode = 1
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_wgkab"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_bpprt"]
 viewport_path = NodePath("SubViewport")
 
-[node name="DwarfSettlement" type="Area3D" unique_id=1146713369 groups=["Building", "Entity"]]
-collision_layer = 26
+[node name="DwarfSettlement" type="Area3D" unique_id=1146713369 node_paths=PackedStringArray("highlight_mesh", "health_component", "unit_maker_component", "body_mesh") groups=["Building", "Entity"]]
+collision_layer = 58
 script = ExtResource("1_efaj4")
+highlight_mesh = NodePath("HighlightMesh")
+health_component = NodePath("HealthComponent")
+unit_maker_component = NodePath("UnitMakerComponent")
+body_mesh = NodePath("BodyMesh")
 
 [node name="HighlightMesh" parent="." unique_id=2073616164 instance=ExtResource("2_24p8b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 visible = false
 mesh = SubResource("PlaneMesh_27gdb")
+
+[node name="UnitMakerComponent" parent="." unique_id=926730106 instance=ExtResource("4_bpprt")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=512416355]
 transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 0, 1.25, 0)
@@ -63,7 +69,6 @@ shape = SubResource("BoxShape3D_vblcw")
 
 [node name="BodyMesh" type="MeshInstance3D" parent="." unique_id=549104639]
 transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 0, 1.25, 0)
-mesh = SubResource("PrismMesh_wgkab")
 
 [node name="Marker3D" type="Marker3D" parent="." unique_id=382978170]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
@@ -79,11 +84,11 @@ neighbor_distance = 0.1
 
 [node name="HealthComponent" parent="." unique_id=339288295 instance=ExtResource("4_wgkab")]
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 1.3726177, 0)
-health = 400
-max_health = 400
+health = 10
+max_health = 10
 
 [node name="HPSprite" parent="HealthComponent" index="0" unique_id=1806707282]
-texture = SubResource("ViewportTexture_wgkab")
+texture = SubResource("ViewportTexture_bpprt")
 
 [node name="SubViewport" parent="HealthComponent" index="1" unique_id=1164087689]
 size = Vector2i(96, 16)

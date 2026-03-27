@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bk5soe7dxxfcm"]
 
 [ext_resource type="Script" uid="uid://ceb5gf4ushwyn" path="res://scenes/entities/unit_list/dwarf_worker/dwarf_worker.gd" id="1_f2n24"]
-[ext_resource type="PackedScene" uid="uid://cv673a3v7wsju" path="res://components/aggro_area_component.tscn" id="2_auf3i"]
+[ext_resource type="PackedScene" uid="uid://cv673a3v7wsju" path="res://components/aggro_component/aggro_component.tscn" id="2_auf3i"]
 [ext_resource type="PackedScene" uid="uid://14s0usu8vx7j" path="res://resources/highlight_mesh/highlight_mesh.tscn" id="2_phyvn"]
 [ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="3_g1rkk"]
 [ext_resource type="PackedScene" uid="uid://dxrceo5t2rtks" path="res://functional/navigation_agent/navigation_agent.tscn" id="4_t7rom"]
@@ -9,6 +9,7 @@
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_e1u8e"]
 height = 1.0
+radius = 0.75
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_g1rkk"]
 render_priority = 0
@@ -22,8 +23,9 @@ shader_parameter/hollow = true
 [sub_resource type="PlaneMesh" id="PlaneMesh_t7rom"]
 material = SubResource("ShaderMaterial_g1rkk")
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_i2bmf"]
-radius = 0.25
+[sub_resource type="CylinderMesh" id="CylinderMesh_auf3i"]
+top_radius = 0.25
+bottom_radius = 0.25
 height = 1.0
 
 [sub_resource type="Animation" id="Animation_e1u8e"]
@@ -95,11 +97,11 @@ size = Vector3(0.25, 0.25, 0.25)
 [sub_resource type="ViewportTexture" id="ViewportTexture_auf3i"]
 viewport_path = NodePath("SubViewport")
 
-[node name="DwarfWorker" type="CharacterBody3D" unique_id=1499610182 node_paths=PackedStringArray("aggro_area") groups=["Entity", "Unit"]]
+[node name="DwarfWorker" type="CharacterBody3D" unique_id=1499610182 node_paths=PackedStringArray("aggro_component") groups=["Entity", "Unit"]]
 collision_layer = 54
 collision_mask = 13
 script = ExtResource("1_f2n24")
-aggro_area = NodePath("AggroArea")
+aggro_component = NodePath("AggroArea")
 
 [node name="InteractArea" type="Area3D" parent="." unique_id=1405716212]
 collision_layer = 0
@@ -121,7 +123,7 @@ visible = false
 mesh = SubResource("PlaneMesh_t7rom")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1184654598]
-mesh = SubResource("CapsuleMesh_i2bmf")
+mesh = SubResource("CylinderMesh_auf3i")
 
 [node name="Anim" type="AnimationPlayer" parent="." unique_id=1830062704]
 libraries/ = SubResource("AnimationLibrary_f2n24")
@@ -137,8 +139,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5)
 mesh = SubResource("BoxMesh_t7rom")
 
 [node name="NavigationAgent" parent="." unique_id=2119946829 instance=ExtResource("4_t7rom")]
-path_desired_distance = 0.5
-target_desired_distance = 0.6
 path_height_offset = 0.25
 avoidance_enabled = false
 debug_enabled = true

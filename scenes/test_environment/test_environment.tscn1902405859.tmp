@@ -27,24 +27,44 @@ transform = Transform3D(-4.371139e-08, 0.7071067, -0.70710677, 0, 0.70710677, 0.
 [node name="Spawn1" parent="GameScene/SpawnHolder" parent_id_path=PackedInt32Array(2086082315, 1490039800) index="0" unique_id=1798815161]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 2.5, -50)
 
-[node name="DwarfWorker7" parent="GameScene/EntityHolder" parent_id_path=PackedInt32Array(2086082315, 1904239509) index="0" unique_id=1499610182 node_paths=PackedStringArray("resource_depot") instance=ExtResource("3_75w43")]
+[node name="DwarfWorker7" parent="GameScene/EntityHolder" parent_id_path=PackedInt32Array(2086082315, 667208127) index="0" unique_id=1499610182 node_paths=PackedStringArray("resource_depot") instance=ExtResource("3_75w43")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 3, 51.62031)
+team = null
+player_id = null
+health = null
+max_health = null
+is_alive = null
+damage = null
 resource_depot = NodePath("../DwarfSettlement")
+target_pos = null
+cmd_queue = null
+cmd_history = null
+held_resource = null
 
-[node name="DwarfWorker6" parent="GameScene/EntityHolder" parent_id_path=PackedInt32Array(2086082315, 1904239509) index="1" unique_id=1213118038 node_paths=PackedStringArray("resource_depot") instance=ExtResource("3_75w43")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 3, 54.4165)
-team = 1
+[node name="DwarfWorker6" parent="GameScene/EntityHolder" parent_id_path=PackedInt32Array(2086082315, 667208127) index="1" unique_id=1213118038 node_paths=PackedStringArray("resource_depot") instance=ExtResource("3_75w43")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 3, 58.681103)
+team = null
+player_id = null
+health = null
+max_health = null
+is_alive = null
+damage = null
 resource_depot = NodePath("../DwarfSettlement")
+target_pos = null
+cmd_queue = null
+cmd_history = null
+held_resource = null
 
 [node name="HPSprite" parent="GameScene/EntityHolder/DwarfWorker6/HealthComponent" parent_id_path=PackedInt32Array(1213118038, 2041268192) index="0" unique_id=1806707282]
 texture = SubResource("ViewportTexture_fnpii")
 
-[node name="DwarfSettlement" parent="GameScene/EntityHolder" parent_id_path=PackedInt32Array(2086082315, 1904239509) index="2" unique_id=1146713369 instance=ExtResource("4_h2la2")]
+[node name="DwarfSettlement" parent="GameScene/EntityHolder" parent_id_path=PackedInt32Array(2086082315, 667208127) index="2" unique_id=1146713369 instance=ExtResource("4_h2la2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 2.5, 50)
 is_constructed = true
 
-[node name="DwarfBarracks" parent="GameScene/EntityHolder" parent_id_path=PackedInt32Array(2086082315, 1904239509) index="3" unique_id=946034466 instance=ExtResource("5_fnpii")]
+[node name="DwarfBarracks" parent="GameScene/EntityHolder" parent_id_path=PackedInt32Array(2086082315, 667208127) index="3" unique_id=946034466 instance=ExtResource("5_fnpii")]
 transform = Transform3D(0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.70710677, 28, 0.75, 40)
+player_id = "1"
 
 [editable path="GameScene"]
 [editable path="GameScene/CameraBase"]

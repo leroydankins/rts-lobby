@@ -30,7 +30,6 @@ Create Forge prototype
 	Build placeholder infantry unit
 	Can research single use upgrade
 
-
 Create prototype infantry unit
 	Contains unit type array
 	selectable
@@ -39,9 +38,35 @@ Create prototype infantry unit
 	Implement worker command queue system
 	moves, attacks enemy units
 
-
 Player technology
 	Array of bools associated with GlobalConstants.Research which determines what technology is available to the player and what units can be built
 	Rankorian_Research = Array[bool] [false, false, false, false]
 	Dwarf_Research = Array[bool] = [false,false,false,false,false,false,false]
 	Array of bools associated with globalconstants.upgrades
+
+#BACKLOG LOL
+	Show unit health and stats when selected
+	Flesh out score screen menu
+
+3/17 DONE
+	Change home resource depot on reaching target for dwarf worker class
+	catch navigation when something is already in interact area
+
+3/18 DONE
+	create end game pop up menu to return to lobby and see post game
+	create pause (but not paused) menu
+
+3/19 DONE
+	connect menu buttons to functions and create end game event
+		create end game event
+
+3/20 DONE
+	Create end game condition that triggrs end game event
+		Creating a player data manager to track player information and then this can check for if we no longer have a unit or building
+		operates by team instead of player_id, but will still have a reference to the player's id?
+
+3/21
+	Work on player_data_manager and player_resource
+
+
+COMPELTELYH REVAMPING SPENDING AND COST TO USE PLAYER COLOR/ID INT ISNTEAD OF PEER ID!

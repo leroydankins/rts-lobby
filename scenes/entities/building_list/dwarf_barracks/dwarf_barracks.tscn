@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://14s0usu8vx7j" path="res://resources/highlight_mesh/highlight_mesh.tscn" id="1_wtuhh"]
 [ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="2_um0yu"]
 [ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="3_helm7"]
-[ext_resource type="PackedScene" uid="uid://bp1byohtd1if2" path="res://components/unit_maker_component.tscn" id="5_helm7"]
+[ext_resource type="PackedScene" uid="uid://bp1byohtd1if2" path="res://components/unit_maker_component/unit_maker_component.tscn" id="5_helm7"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3ycct"]
 render_priority = 0
@@ -61,7 +61,7 @@ viewport_path = NodePath("SubViewport")
 
 [node name="DwarfBarracks" type="StaticBody3D" unique_id=946034466 node_paths=PackedStringArray("highlight_mesh", "health_component", "unit_maker_component")]
 transform = Transform3D(0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.70710677, 0, 0, 0)
-collision_layer = 26
+collision_layer = 58
 script = ExtResource("1_um0yu")
 highlight_mesh = NodePath("HighlightMesh")
 health_component = NodePath("HealthComponent")

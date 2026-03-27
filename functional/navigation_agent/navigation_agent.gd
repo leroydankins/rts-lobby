@@ -2,13 +2,14 @@ extends NavigationAgent3D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	var agent: RID = get_rid()
-	# Enable avoidance
-	NavigationServer3D.agent_set_avoidance_enabled(agent, true)
-	# Create avoidance callback
-	NavigationServer3D.agent_set_avoidance_callback(agent, Callable(self, "_avoidance_done"))
-	# Switch to 3D avoidance
-	NavigationServer3D.agent_set_use_3d_avoidance(agent, true)
+	#var agent: RID = get_rid()
+	## Enable avoidance
+	#NavigationServer3D.agent_set_avoidance_enabled(agent, true)
+	## Create avoidance callback
+	#NavigationServer3D.agent_set_avoidance_callback(agent, Callable(self, "_avoidance_done"))
+	## Switch to 3D avoidance
+	#NavigationServer3D.agent_set_use_3d_avoidance(agent, true)
+	pass;
 
 
 func actor_setup() -> void:

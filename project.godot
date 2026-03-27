@@ -16,10 +16,10 @@ config/icon="res://assets/placeholder/icon.svg"
 
 [autoload]
 
-Lobby="*uid://dovni8u8e0xdm"
 LocalPlayerData="*uid://4cebbyiw6dgv"
 ReplayManager="*uid://c52xk0rxkg112"
 DebugGlobal="*uid://cvjfea0q8veg8"
+Lobby="*uid://dcc12p4tfdrvs"
 
 [debug]
 
@@ -31,8 +31,8 @@ gdscript/warnings/return_value_discarded=1
 
 [display]
 
-window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
+window/size/viewport_width=1280
+window/size/viewport_height=720
 
 [editor_plugins]
 
@@ -63,6 +63,7 @@ Unit="Only Units in this group, excludes buildings"
 Building="Excludes Units"
 EntityHolder="EntityHolder"
 Resource="In Game Resources"
+PlayerDataManager=""
 
 [gui]
 
@@ -212,11 +213,11 @@ A={
 3d_physics/layer_4="Buildings"
 3d_physics/layer_5="Selectable"
 3d_physics/layer_6="AggroLayer"
+3d_physics/layer_32="NavBakeLayer"
 
 [navigation]
 
-3d/default_cell_size=0.05
-3d/default_cell_height=0.1
+3d/default_cell_height=0.5
 
 [physics]
 
@@ -226,6 +227,4 @@ A={
 
 textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
-renderer/rendering_method="gl_compatibility"
-renderer/rendering_method.mobile="gl_compatibility"
 textures/lossless_compression/force_png=true

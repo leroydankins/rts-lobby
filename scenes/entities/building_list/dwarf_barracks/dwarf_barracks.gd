@@ -8,16 +8,14 @@ const PREVIEW: Texture2D = preload(GlobalConstants.BUILDING_PLACEHOLDER_TEXTURE)
 @export var unit_maker_component: UnitMakerComponent
 var game: GameScene;
 var entity_holder: EntityHolder;
+var player_data_manager: PlayerDataManager;
 
 #export so that in test environment everything is ok
 @export_category("Test Environment Variables")
-@export var player_id: String = "";
 @export var team: int = 0;
 @export var color: int = 0;
 
 #combat things
-@export var health: int = 250;
-@export var max_health: int = 250;
 @export var is_alive: bool = true;
 
 
@@ -25,12 +23,10 @@ const CONSTRUCTION_COMPLETE: int = 10;
 var construction_value: float = 0;
 @export var is_constructed: bool = false;
 
-
 #export for syncing
 @export_category("Synced Properties")
 @export var target_location: Vector3;
 @export var target: Node3D;
-
 
 #Shows commands that the unit can take
 var cmd_dict: Dictionary[int, Dictionary] = {
@@ -55,6 +51,7 @@ var cmd_dict: Dictionary[int, Dictionary] = {
 func _ready() -> void:
 	game = get_tree().get_first_node_in_group("Game");
 	entity_holder = get_tree().get_first_node_in_group("EntityHolder");
+	player_data_manager = game.player_data_manager;
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -85,7 +82,7 @@ func request_cmd(cmd_data: Dictionary) -> void:
 			print("Full queue, rejecting command");
 			return;
 		var cost_arr: Array = cmd_data["cost"];
-		var success: bool = game.spend_resources(player_id,cost_arr);
+		var success: bool = player_data_manager.spend_resources(color,cost_arr);
 		if (!success):
 			return;
 	var cmd: String = cmd_data["mnemonic"]
@@ -135,10 +132,15 @@ func unset_selected() -> void:
 func take_damage(damage_int: int, attacking_team: int) -> void:
 	if(!multiplayer.is_server() || attacking_team == team):
 		return;
+	print(damage_int)
+	#later we will play death animations!!
 	var died: bool = health_component.take_damage(damage_int);
 	if(died):
+		is_alive = false;
 		var entity_path: String = get_path();
-		entity_holder.rpc("derigister unit", entity_path);
+		entity_holder.rpc("remove_entity", entity_path);
+		#play death animation
+		#anim.stop();
 
 
 func heal(heal_int: int, healing_team: int) -> void:

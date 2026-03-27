@@ -1,0 +1,110 @@
+[gd_scene format=3 uid="uid://bitlb2ag1imd"]
+
+[ext_resource type="Script" uid="uid://duq32cfku5vrk" path="res://scenes/score_screen/score_screen.gd" id="1_ydmrk"]
+
+[node name="ScoreScreen" type="Control" unique_id=1695320857]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ydmrk")
+
+[node name="MainMenuButton" type="Button" parent="." unique_id=628344615]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.8578125
+anchor_top = 0.89305556
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Return To Main"
+metadata/_edit_use_anchors_ = true
+
+[node name="LobbyButton" type="Button" parent="." unique_id=18063774]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.70703125
+anchor_top = 0.89166665
+anchor_right = 0.8492187
+anchor_bottom = 0.9986111
+offset_left = -8.0
+offset_top = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Return To Lobby"
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=12321527]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.02
+anchor_right = 0.6
+anchor_bottom = 0.1
+offset_bottom = 0.11999893
+grow_horizontal = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer" unique_id=1541033404]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 2
+
+[node name="OverallScore" type="Button" parent="HBoxContainer/MarginContainer" unique_id=649644784]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Overall"
+
+[node name="MarginContainer2" type="MarginContainer" parent="HBoxContainer" unique_id=1401038954]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 2
+
+[node name="ResourceScore" type="Button" parent="HBoxContainer/MarginContainer2" unique_id=1994722765]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Resources"
+
+[node name="MarginContainer3" type="MarginContainer" parent="HBoxContainer" unique_id=619808689]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 2
+
+[node name="ArmyScore" type="Button" parent="HBoxContainer/MarginContainer3" unique_id=1674693902]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Army"
+
+[node name="TabContainer" type="TabContainer" parent="." unique_id=601612212]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.040625
+anchor_top = 0.10138889
+anchor_right = 0.92890626
+anchor_bottom = 0.87916666
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="Overall Score" type="MarginContainer" parent="TabContainer" unique_id=852577633]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+metadata/_tab_index = 0

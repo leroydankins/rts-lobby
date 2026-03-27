@@ -1,3 +1,4 @@
+class_name BuildSlot
 extends Control
 signal queue_pressed(slot: int);
 
@@ -16,6 +17,14 @@ func on_press() -> void:
 func update_data(texture: Texture2D) -> void:
 	texture_rect.texture = texture;
 
+func remove_data() ->void:
+	texture_rect.texture = null;
+
+func has_texture() -> bool:
+	if texture_rect.texture != null:
+		return true;
+	else:
+		return false;
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass

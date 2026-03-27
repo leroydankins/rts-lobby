@@ -1,14 +1,18 @@
 extends CharacterBody3D
+#ENTITY CONSTANTS
 const ENTITY_NAME: String = "DwarfWorker"
 const ENTITY_TYPE: GlobalConstants.EntityType = GlobalConstants.EntityType.UNIT;
+const ENTITY_NUMBER: EntityConstants.Units = EntityConstants.Units.DWARF_WORKER;
 const PREVIEW: Texture2D = preload(GlobalConstants.UNIT_PLACEHOLDER_TEXTURE);
+const ENTITY_HEIGHT_OFFSET: float = .5;
+
 @onready var highlight_mesh: MeshInstance3D = $HighlightMesh
 @onready var resource_mesh: MeshInstance3D = $ResourceMesh
 @onready var anim: AnimationPlayer = $Anim
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var interact_area: Area3D = $InteractArea
-@export var aggro_area: AggroComponent
+@export var aggro_component: AggroComponent
 
 const MOVE_SPEED: float = 4.0;
 const GET_RESOURCE_COLLISION_MASK: int = 0b1001 # This is set with direct method call atm
@@ -16,8 +20,7 @@ const REGULAR_COLLISION_MASK: int = 0b1011; #OBE: Method Call set_collision_mask
 const UNIT_COLLISION_MASK: int = 3;
 
 @export var team: int = 0;
-var color: int = 0;
-@export var player_id: String = "";
+@export var color: int = 0;
 
 #combat things
 @export var health: int = 25;
@@ -28,13 +31,14 @@ var color: int = 0;
 #extra game refernces,  bad and get rid of this later
 var game: GameScene;
 var entity_holder: EntityHolder;
+var player_data_manager: PlayerDataManager;
 @export var resource_depot: Node3D
 #navigation bool
 var navigating: bool = false;
 
 #LOCAL VARIABLE, DO NOT SYNC ACROSS PLAYERS
 var is_selected: bool = false;
-
+var interactable_array: Array = [];
 #Shows commands that the unit can take
 var cmd_dict: Dictionary[int, Dictionary] = {
 	0: {},
@@ -68,12 +72,13 @@ var building: Node3D;
 func _ready() -> void:
 	game = get_tree().get_first_node_in_group("Game");
 	entity_holder = get_tree().get_first_node_in_group("EntityHolder");
+	player_data_manager = game.player_data_manager;
 	navigation_agent.navigation_finished.connect(on_nav_finished);
 	interact_area.body_entered.connect(on_interact_area_entered);
 	interact_area.area_entered.connect(on_interact_area_entered);
 	interact_area.body_exited.connect(on_interact_area_exited);
 	interact_area.area_exited.connect(on_interact_area_exited);
-	aggro_area.aggrod.connect(on_aggrod)
+	aggro_component.aggrod.connect(on_aggrod)
 	#navigation_agent.velocity_computed.connect(Callable(_on_velocity_computed))
 	#check if we don't have a correct building type for resource depot? why the fuck would it be wrong
 	if(resource_depot != null):
@@ -245,6 +250,10 @@ func _process(delta: float) -> void:
 			if(resource_depot.team != team):
 				resource_depot = null;
 				finish_cmd();
+			if(resource_depot.is_alive != true):
+				resource_depot = null;
+				finish_cmd();
+				return;
 			var g_pos: Vector3 = resource_depot.global_position;
 			if (g_pos != navigation_agent.target_position):
 				navigation_agent.set_target_position(g_pos);
@@ -263,7 +272,7 @@ func unset_selected() -> void:
 	health_component.hide_health();
 
 func start_cmd() -> void:
-	aggro_area.can_aggro = false;
+	aggro_component.can_aggro = false;
 	var cmd: Dictionary = cmd_queue[0];
 	match cmd["command"]:
 		GlobalConstants.Commands.MOVE:
@@ -289,6 +298,7 @@ func start_cmd() -> void:
 				return;
 			else:
 				target = tar;
+
 			navigation_agent.set_target_position(target.global_position);
 			navigating = true;
 			#Reassign command type based on entity
@@ -297,6 +307,7 @@ func start_cmd() -> void:
 					#Is this unit an enemy? Attack, else, follow
 					if (target.team != team):
 						cmd["command"] = GlobalConstants.Commands.ATTACK;
+						print("attack")
 					else:
 						cmd["command"] = GlobalConstants.Commands.FOLLOW;
 				GlobalConstants.EntityType.BUILDING:
@@ -315,7 +326,6 @@ func start_cmd() -> void:
 				GlobalConstants.EntityType.RESOURCE:
 					cmd["command"] = GlobalConstants.Commands.GET_RESOURCE;
 					set_collision_mask_value(UNIT_COLLISION_MASK,false)
-
 		GlobalConstants.Commands.ATTACK:
 			#currently there is no way to send an attack command directly to this point, but will probably implement an attack command via hotkey - erh 2/28/26
 			var tar: Node3D = get_tree().root.get_node(cmd["target_node_path"]);
@@ -356,11 +366,14 @@ func start_cmd() -> void:
 			if(navigating == false):
 				navigating = true;
 			target_pos = t_pos;
-			aggro_area.can_aggro = true;
+			aggro_component.can_aggro = true;
 			pass;
+	if(is_instance_valid(target)):
+		for i: int in interactable_array.size(): #check if the target is already in range
+			if(target == interactable_array[i]):
+				on_nav_finished();
 
-	#END OF START COMMAND
-	wait_bool = false;
+
 
 #called only by multipalyer instance
 func finish_cmd() -> void:
@@ -381,12 +394,11 @@ func finish_cmd() -> void:
 	target = null;
 	target_pos = Vector3.ZERO;
 	navigating = false;
-	aggro_area.can_aggro = false;
-
+	aggro_component.can_aggro = false;
 	#IDLE STATE DATA
 	if(cmd_queue.is_empty()):
-		if(aggro_area.auto_aggro):
-			aggro_area.can_aggro = true;
+		if(aggro_component.auto_aggro):
+			aggro_component.can_aggro = true;
 
 	else:
 		start_cmd();
@@ -401,9 +413,9 @@ func request_cmd(cmd_data: Dictionary) -> void:
 	if !cmd_data.has("mnemonic"):
 		push_error("command invalid");
 		return;
-	if(cmd_data.has("cost")):
+	if(cmd_data.has("cost")): #Rework to use team id instead of cost
 		var cost_arr: Array = cmd_data["cost"];
-		var success: bool = game.spend_resources(player_id,cost_arr);
+		var success: bool = player_data_manager.spend_resources(color,cost_arr);
 		if (!success):
 			return;
 
@@ -415,11 +427,11 @@ func request_cmd(cmd_data: Dictionary) -> void:
 					#backwards way of doing this if statement lol, fix later
 					continue;
 				#refund the cost if you are clearing out the queue
-				var minerals: int = cmd_queue[i]["cost"][0];
-				var gas: int = cmd_queue[i]["cost"][1];
+				var resources: Array[int] = [cmd_queue[i]["cost"]];
 				#for those reading this, I know this is probably bad code smell or whatever to be calling a parent method but whatever dude
-				game.request_player_data_update.rpc(player_id,game.PLAYER_RESOURCE_KEY, minerals)
-				game.request_player_data_update.rpc(player_id,game.PLAYER_GAS_KEY, gas)
+				player_data_manager.refund_resources(color,resources);
+
+
 			pass;
 		#finish whatever you were doing, put that command into history dictionary
 		finish_cmd();
@@ -480,7 +492,6 @@ func spawn_building_rpc(dict: Dictionary) -> void:
 		return;
 	var obj: Node3D = load(dict["file_path"]).instantiate();
 	obj.team = dict["team"];
-	obj.player_id = dict["player_id"];
 
 	#color is an int, the object will access the actual color via GlobalConstants
 	obj.color = dict["color"];
@@ -497,10 +508,8 @@ func spawn_building(filepath: String) -> void:
 	if (!multiplayer.is_server()):
 		return;
 	var spawn_dict: Dictionary ={
-	#temp use of a direct constant, the filepath will depend on starting race
 	"file_path" = filepath,
 	"team" = team,
-	"player_id" = player_id,
 	"position" = cmd_queue[0]["location"],
 	"color" = color,
 	}
@@ -552,13 +561,13 @@ func attack_enemy() ->void:
 	if (target.team == team):
 		return;
 	var dmg: int = damage;
-	target.take_damage(dmg, self);
+	target.take_damage(dmg, team);
 	print(dmg);
 
 #combat
 #called by enemy unit or attack area?
-func take_damage(damage_int: int, attacking_node: Node3D) -> void:
-	if(!multiplayer.is_server() || attacking_node.team == team):
+func take_damage(damage_int: int, attacking_team: int) -> void:
+	if(!multiplayer.is_server() || attacking_team == team):
 		return;
 	print(damage_int)
 	#later we will play death animations!!
@@ -581,6 +590,10 @@ func on_nav_finished() ->void:
 			navigating = false;
 			finish_cmd();
 		GlobalConstants.Commands.FOLLOW:
+			if(target.ENTITY_TYPE == GlobalConstants.EntityType.BUILDING):
+				if(target.BUILDING_TYPE.has(GlobalConstants.BuildingType.RESOURCE_DEPOT)):
+					resource_depot = target;
+				finish_cmd();
 			navigating = false;
 		GlobalConstants.Commands.BUILD:
 				if(build_started != true):
@@ -619,7 +632,7 @@ func on_nav_finished() ->void:
 			navigating = false;
 			#Final game will use event system and signals to handle this instead of direct coupling I guess? FUTURE ETHAN PROBLEM LOL
 			#Allow resource depots to handle messaging system for resource gain?
-			game.gain_resources(player_id, held_resource);
+			player_data_manager.gain_resources(color, held_resource);
 			held_resource.clear();
 			cmd_queue[0]["command"] = GlobalConstants.Commands.GET_RESOURCE;
 			if(target.ENTITY_TYPE == GlobalConstants.EntityType.RESOURCE):
@@ -628,10 +641,18 @@ func on_nav_finished() ->void:
 				navigating = true;
 			else:
 				finish_cmd();
+		GlobalConstants.Commands.ATTACK:
+			navigating = false;
+		_:
+			navigating = false;
+			finish_cmd();
 
 func on_interact_area_entered(body: Node3D) ->void:
 	if(!multiplayer.is_server()):
 		return
+	#should always be something interactable because its my god damn setting!
+	interactable_array.append(body);
+
 	if(cmd_queue.is_empty()):
 		return;
 	var command: int = cmd_queue[0]["command"];
@@ -645,14 +666,18 @@ func on_interact_area_entered(body: Node3D) ->void:
 	if (body != target):
 		return;
 	on_nav_finished();
-	if (command == GlobalConstants.Commands.ATTACK):
-		print("got here")
-		navigating = false;
-		anim.play("attack_target");
+	match command:
+		GlobalConstants.Commands.ATTACK:
+			anim.play("attack_target");
+
 
 func on_interact_area_exited(body: Node3D) ->void:
 	if(!multiplayer.is_server()):
 		return
+	for i: int in interactable_array.size():
+		if interactable_array[i] == body:
+			interactable_array.pop_at(i);
+			break;
 	if(cmd_queue.is_empty()):
 		return;
 	if(!is_instance_valid(target)):
@@ -675,11 +700,9 @@ func on_aggrod(enemy: Node3D) -> void:
 				#backwards way of doing this if statement lol, fix later
 				continue;
 			#refund the cost if you are clearing out the queue
-			var minerals: int = cmd_queue[i]["cost"][0];
-			var gas: int = cmd_queue[i]["cost"][1];
+			var resources: Array[int] = [cmd_queue[i]["cost"]];
 			#for those reading this, I know this is probably bad code smell or whatever to be calling a parent method but whatever dude
-			game.request_player_data_update.rpc(player_id,game.PLAYER_RESOURCE_KEY, minerals)
-			game.request_player_data_update.rpc(player_id,game.PLAYER_GAS_KEY, gas)
+			player_data_manager.refund_resources(color,resources);
 	#finish whatever you were doing, put that command into history dictionary
 	finish_cmd();
 	#Clear the queued commands queued after refunding for them all, if you do not want to clear the queue, use queue_cmd()

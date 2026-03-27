@@ -9,7 +9,7 @@ extends Control
 
 
 @onready var obb_label: Label = $Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl/OBBLabel
-@onready var build_slot: Control = $Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl/BuildSlot
+@onready var build_slot: BuildSlot = $Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl/BuildSlot
 @onready var obb_progress_bar: ProgressBar = $Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl/OBBProgressBar
 @onready var build_queue_container: HBoxContainer = $Control/UnitHBox/MarginContainer/BuildQueueContainer
 
@@ -49,14 +49,13 @@ func on_first_queue_pressed(_slot: int) -> void:
 	command_controller.handle_cmd(cancel_cmd);
 
 func on_queue_pressed(queue_slot: int) -> void:
-	first_selected = command_controller.selected[0];
-	if("build_queue" in first_selected):
-		var cancel_cmd: Dictionary = GlobalConstants.CANCEL_QUEUED_DICTIONARY.duplicate();
-		cancel_cmd["int"] = queue_slot;
-		command_controller.handle_cmd(cancel_cmd);
-		#unqueue that object
+	var cancel_cmd: Dictionary = GlobalConstants.CANCEL_QUEUED_DICTIONARY.duplicate();
+	cancel_cmd["int"] = queue_slot;
+	command_controller.handle_cmd(cancel_cmd);
+	#unqueue that object
 
 func on_deselected_signal() ->void:
+	build_slot.remove_data();
 	unit_label.text = "";
 	unit_container.hide();
 	unit_preview.texture = null;
@@ -65,6 +64,8 @@ func on_deselected_signal() ->void:
 	#Update image and data for each cmd box here
 	for cmd: CmdGUI in cmd_box_arr:
 		cmd.clear_data();
+	for slot: BuildSlot in build_queue_container.get_children():
+		slot.remove_data();
 
 func on_selected_signal(entity: Node3D) ->void:
 	if(entity == null):
@@ -115,7 +116,6 @@ func on_selected_signal(entity: Node3D) ->void:
 
 	if (command_controller.selected.size() > 1):
 		unit_container.show();
-
 	else:
 		unit_container.hide();
 
@@ -124,24 +124,30 @@ func on_selected_signal(entity: Node3D) ->void:
 			object_being_built_control.show();
 			obb_progress_bar.max_value = 100; #to base it on 100% complete stats
 			obb_progress_bar.value = entity.construction_value / entity.CONSTRUCTION_COMPLETE;
-			obb_label.text = "unbuilt";
+			obb_label.text = entity.ENTITY_NAME;
 			build_queue_container.hide();
-		elif(!entity.build_item.is_empty()):
+		elif(!entity.unit_maker_component.build_item.is_empty()):
 			object_being_built_control.show();
-			obb_progress_bar.max_value = entity.build_time;
-			obb_progress_bar.value = entity.build_progress;
-			obb_label.text = entity.build_item.name;
+			if(!build_slot.has_texture()):
+				var text: Texture2D = load(entity.unit_maker_component.build_item["sprite_path"]);
+				build_slot.update_data(text)
+			obb_progress_bar.max_value = entity.unit_maker_component.build_time;
+			obb_progress_bar.value = entity.unit_maker_component.build_progress;
+			obb_label.text = entity.unit_maker_component.build_item.name;
 			var slots: Array = build_queue_container.get_children();
 			build_queue_container.show();
+			var slot: BuildSlot;
 			for i: int in slots.size():
-				if(i < entity.build_queue.size()):
-					slots[i].show();
-					var text: Texture2D = load(entity.build_queue[i]["sprite_path"])
-					slots[i].update_data(text);
+				slot = slots[i];
+				if(i < entity.unit_maker_component.build_queue.size()):
+					slot.show();
+					var text: Texture2D = load(entity.unit_maker_component.build_queue[i]["sprite_path"])
+					slot.update_data(text);
 					#set button
 				else:
-					slots[i].hide();
+					slot.hide();
 		else:
+			build_slot.remove_data();
 			object_being_built_control.hide();
 			unit_container.show();
 			build_queue_container.hide();
@@ -190,25 +196,31 @@ func _process(_delta: float) -> void:
 		if(!entity.is_constructed):
 			object_being_built_control.show();
 			obb_progress_bar.max_value = 100; #to base it on 100% complete stats
-			obb_progress_bar.value = entity.construction_value / entity.CONSTRUCTION_COMPLETE;
-			obb_label.text = "unbuilt";
+			obb_progress_bar.value = (entity.construction_value / entity.CONSTRUCTION_COMPLETE) * 100;
+			obb_label.text = entity.ENTITY_NAME;
 			build_queue_container.hide();
-		elif(!entity.build_item.is_empty()):
+		elif(!entity.unit_maker_component.build_item.is_empty()):
 			object_being_built_control.show();
-			obb_progress_bar.max_value = entity.build_time;
-			obb_progress_bar.value = entity.build_progress;
-			obb_label.text = entity.build_item.name;
+			if(!build_slot.has_texture()):
+				var text: Texture2D = load(entity.unit_maker_component.build_item["sprite_path"]);
+				build_slot.update_data(text)
+			obb_progress_bar.max_value = entity.unit_maker_component.build_time;
+			obb_progress_bar.value = entity.unit_maker_component.build_progress;
+			obb_label.text = entity.unit_maker_component.build_item.name;
 			var slots: Array = build_queue_container.get_children();
 			build_queue_container.show();
 			for i: int in slots.size():
-				if(i < entity.build_queue.size()):
+				if(i < entity.unit_maker_component.build_queue.size()):
 					slots[i].show();
-					var text: Texture2D = load(entity.build_queue[i]["sprite_path"])
-					slots[i].update_data(text);
+					if(!slots[i].has_texture()):
+						var text: Texture2D = load(entity.unit_maker_component.build_queue[i]["sprite_path"])
+						slots[i].update_data(text);
 					#set button
 				else:
+					slots[i].remove_data();
 					slots[i].hide();
 		else:
+			build_slot.remove_data();
 			object_being_built_control.hide();
 			unit_container.show();
 			build_queue_container.hide();

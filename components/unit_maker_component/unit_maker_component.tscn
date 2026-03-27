@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bp1byohtd1if2"]
 
-[ext_resource type="Script" uid="uid://edmc2mk1kfm1" path="res://components/unit_maker_component.gd" id="1_oaevn"]
+[ext_resource type="Script" uid="uid://edmc2mk1kfm1" path="res://components/unit_maker_component/unit_maker_component.gd" id="1_oaevn"]
 
 [node name="UnitMakerComponent" type="Node3D" unique_id=926730106]
 script = ExtResource("1_oaevn")
