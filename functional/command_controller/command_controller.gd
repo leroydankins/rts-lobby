@@ -134,7 +134,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					if(!has_entity_in_selected):
 						obj.set_selected();
 						selected.append(obj);
-					_err  = emit_signal("selected_signal", selected[0]);
+					selected_signal.emit(selected[0]);
 					return;
 
 			#if we didn't hit anything
@@ -247,7 +247,7 @@ func handle_cmd(p_cmd: Dictionary) -> void:
 			#queue not an initialized term in each command, only created in this scenario
 			cmd["queue"] = true;
 
-	request_unit_cmd.rpc_id(Lobby.multiplayer_server_id, unit_path_arr, cmd,game.player_data_manager.local_id); #We will need to fix this
+	request_unit_cmd.rpc_id(get_multiplayer_authority(), unit_path_arr, cmd,game.player_data_manager.local_id); #We will need to fix this
 
 
 #client RPCs server/host to start the action, final checks here before sending command
@@ -274,7 +274,7 @@ func request_unit_cmd(unit_path_arr: Array[String], cmd: Dictionary, player_id: 
 
 		var node_path: String = unit.get_path();
 		var cmd_time: float = game.get_elapsed_time();
-		unit.request_cmd.rpc_id(Lobby.multiplayer_server_id, cmd);
+		unit.request_cmd.rpc_id(get_multiplayer_authority(), cmd);
 
 		var logged_cmd: Dictionary = {
 			#ReplayConstants.TIME_KEY

@@ -30,7 +30,7 @@ func update_dictionary_data(key: String, data: Variant) -> void:
 	#if we are online, update lobby info
 	if (Lobby.is_connected):
 		print("we are online, sending updated information in rpc to server");
-		Lobby.local_update_peer_information.rpc_id(1,str(Lobby.multiplayer.get_unique_id()), local_player);
+		Lobby.local_update_peer_information.rpc_id(get_multiplayer_authority(),str(Lobby.multiplayer.get_unique_id()), local_player);
 
 func update_dictionary_batch(new_dict: Dictionary) -> void:
 	if (new_dict.is_empty()):
@@ -39,7 +39,7 @@ func update_dictionary_batch(new_dict: Dictionary) -> void:
 	local_player = new_dict;
 	if (Lobby.is_connected):
 		print("we are online");
-		Lobby.local_update_peer_information.rpc_id(1,str(Lobby.multiplayer.get_unique_id()), local_player);
+		Lobby.local_update_peer_information.rpc_id(get_multiplayer_authority(),str(Lobby.multiplayer.get_unique_id()), local_player);
 
 
 #called by the Lobby instance when we have received updated dictionary from server, called as separate function at the end of Lobby.server_update_list to prevent a loop of updates

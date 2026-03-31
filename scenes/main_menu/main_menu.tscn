@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://b1sw5jrtyj01o"]
+
+[ext_resource type="Script" uid="uid://cg5ei6hfh7dv3" path="res://scenes/main_menu/main_menu.gd" id="1_fsom3"]
+
+[node name="MainMenu" type="Control" unique_id=1542155705 node_paths=PackedStringArray("play_ai", "play_online", "options", "tutorial")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_fsom3")
+play_ai = NodePath("Panel/VBoxContainer/MarginContainer/PlayAI")
+play_online = NodePath("Panel/VBoxContainer/MarginContainer2/PlayOnline")
+options = NodePath("Panel/VBoxContainer/MarginContainer4/Options")
+tutorial = NodePath("Panel/VBoxContainer/MarginContainer3/Tutorial")
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=923372662]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0546875
+anchor_top = 0.32777777
+anchor_right = 0.31953126
+anchor_bottom = 0.78333336
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=1929954309]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/VBoxContainer" unique_id=238790828]
+layout_mode = 2
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="PlayAI" type="Button" parent="Panel/VBoxContainer/MarginContainer" unique_id=1961986273]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Play Versus AI"
+
+[node name="MarginContainer2" type="MarginContainer" parent="Panel/VBoxContainer" unique_id=1922704026]
+layout_mode = 2
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="PlayOnline" type="Button" parent="Panel/VBoxContainer/MarginContainer2" unique_id=391576593]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Play Online"
+
+[node name="MarginContainer3" type="MarginContainer" parent="Panel/VBoxContainer" unique_id=945345774]
+layout_mode = 2
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Tutorial" type="Button" parent="Panel/VBoxContainer/MarginContainer3" unique_id=1530438734]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Tutorial
+"
+
+[node name="MarginContainer4" type="MarginContainer" parent="Panel/VBoxContainer" unique_id=1820365054]
+layout_mode = 2
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Options" type="Button" parent="Panel/VBoxContainer/MarginContainer4" unique_id=18934173]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Options"
+
+[node name="Title" type="Label" parent="." unique_id=894619192]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05625
+anchor_top = 0.07638889
+anchor_right = 0.31771874
+anchor_bottom = 0.3097778
+offset_right = 0.3199997
+offset_bottom = -0.040000916
+theme_override_font_sizes/font_size = 48
+text = "BattleCraft"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true

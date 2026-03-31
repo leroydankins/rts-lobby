@@ -70,7 +70,7 @@ func finish_build() -> void:
 #i did
 func cancel_queued(p_int: int) -> void:
 	#refund the cost if you are clearing out the queue
-	if(!multiplayer.is_server()):
+	if(!is_multiplayer_authority()):
 		return;
 	print("canceled!")
 	var queued: Dictionary = build_queue.pop_at(p_int);
@@ -79,7 +79,7 @@ func cancel_queued(p_int: int) -> void:
 	var _success: int = parent.player_data_manager.refund_resources(parent.color,queued["cost"]);
 
 func cancel_build() ->void:
-	if(!multiplayer.is_server()):
+	if(!is_multiplayer_authority()):
 		return;
 	if(build_item.is_empty()):
 		return;
@@ -95,7 +95,7 @@ func cancel_build() ->void:
 
 #called by multipalyer authority only
 func spawn_unit(filepath: String) -> void:
-	if (!multiplayer.is_server()): # Will call RPC to sync with all players
+	if (!is_multiplayer_authority()): # Will call RPC to sync with all players
 		return;
 	var start_vector: Vector2 = Vector2(global_position.x, global_position.z); #
 	var end_vector: Vector2 = start_vector + Vector2.ONE;

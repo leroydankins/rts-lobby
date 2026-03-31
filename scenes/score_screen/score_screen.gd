@@ -1,7 +1,8 @@
 class_name ScoreScreen;
 extends Control
 
-signal finish_score_screen();
+signal return_main_pressed();
+signal lobby_pressed();
 
 @onready var main_menu_button: Button = $MainMenuButton
 @onready var lobby_button: Button = $LobbyButton
@@ -18,14 +19,16 @@ func _process(delta: float) -> void:
 	pass
 
 func on_main() ->void:
+	return_main_pressed.emit();
 	pass;
 
 func on_lobby() ->void:
+	lobby_pressed.emit();
 	pass;
 
 #placeholder functions
 func populate_score_screen(player_dictionary: Dictionary) -> void:
-	for player: String in player_dictionary:
+	for player: int in player_dictionary:
 		#populate each data point with relevant data
 		#will need to keep all data points in arrays for making the graphs show
 		pass;

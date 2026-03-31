@@ -68,6 +68,7 @@ func on_deselected_signal() ->void:
 		slot.remove_data();
 
 func on_selected_signal(entity: Node3D) ->void:
+	print("selected")
 	if(entity == null):
 		unit_label.text = "";
 		unit_container.hide();

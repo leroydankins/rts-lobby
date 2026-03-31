@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cj2g37cbu27v"]
+
+[ext_resource type="Script" uid="uid://bxqk14jru353a" path="res://functional/building_grid/grid_tile.gd" id="1_jts7a"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_uqm5m"]
+size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cwp8q"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.40784314)
+
+[node name="GridTile" type="MeshInstance3D" unique_id=1470269906]
+mesh = SubResource("PlaneMesh_uqm5m")
+surface_material_override/0 = SubResource("StandardMaterial3D_cwp8q")
+script = ExtResource("1_jts7a")

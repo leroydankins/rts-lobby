@@ -1,6 +1,9 @@
 class_name EntityHolder
 extends Node3D
 
+signal player_lost(player_id: int);
+
+
 var global_entity_array: Array[Node3D] = [];
 var global_unit_array: Array[Node3D] = [];
 var global_building_array: Array[Node3D] = [];
@@ -49,7 +52,7 @@ func instantiate_entity(spawn_dict: Dictionary, cmd: Dictionary) -> void: #Calle
 	if(multiplayer.is_server()):
 		if(cmd.is_empty()):
 			return;
-		entity.request_cmd.rpc_id(Lobby.multiplayer_server_id, cmd);
+		entity.request_cmd.rpc_id(get_multiplayer_authority(), cmd);
 	return
 
 @rpc("authority", "call_local", "reliable")
@@ -92,10 +95,10 @@ func remove_entity(entity_path: String) -> void:
 					player_arr[ent_color]["buildings"].remove_at(i);
 					break;
 			#check to see if that was the last building and end game
-			if(multiplayer.is_server()):
+			if(is_multiplayer_authority()):
 				if(player_arr[ent_color]["buildings"].is_empty()):
-					print("we know we are out of buildings?");
-					player_data_manager.player_lost.rpc(ent_color);
+					player_lost.emit(ent_color); #Goes to game scene who calls player data manager
+					#player_data_manager.defeat_player(ent_color);
 	remove_child(entity);
 
 @rpc("authority", "call_local", "reliable")

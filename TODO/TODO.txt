@@ -65,8 +65,11 @@ Player technology
 		Creating a player data manager to track player information and then this can check for if we no longer have a unit or building
 		operates by team instead of player_id, but will still have a reference to the player's id?
 
-3/21
+3/21DONE
 	Work on player_data_manager and player_resource
 
-
 COMPELTELYH REVAMPING SPENDING AND COST TO USE PLAYER COLOR/ID INT ISNTEAD OF PEER ID!
+DONE
+a
+Show cost of each task in command gui
+Sync build state between client and host

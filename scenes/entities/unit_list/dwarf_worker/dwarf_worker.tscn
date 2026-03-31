@@ -6,6 +6,7 @@
 [ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="3_g1rkk"]
 [ext_resource type="PackedScene" uid="uid://dxrceo5t2rtks" path="res://functional/navigation_agent/navigation_agent.tscn" id="4_t7rom"]
 [ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="5_e1u8e"]
+[ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="5_h4o6a"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_e1u8e"]
 height = 1.0
@@ -62,7 +63,7 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [],
-"method": &"extract_resources"
+"method": &"extract_resource"
 }]
 }
 
@@ -94,7 +95,7 @@ albedo_color = Color(0, 0.48721582, 0.90107334, 1)
 material = SubResource("StandardMaterial3D_g1rkk")
 size = Vector3(0.25, 0.25, 0.25)
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_auf3i"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_h4o6a"]
 viewport_path = NodePath("SubViewport")
 
 [node name="DwarfWorker" type="CharacterBody3D" unique_id=1499610182 node_paths=PackedStringArray("aggro_component") groups=["Entity", "Unit"]]
@@ -131,8 +132,9 @@ libraries/ = SubResource("AnimationLibrary_f2n24")
 [node name="CollisionBody" type="CollisionShape3D" parent="." unique_id=802037494]
 shape = SubResource("CylinderShape3D_g1rkk")
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1926167555]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1926167555 groups=["SyncComponent"]]
 replication_config = SubResource("SceneReplicationConfig_g1rkk")
+script = ExtResource("5_h4o6a")
 
 [node name="ResourceMesh" type="MeshInstance3D" parent="." unique_id=1493570494]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5)
@@ -148,7 +150,7 @@ health = 25
 max_health = 25
 
 [node name="HPSprite" parent="HealthComponent" index="0" unique_id=1806707282]
-texture = SubResource("ViewportTexture_auf3i")
+texture = SubResource("ViewportTexture_h4o6a")
 
 [node name="SubViewport" parent="HealthComponent" index="1" unique_id=1164087689]
 size = Vector2i(96, 16)

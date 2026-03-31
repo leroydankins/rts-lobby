@@ -1,5 +1,9 @@
+class_name LobbyGUI
 extends Control
-@onready var lobby_data: Control = $LobbyData
+
+signal return_main_pressed();
+
+@onready var return_to_main: Button = $ReturnToMain
 
 @onready var create_lobby_button: Button = $HostData/HostBox/CreateLobbyButton
 @onready var username_edit: TextEdit = $LoginData/LoginBox/HBoxContainer/UsernameEdit
@@ -19,6 +23,7 @@ extends Control
 
 
 #Lobby Status Vars
+@onready var lobby_data: Control = $LobbyData
 @onready var lobby_label: Label = $LobbyData/LobbyBox/LobbyLabel
 @onready var connection_status: Label = $LobbyData/LobbyBox/ConnectionStatus
 
@@ -68,6 +73,7 @@ func _ready() -> void:
 	_null_var = team_dropdown.item_selected.connect(on_team_select);
 	_null_var = color_dropdown.item_selected.connect(on_color_select);
 	_null_var = race_dropdown.item_selected.connect(on_race_select);
+	_null_var = return_to_main.pressed.connect(on_return_to_main);
 
 
 #MAJOR FUNCTION
@@ -81,6 +87,7 @@ func on_lobby_update() -> void:
 		for i: int in peer_name_labels.size():
 			peer_name_labels[i].text = "Peer %s" % [i+1];
 			peer_ready_labels[i].text = "";
+			peer_team_labels[i].text = "";
 			peer_colors[i].hide();
 
 	#if we are connected to a lobby
@@ -206,8 +213,6 @@ func on_connection_started() ->void:
 
 
 func on_connection_ended() -> void:
-	if(!visible):
-		return;
 	join_lobby_button.disabled = false;
 	create_lobby_button.disabled = false;
 	disconnect_button.disabled = true;
@@ -218,6 +223,8 @@ func on_connection_ended() -> void:
 	color_dropdown.disabled = true;
 	race_dropdown.disabled = true;
 	connection_status.text = "Status: Not Connected"
+	#Setting button_pressed to false will call emit the toggle signal automatically
+	ready_button.button_pressed = false;
 
 
 func on_create_lobby_pressed()-> Error:
@@ -237,3 +244,9 @@ func on_join_lobby_pressed()-> Error:
 	var err: Error = Lobby.join_lobby(ip_text_box.text);
 
 	return err;
+
+func on_return_to_main() ->void:
+	#Setting button_pressed to false will call emit the toggle signal automatically
+	ready_button.button_pressed = false;
+	#call disconnect pressed
+	return_main_pressed.emit();

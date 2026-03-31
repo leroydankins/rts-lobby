@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://begc0alo7fdrf"]
+
+[ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="1_yhrkm"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_yhrkm"]
+
+[node name="SyncComponent" type="MultiplayerSynchronizer" unique_id=1934263285 groups=["SyncComponent"]]
+replication_config = SubResource("SceneReplicationConfig_yhrkm")
+script = ExtResource("1_yhrkm")

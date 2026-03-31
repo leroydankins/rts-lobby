@@ -64,6 +64,7 @@ Building="Excludes Units"
 EntityHolder="EntityHolder"
 Resource="In Game Resources"
 PlayerDataManager=""
+SyncComponent=""
 
 [gui]
 

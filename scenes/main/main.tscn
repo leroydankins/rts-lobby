@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://uq2xxe87qrg3" path="res://scenes/main/main.gd" id="1_2w1kt"]
 [ext_resource type="Script" uid="uid://ny1k5n1wesmp" path="res://scenes/lobby_gui/lobby_gui.gd" id="1_yh5la"]
 [ext_resource type="PackedScene" uid="uid://bitlb2ag1imd" path="res://scenes/score_screen/score_screen.tscn" id="3_k2fmo"]
+[ext_resource type="PackedScene" uid="uid://b1sw5jrtyj01o" path="res://scenes/main_menu/main_menu.tscn" id="4_l3cfh"]
 
 [node name="Main" type="Node" unique_id=863003041 groups=["Main"]]
 script = ExtResource("1_2w1kt")
@@ -10,6 +11,7 @@ script = ExtResource("1_2w1kt")
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=802540709]
 
 [node name="LobbyGUI" type="Control" parent="CanvasLayer" unique_id=1367195987]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -394,7 +396,23 @@ size_flags_horizontal = 4
 text = "Join Lobby"
 metadata/_edit_use_anchors_ = true
 
+[node name="ReturnToMain" type="Button" parent="CanvasLayer/LobbyGUI" unique_id=544587356]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0934375
+anchor_top = 0.81233335
+anchor_right = 0.37834376
+anchor_bottom = 0.9441667
+offset_left = -0.5999985
+offset_top = 0.11999512
+offset_right = -0.2800064
+offset_bottom = 0.19995117
+text = "Return To Main Menu"
+metadata/_edit_use_anchors_ = true
+
 [node name="ScoreScreen" parent="CanvasLayer" unique_id=1695320857 instance=ExtResource("3_k2fmo")]
 visible = false
+
+[node name="MainMenu" parent="CanvasLayer" unique_id=1542155705 instance=ExtResource("4_l3cfh")]
 
 [node name="GameHolder" type="Node" parent="." unique_id=879181187]

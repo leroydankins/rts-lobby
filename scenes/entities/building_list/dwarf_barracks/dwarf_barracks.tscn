@@ -5,6 +5,7 @@
 [ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="2_um0yu"]
 [ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="3_helm7"]
 [ext_resource type="PackedScene" uid="uid://bp1byohtd1if2" path="res://components/unit_maker_component/unit_maker_component.tscn" id="5_helm7"]
+[ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="6_k4th7"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3ycct"]
 render_priority = 0
@@ -39,25 +40,37 @@ albedo_color = Color(0.6230791, 0.2722984, 0.15462327, 1)
 material = SubResource("StandardMaterial3D_24p8b")
 height = 0.5
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_xatg6"]
-properties/0/path = NodePath(".:is_constructed")
+[sub_resource type="ViewportTexture" id="ViewportTexture_k4th7"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_stfpi"]
+properties/0/path = NodePath("HealthComponent:max_health")
 properties/0/spawn = true
 properties/0/replication_mode = 2
-properties/1/path = NodePath(".:build_time")
+properties/1/path = NodePath("HealthComponent:health")
 properties/1/spawn = true
 properties/1/replication_mode = 2
-properties/2/path = NodePath(".:build_item")
+properties/2/path = NodePath("UnitMakerComponent:build_time")
 properties/2/spawn = true
 properties/2/replication_mode = 2
-properties/3/path = NodePath(".:build_queue")
+properties/3/path = NodePath("UnitMakerComponent:build_item")
 properties/3/spawn = true
 properties/3/replication_mode = 2
-properties/4/path = NodePath(".:build_progress")
+properties/4/path = NodePath("UnitMakerComponent:build_queue")
 properties/4/spawn = true
 properties/4/replication_mode = 2
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_helm7"]
-viewport_path = NodePath("SubViewport")
+properties/5/path = NodePath("UnitMakerComponent:build_progress")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath("UnitMakerComponent:build_speed_mult")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath(".:construction_value")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath(".:is_constructed")
+properties/8/spawn = true
+properties/8/replication_mode = 2
 
 [node name="DwarfBarracks" type="StaticBody3D" unique_id=946034466 node_paths=PackedStringArray("highlight_mesh", "health_component", "unit_maker_component")]
 transform = Transform3D(0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.70710677, 0, 0, 0)
@@ -88,9 +101,6 @@ mesh = SubResource("BoxMesh_3ycct")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.5, 0)
 mesh = SubResource("CylinderMesh_u51tq")
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1055694283]
-replication_config = SubResource("SceneReplicationConfig_xatg6")
-
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1349025069]
 avoidance_enabled = true
 height = 2.5
@@ -101,11 +111,15 @@ neighbor_distance = 0.1
 
 [node name="HPSprite" parent="HealthComponent" index="0" unique_id=1806707282]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7510331, 0)
-texture = SubResource("ViewportTexture_helm7")
+texture = SubResource("ViewportTexture_k4th7")
 
 [node name="SubViewport" parent="HealthComponent" index="1" unique_id=1164087689]
 size = Vector2i(96, 16)
 
 [node name="UnitMakerComponent" parent="." unique_id=926730106 instance=ExtResource("5_helm7")]
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1315125353 groups=["SyncComponent"]]
+replication_config = SubResource("SceneReplicationConfig_stfpi")
+script = ExtResource("6_k4th7")
 
 [editable path="HealthComponent"]

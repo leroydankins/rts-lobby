@@ -67,7 +67,7 @@ func _ready() -> void:
 
 #Only process if you are the server, properties will get synced to other players across RPC calls
 func _process(delta: float) -> void:
-	if (!multiplayer.is_server()):
+	if (!is_multiplayer_authority()):
 		return;
 	if(!is_constructed):
 		if(construction_value >= CONSTRUCTION_COMPLETE):
@@ -89,7 +89,7 @@ func unset_selected() -> void:
 #This is the only real logic in the script
 @rpc("any_peer","call_local","reliable")
 func request_cmd(cmd_data: Dictionary) -> void:
-	if(!multiplayer.is_server()):
+	if(!is_multiplayer_authority()):
 		return
 	if(!is_constructed):
 		print("cannot accept commands, we arent fully fleshed yet! :)");
@@ -145,7 +145,7 @@ func request_cmd(cmd_data: Dictionary) -> void:
 
 #combat will eventually be handled outside of main script?
 func take_damage(damage_int: int, attacking_team: int) -> void:
-	if(!multiplayer.is_server() || attacking_team == team):
+	if(!is_multiplayer_authority() || attacking_team == team):
 		return;
 	print(damage_int)
 	#later we will play death animations!!
@@ -159,6 +159,6 @@ func take_damage(damage_int: int, attacking_team: int) -> void:
 
 
 func heal(heal_int: int, healing_team: int) -> void:
-	if(!multiplayer.is_server() || healing_team != team):
+	if(!is_multiplayer_authority() || healing_team != team):
 		return;
 	health_component.heal(heal_int);

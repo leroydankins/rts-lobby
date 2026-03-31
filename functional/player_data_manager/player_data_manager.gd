@@ -1,7 +1,8 @@
 class_name PlayerDataManager
 extends Node
 
-signal player_won(winning_team: int);
+signal team_won(winning_team: int);
+
 #################################################################
 ##var player_dictionary: Dictionary[String, Variant] = { ##Data is collected from the lobby node and then we do not communicate with lobby after
 
@@ -28,7 +29,7 @@ const PLAYING_KEY: String = "player_playing";
 
 @rpc("any_peer", "call_local", "reliable")
 func request_player_data_update(player_id: int, key: String, data: Variant) -> void:
-	if (!multiplayer.is_server()):
+	if (!is_multiplayer_authority()):
 		return;
 	if (!player_dict.has(player_id)):
 		return;
@@ -68,7 +69,7 @@ func push_player_data_update(updated_player: int, key: String, data: Variant) ->
 @rpc("authority", "call_local", "reliable")
 func push_player_data_update_batch(updated_player:int, dict: Dictionary[int, Variant]) ->void:
 	#if this was not called by the authority return;
-	if (multiplayer.get_remote_sender_id() != Lobby.multiplayer_server_id):
+	if (multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
 		push_error("this wasnt sent by the authority? wtf");
 		return;
 	#if this is not a valid player return;
@@ -85,7 +86,7 @@ func push_player_data_update_batch(updated_player:int, dict: Dictionary[int, Var
 @rpc("authority","call_local","reliable")
 func push_game_data_batch(dict: Dictionary[int, Dictionary]) ->void:
 	#if this was not called by the authority return;
-	if (multiplayer.get_remote_sender_id() != Lobby.multiplayer_server_id):
+	if (multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
 		push_error("this wasnt sent by the authority? wtf");
 		return;
 	player_dict = dict;
@@ -94,7 +95,7 @@ func spend_resources(player_id: int, cost_arr: Array) -> bool:
 	var mineral_cost: int = cost_arr[0];
 	var gas_cost: int = cost_arr[1];
 	#final check on resources
-	print(player_dict[player_id][MINERAL_KEY])
+
 	if (mineral_cost > player_dict[player_id][MINERAL_KEY]):
 		return false;
 	if (gas_cost> player_dict[player_id][GAS_KEY]):
@@ -109,7 +110,7 @@ func refund_resources(player_id: int, cost_arr: Array) ->bool:
 	var mineral_cost: int = cost_arr[0];
 	var gas_cost: int = cost_arr[1];
 	#final check on resources
-	print(player_dict[player_id])
+
 	#max allowable minerals?
 	if (mineral_cost > 99999):
 		return false;
@@ -138,24 +139,33 @@ func gain_resources(player_id: int, resource_arr: Array) -> bool:
 			return false;
 
 @rpc("any_peer","call_local","reliable")
-func player_lost(player_id:int) -> void:
-	request_player_data_update(player_id,PLAYING_KEY,false);
+func defeat_player(player_id:int) -> void:
+	if(!is_multiplayer_authority()):
+		return;
+	request_player_data_update(player_id,PLAYING_KEY,false); #sends player update to all players
 	var team: int = player_dict[player_id][TEAM_KEY];
 	var team_lost: bool = true;
 	for player: int in player_dict.keys():
 		if player == player_id:
+			print('this happens once')
 			continue;
 		if(player_dict[player][TEAM_KEY] == team): #if we have teammates that are still in the game and havent lost
 			if(player_dict[player][PLAYING_KEY] == true):
 				team_lost = false;
 	if (team_lost):#if this team lost, check other teams to see who won or if game continues
+		#we should definitely get here in 1v1
+		print('team lost')
 		var teams_left: Array[int] = [];
+		print(team, "is the team that lost")
 		for player: int in player_dict.keys():
+			print(player_dict[player])
 			if (player_dict[player][TEAM_KEY] == team):
 				continue;
 			if (teams_left.has(player_dict[player][TEAM_KEY])):
 				continue;
-			if(player_dict[player][PLAYING_KEY] == true):
+			if(player_dict[player][PLAYING_KEY] == true): #this is the issue
 				teams_left.append(player_dict[player][TEAM_KEY]);
 		if(teams_left.size() == 1):
-			player_won.emit(teams_left[0]);
+			#We say which team won! goes to multiplayer authority and then rpc out
+			team_won.emit(teams_left[0]);
+		print(teams_left.size())

@@ -93,7 +93,7 @@ func _physics_process(delta: float) ->void:
 	#only do stuff if we are
 	#1. the multipalyer authority
 	#2. we are currently navigating around or moving
-	if(!multiplayer.is_server()):
+	if(!is_multiplayer_authority()):
 		return;
 	if NavigationServer3D.map_get_iteration_id(navigation_agent.get_navigation_map()) == 0:
 		return
@@ -126,7 +126,7 @@ func _process(delta: float) -> void:
 		resource_mesh.visible = false;
 	#TEMPRORARU
 
-	if(!multiplayer.is_server()):
+	if(!is_multiplayer_authority()):
 		return;
 	if(cmd_queue.is_empty()):
 		#current_state = UnitState.IDLE;
@@ -298,7 +298,6 @@ func start_cmd() -> void:
 				return;
 			else:
 				target = tar;
-
 			navigation_agent.set_target_position(target.global_position);
 			navigating = true;
 			#Reassign command type based on entity
@@ -307,7 +306,6 @@ func start_cmd() -> void:
 					#Is this unit an enemy? Attack, else, follow
 					if (target.team != team):
 						cmd["command"] = GlobalConstants.Commands.ATTACK;
-						print("attack")
 					else:
 						cmd["command"] = GlobalConstants.Commands.FOLLOW;
 				GlobalConstants.EntityType.BUILDING:
@@ -321,11 +319,13 @@ func start_cmd() -> void:
 							resource_depot = target;
 							cmd["command"] = GlobalConstants.Commands.RETURN_RESOURCE;
 							set_collision_mask_value(UNIT_COLLISION_MASK,false)
+							set_collision_layer_value(UNIT_COLLISION_MASK,false)
 						else:
 							cmd["command"] = GlobalConstants.Commands.FOLLOW;
 				GlobalConstants.EntityType.RESOURCE:
 					cmd["command"] = GlobalConstants.Commands.GET_RESOURCE;
 					set_collision_mask_value(UNIT_COLLISION_MASK,false)
+					set_collision_layer_value(UNIT_COLLISION_MASK,false)
 		GlobalConstants.Commands.ATTACK:
 			#currently there is no way to send an attack command directly to this point, but will probably implement an attack command via hotkey - erh 2/28/26
 			var tar: Node3D = get_tree().root.get_node(cmd["target_node_path"]);
@@ -367,7 +367,6 @@ func start_cmd() -> void:
 				navigating = true;
 			target_pos = t_pos;
 			aggro_component.can_aggro = true;
-			pass;
 	if(is_instance_valid(target)):
 		for i: int in interactable_array.size(): #check if the target is already in range
 			if(target == interactable_array[i]):
@@ -381,7 +380,7 @@ func finish_cmd() -> void:
 	wait_bool = true;
 	#finish any animation you are on
 	#sync this with network state
-	anim.stop();
+
 	if(!cmd_queue.is_empty()):
 	#get next command in sequence
 		var cmd: Dictionary = cmd_queue.pop_front();
@@ -391,10 +390,14 @@ func finish_cmd() -> void:
 	#reinit state data
 	set_collision_mask_value(UNIT_COLLISION_MASK, true)
 	build_started = false;
+	if(anim.current_animation == "extract_resource"):
+		target.in_use = false;
 	target = null;
 	target_pos = Vector3.ZERO;
 	navigating = false;
 	aggro_component.can_aggro = false;
+
+	anim.stop();
 	#IDLE STATE DATA
 	if(cmd_queue.is_empty()):
 		if(aggro_component.auto_aggro):
@@ -408,7 +411,7 @@ func finish_cmd() -> void:
 
 @rpc("any_peer","call_local","reliable")
 func request_cmd(cmd_data: Dictionary) -> void:
-	if(!multiplayer.is_server()):
+	if(!is_multiplayer_authority()):
 		return
 	if !cmd_data.has("mnemonic"):
 		push_error("command invalid");
@@ -486,7 +489,7 @@ func request_cmd(cmd_data: Dictionary) -> void:
 #special case where the object needs to add the child to keep refernce
 @rpc("authority", "call_local", "reliable")
 func spawn_building_rpc(dict: Dictionary) -> void:
-	if (multiplayer.get_remote_sender_id() != Lobby.multiplayer_server_id):
+	if (multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
 		return
 	if (dict.is_empty()):
 		return;
@@ -505,7 +508,7 @@ func spawn_building_rpc(dict: Dictionary) -> void:
 
 #this only gets called by the multiplayer host because it is called from process, which is only done by the host
 func spawn_building(filepath: String) -> void:
-	if (!multiplayer.is_server()):
+	if (!is_multiplayer_authority()):
 		return;
 	var spawn_dict: Dictionary ={
 	"file_path" = filepath,
@@ -518,7 +521,7 @@ func spawn_building(filepath: String) -> void:
 
 
 #animation track calls
-func extract_resources() -> void:
+func extract_resource() -> void:
 	var cmd: Dictionary = cmd_queue[0];
 	if cmd["command"] != GlobalConstants.Commands.GET_RESOURCE:
 		finish_cmd();
@@ -554,7 +557,7 @@ func extract_resources() -> void:
 func attack_enemy() ->void:
 	if(!is_alive):
 		return;
-	if(!multiplayer.is_server()):
+	if(!is_multiplayer_authority()):
 		return;
 	if(!is_instance_valid(target)):
 		return;
@@ -562,14 +565,14 @@ func attack_enemy() ->void:
 		return;
 	var dmg: int = damage;
 	target.take_damage(dmg, team);
-	print(dmg);
+
 
 #combat
 #called by enemy unit or attack area?
 func take_damage(damage_int: int, attacking_team: int) -> void:
-	if(!multiplayer.is_server() || attacking_team == team):
+	if(!is_multiplayer_authority() || attacking_team == team):
 		return;
-	print(damage_int)
+
 	#later we will play death animations!!
 	var died: bool = health_component.take_damage(damage_int);
 	if(died):
@@ -580,7 +583,7 @@ func take_damage(damage_int: int, attacking_team: int) -> void:
 		anim.stop();
 
 func heal(heal_int: int, healing_node: Node3D) -> void:
-	if(!multiplayer.is_server() || healing_node.team != team):
+	if(!is_multiplayer_authority() || healing_node.team != team):
 		return;
 	health_component.heal(heal_int);
 
@@ -648,7 +651,7 @@ func on_nav_finished() ->void:
 			finish_cmd();
 
 func on_interact_area_entered(body: Node3D) ->void:
-	if(!multiplayer.is_server()):
+	if(!is_multiplayer_authority()):
 		return
 	#should always be something interactable because its my god damn setting!
 	interactable_array.append(body);
@@ -659,6 +662,10 @@ func on_interact_area_entered(body: Node3D) ->void:
 	#special case that we are not navigating to target but returning resource to resource depot
 	if(command == GlobalConstants.Commands.RETURN_RESOURCE):
 		if(body == resource_depot):
+			on_nav_finished();
+			return;
+	if(command == GlobalConstants.Commands.GET_RESOURCE):
+		if(body.ENTITY_TYPE == GlobalConstants.EntityType.RESOURCE):
 			on_nav_finished();
 			return;
 	if(!is_instance_valid(target)):
@@ -672,7 +679,7 @@ func on_interact_area_entered(body: Node3D) ->void:
 
 
 func on_interact_area_exited(body: Node3D) ->void:
-	if(!multiplayer.is_server()):
+	if(!is_multiplayer_authority()):
 		return
 	for i: int in interactable_array.size():
 		if interactable_array[i] == body:

@@ -61,7 +61,6 @@ var players_loaded: int = 0
 		#players_loaded = value;
 		#data_updated.emit();
 
-var multiplayer_server_id: int = 1;
 
 var _null_var: int;
 
@@ -145,7 +144,7 @@ func remove_multiplayer_peer() -> Error:
 	lobby_name = "";
 	lobby_player_dictionary.clear();
 	connection_ended.emit();
-
+	data_updated.emit();
 	var err: Error;
 	if (multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.ConnectionStatus.CONNECTION_CONNECTED):
 		err = Error.OK;
@@ -174,6 +173,7 @@ func game_scene_loaded() -> void:
 		return;
 	players_loaded += 1;
 	if players_loaded == lobby_player_dictionary.size():
+		print("emitted game start at %s" % Time.get_ticks_msec())
 		start_game.emit()
 		players_loaded = 0;
 
@@ -245,7 +245,7 @@ func local_update_peer_information(sender_id: String, updated_dictionary: Dictio
 @rpc("authority","call_local","reliable")
 func server_update_player_list(lobby_dict: Dictionary)-> void:
 	#Multiplayer server ID is 1
-	if(multiplayer.get_remote_sender_id() != multiplayer_server_id):
+	if(multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
 		return;
 
 	#in case the server has updated our character, update that information first so we can call local data in GUI updates
@@ -261,7 +261,7 @@ func server_update_player_list(lobby_dict: Dictionary)-> void:
 @rpc("authority","call_local","reliable")
 func server_update_lobby_name(lob_name: String)-> void:
 	#Multiplayer server ID is 1
-	if(multiplayer.get_remote_sender_id() != multiplayer_server_id):
+	if(multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
 		return;
 	#update our lobby's reference to palyers to be the same as the
 	lobby_name = lob_name;
@@ -309,6 +309,7 @@ func on_server_disconnected() -> void:
 	lobby_name = "";
 	lobby_player_dictionary.clear();
 	connection_ended.emit();
+	data_updated.emit();
 
 func _exit_tree() -> void:
 	if (upnp_thread && upnp_thread.is_alive()):

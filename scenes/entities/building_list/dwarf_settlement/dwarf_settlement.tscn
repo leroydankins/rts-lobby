@@ -5,6 +5,7 @@
 [ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="3_wgkab"]
 [ext_resource type="PackedScene" uid="uid://bp1byohtd1if2" path="res://components/unit_maker_component/unit_maker_component.tscn" id="4_bpprt"]
 [ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="4_wgkab"]
+[ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="5_27gdb"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wgkab"]
 render_priority = 0
@@ -40,12 +41,18 @@ properties/4/spawn = true
 properties/4/replication_mode = 2
 properties/5/path = NodePath("HealthComponent:health")
 properties/5/spawn = true
-properties/5/replication_mode = 1
+properties/5/replication_mode = 2
 properties/6/path = NodePath("HealthComponent:max_health")
 properties/6/spawn = true
-properties/6/replication_mode = 1
+properties/6/replication_mode = 2
+properties/7/path = NodePath(".:construction_value")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath(".:is_constructed")
+properties/8/spawn = true
+properties/8/replication_mode = 2
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_bpprt"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_27gdb"]
 viewport_path = NodePath("SubViewport")
 
 [node name="DwarfSettlement" type="Area3D" unique_id=1146713369 node_paths=PackedStringArray("highlight_mesh", "health_component", "unit_maker_component", "body_mesh") groups=["Building", "Entity"]]
@@ -73,8 +80,9 @@ transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70
 [node name="Marker3D" type="Marker3D" parent="." unique_id=382978170]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1789013543]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1789013543 groups=["SyncComponent"]]
 replication_config = SubResource("SceneReplicationConfig_24p8b")
+script = ExtResource("5_27gdb")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=729022020]
 avoidance_enabled = true
@@ -88,7 +96,7 @@ health = 10
 max_health = 10
 
 [node name="HPSprite" parent="HealthComponent" index="0" unique_id=1806707282]
-texture = SubResource("ViewportTexture_bpprt")
+texture = SubResource("ViewportTexture_27gdb")
 
 [node name="SubViewport" parent="HealthComponent" index="1" unique_id=1164087689]
 size = Vector2i(96, 16)

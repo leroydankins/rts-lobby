@@ -49,9 +49,10 @@ func _ready() -> void:
 	_null_var = in_game_menu.resume_pressed.connect(on_resume);
 	_null_var = in_game_menu.return_to_game_pressed.connect(on_return);
 	_null_var = in_game_menu.score_screen_pressed.connect(on_score_screen);
-	Lobby.game_scene_loaded.rpc_id(Lobby.multiplayer_server_id);
+	Lobby.game_scene_loaded.rpc_id(get_multiplayer_authority());
 
-	player_data_manager.player_won.connect(end_game);
+	entity_holder.player_lost.connect(on_player_lost);
+	player_data_manager.team_won.connect(on_team_won);
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -77,8 +78,7 @@ func on_start() -> void:
 	var player_arr: Array[int] = [];
 	for player: String in Lobby.lobby_player_dictionary:
 		player_arr.append(Lobby.lobby_player_dictionary[player][GlobalConstants.COLOR_KEY])
-	print("we created the player array that the entity holder will use first")
-	print("player arr is %s" % [player_arr]);
+
 	entity_holder.initialize_player_arr.rpc(player_arr);
 	for player_id: String in Lobby.lobby_player_dictionary:
 		var player: int = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY];
@@ -93,7 +93,7 @@ func on_start() -> void:
 		"player_gas" = player_gas,
 		"player_supply" = [0,0],
 		"player_peer_id" = player_id,
-		"player_playing" = false,
+		"player_playing" = true,
 		}
 		#
 		player_data_manager.player_dict[player] = player_dict; #player is an int key for the
@@ -132,7 +132,7 @@ func add_entity_from_dict(spawn_dictionary: Dictionary) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func create_initial_player_entities(dict: Dictionary) -> void:
-	if (multiplayer.get_remote_sender_id() != Lobby.multiplayer_server_id):
+	if (multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
 		return;
 	if (dict.is_empty()):
 		push_error("BUG AT GAME_SCENE TRYING TO SPAWN INITIAL UNITS");
@@ -146,20 +146,17 @@ func create_initial_player_entities(dict: Dictionary) -> void:
 			spawn_path = GlobalConstants.DWARF_SETTLEMENT_FILEPATH;
 	var start_building: Node3D = load(spawn_path).instantiate();
 	start_building.team = dict["team"];
-	print("player id for starting building is %s" % dict["player_id"])
 	#color is an int, the object will access the actual color via GlobalConstants
 	start_building.color = dict["color"];
 	start_building.is_constructed = true;
 	entity_holder.register_entity(start_building);
 	start_building.global_position = dict["position"];
-
 	pass;
 
 #set up game for player, called by rpc_id to each specific player
 @rpc("authority", "call_local", "reliable")
 func initialize_local_start(init_dict: Dictionary, player_id: int) -> void:
 	player_data_manager.local_id = player_id
-	print("my local id is %s" % player_id)
 	if (init_dict.is_empty()):
 		push_error(multiplayer.get_unique_id(), "cannot initialize game start data, init dict was empty")
 		return;
@@ -173,27 +170,57 @@ func initialize_local_start(init_dict: Dictionary, player_id: int) -> void:
 #called by the server, each local person starts the game
 @rpc("authority","call_local","reliable")
 func start_game() -> void:
+	print("started game game start at %s" % Time.get_ticks_msec())
+	process_mode = Node.PROCESS_MODE_INHERIT
 	game_is_active = true;
 	game_clock.text = "00:00";
 	start_time = Time.get_ticks_msec();
 	team_label.text = "Team: %s" % player_data_manager.player_dict[player_data_manager.local_id][PlayerDataManager.TEAM_KEY];
 
-func end_game(winner_team: int) -> void:
-	if(!multiplayer.is_authority()):
+#these get called only on multiplayer authority
+@rpc("any_peer","call_local","reliable")
+func on_player_lost(losing_player: int) ->void:
+	if(!is_multiplayer_authority()):
+		return;
+	var peer_id: int = int(player_data_manager.player_dict[losing_player][PlayerDataManager.PEER_ID_KEY])
+	player_data_manager.defeat_player(losing_player); #will emit team won if team wins
+	player_lost_rpc.rpc(peer_id); #tell the clients that this person quit so they stop syncing
+
+#players lose individually, but its a team that wins in the game logic
+func on_team_won(winner_team: int) ->void:
+	if(!is_multiplayer_authority()):
 		return;
 	var dict: Dictionary = player_data_manager.player_dict;
 	for player: int in dict:
-		var peer_id: String = dict[PlayerDataManager.PEER_ID_KEY];
+		var peer_id: String = dict[player][PlayerDataManager.PEER_ID_KEY];
 		if dict[player][PlayerDataManager.TEAM_KEY] == winner_team:
 			end_game_rpc.rpc_id(int(peer_id), true); # Winner
-
 		else:
 			end_game_rpc.rpc_id(int(peer_id), false);
+
+
+
+@rpc("authority","call_local","reliable")
+func player_lost_rpc(peer_id: int) ->void:
+	var local: bool = false;
+	if(peer_id == int(player_data_manager.player_dict[player_data_manager.local_id][PlayerDataManager.PEER_ID_KEY])): #If this is us
+		local = true;
+		process_mode = Node.PROCESS_MODE_DISABLED;
+		game_is_active = false;
+		in_game_menu.show_defeat();
+	for sync: SyncComponent in get_tree().get_nodes_in_group("SyncComponent"):
+		sync.set_visibility_for(peer_id, false)
+		if(local):
+			sync.stop_sync();
+
+
 
 
 @rpc("authority", "call_local", "reliable")
 func end_game_rpc(is_winner: bool) -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED;
+	for sync: SyncComponent in get_tree().get_nodes_in_group("SyncComponent"):
+		sync.stop_sync()
 	game_is_active = false;
 	if (is_winner):
 		in_game_menu.show_victory();
@@ -201,11 +228,9 @@ func end_game_rpc(is_winner: bool) -> void:
 		in_game_menu.show_defeat();
 
 func on_quit() -> void:
-	player_data_manager.player_lost.rpc(player_data_manager.local_id);
-	process_mode = Node.PROCESS_MODE_DISABLED;
-	game_is_active = false;
-	in_game_menu.show_defeat();
-
+	#tell the server that we quit
+	on_player_lost.rpc_id(get_multiplayer_authority(),player_data_manager.local_id);
+	#player_data_manager.player_lost.rpc(player_data_manager.local_id);
 
 func on_resume() ->void:
 	in_game_menu.toggle_menu();
@@ -230,7 +255,6 @@ func get_player_history() ->Dictionary:
 	return {};
 func get_cmd_array() -> Dictionary:
 	return {};
-
 
 func get_elapsed_time() -> float:
 	var time: float = Time.get_ticks_msec() - start_time;
