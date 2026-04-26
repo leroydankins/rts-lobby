@@ -272,25 +272,22 @@ script = ExtResource("3_htyio")
 
 [node name="Control" type="Control" parent="UI_Layer/InputGUI" unique_id=2019282043]
 layout_mode = 1
-anchor_left = 0.25
-anchor_right = 0.75
-anchor_bottom = 0.95
+anchor_left = 0.00234375
+anchor_top = -0.15855506
+anchor_right = 1.0
+anchor_bottom = 0.98922276
 grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
 [node name="CommandMarginContainer" type="MarginContainer" parent="UI_Layer/InputGUI/Control" unique_id=831888129]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.059
-anchor_top = -0.17600001
-anchor_right = 1.5000001
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0.015991211
-offset_top = -0.07759857
-offset_right = -1.000061
-offset_bottom = 7.350006
-grow_horizontal = 2
+offset_left = -212.0
+grow_horizontal = 0
 grow_vertical = 2
 theme_override_constants/margin_left = 4
 theme_override_constants/margin_top = 4
@@ -345,21 +342,21 @@ layout_mode = 2
 
 [node name="UnitHBox" type="HBoxContainer" parent="UI_Layer/InputGUI/Control" unique_id=1750061319]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.16840278
-anchor_top = -0.1512764
-anchor_right = 0.9357639
-anchor_bottom = 0.8487236
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -431.5
+offset_right = 426.5
 grow_horizontal = 2
 grow_vertical = 2
-metadata/_edit_use_anchors_ = true
 
 [node name="SelectedUnitBox" type="MarginContainer" parent="UI_Layer/InputGUI/Control/UnitHBox" unique_id=1670278067]
 custom_minimum_size = Vector2(192, 0)
 layout_mode = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
 theme_override_constants/margin_bottom = 4
 metadata/_edit_use_anchors_ = true
 
@@ -383,10 +380,10 @@ text = "CurrentUnit"
 [node name="MarginContainer" type="MarginContainer" parent="UI_Layer/InputGUI/Control/UnitHBox" unique_id=326874998]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
 metadata/_edit_use_anchors_ = true
 
 [node name="Panel" type="Panel" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer" unique_id=1028838982]
@@ -480,6 +477,20 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="BuildSlot16" parent="UI_Layer/InputGUI/Control/UnitHBox/MarginContainer/BuildQueueContainer" unique_id=1319213355 instance=ExtResource("6_l0ewv")]
+layout_mode = 2
+
+[node name="MapContainer" type="MarginContainer" parent="UI_Layer/InputGUI/Control" unique_id=310822548]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 201.0
+grow_vertical = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="Panel" type="Panel" parent="UI_Layer/InputGUI/Control/MapContainer" unique_id=1072014750]
 layout_mode = 2
 
 [node name="GameResourcePanel" type="PanelContainer" parent="UI_Layer" unique_id=2134463555]

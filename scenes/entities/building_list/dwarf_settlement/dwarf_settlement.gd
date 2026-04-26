@@ -7,6 +7,7 @@ const PREVIEW: Texture2D = preload(GlobalConstants.BUILDING_PLACEHOLDER_TEXTURE)
 @export var health_component: HealthComponent;
 @export var unit_maker_component: UnitMakerComponent;
 @export var body_mesh: MeshInstance3D;
+
 var game: GameScene;
 var entity_holder: EntityHolder;
 var player_data_manager: PlayerDataManager;
@@ -37,7 +38,7 @@ const CONSTRUCTION_COMPLETE: int = 10;
 #Shows commands that the unit can take
 var cmd_dict: Dictionary[int, Dictionary] = {
 	0: {},
-	1: GlobalConstants.BUILD_DWARF_WORKER_DICTIONARY,
+	1: GlobalConstants.TRAIN_DWARF_WORKER_DICTIONARY,
 	2: {},
 	3: {},
 	4: {},
@@ -67,15 +68,13 @@ func _ready() -> void:
 
 #Only process if you are the server, properties will get synced to other players across RPC calls
 func _process(delta: float) -> void:
-	if (!is_multiplayer_authority()):
-		return;
 	if(!is_constructed):
 		if(construction_value >= CONSTRUCTION_COMPLETE):
 			is_constructed = true;
 			body_mesh.mesh = DS_BUILT;
 			body_mesh.position.y = (DS_BUILT.size.y / 2);
-		else:
-			return;
+	if (!is_multiplayer_authority()):
+		return;
 	unit_maker_component.build(delta)
 
 func set_selected() -> void:
@@ -106,6 +105,12 @@ func request_cmd(cmd_data: Dictionary) -> void:
 		var success: bool = player_data_manager.spend_resources(color,cost_arr);
 		if (!success):
 			return;
+	if(cmd_data["command"] == GlobalConstants.Commands.TRAIN):
+		if(unit_maker_component.build_queue.size() >= unit_maker_component.BUILD_LIMIT):
+			#we cant do this command
+			return;
+		unit_maker_component.build_queue.append(cmd_data);
+		return
 	var cmd: String = cmd_data["mnemonic"]
 	match cmd:
 		#Target unit

@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://14s0usu8vx7j" path="res://resources/highlight_mesh/highlight_mesh.tscn" id="1_wtuhh"]
 [ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="2_um0yu"]
 [ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="3_helm7"]
+[ext_resource type="BoxMesh" uid="uid://tsx37vxlw7q0" path="res://assets/meshes/dwarf_barracks/db_built.tres" id="4_yx0le"]
 [ext_resource type="PackedScene" uid="uid://bp1byohtd1if2" path="res://components/unit_maker_component/unit_maker_component.tscn" id="5_helm7"]
 [ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="6_k4th7"]
 
@@ -20,27 +21,10 @@ shader_parameter/hollow = true
 material = SubResource("ShaderMaterial_3ycct")
 size = Vector2(4, 4)
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_u51tq"]
-height = 0.75
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_g6x0b"]
 size = Vector3(1.5, 1.5, 1.5)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3ycct"]
-albedo_color = Color(0.63603765, 0.25971344, 0.1137917, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_3ycct"]
-material = SubResource("StandardMaterial3D_3ycct")
-size = Vector3(1.5, 1.5, 1.5)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_24p8b"]
-albedo_color = Color(0.6230791, 0.2722984, 0.15462327, 1)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_u51tq"]
-material = SubResource("StandardMaterial3D_24p8b")
-height = 0.5
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_k4th7"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_yx0le"]
 viewport_path = NodePath("SubViewport")
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_stfpi"]
@@ -70,36 +54,31 @@ properties/7/spawn = true
 properties/7/replication_mode = 2
 properties/8/path = NodePath(".:is_constructed")
 properties/8/spawn = true
-properties/8/replication_mode = 2
+properties/8/replication_mode = 0
 
-[node name="DwarfBarracks" type="StaticBody3D" unique_id=946034466 node_paths=PackedStringArray("highlight_mesh", "health_component", "unit_maker_component")]
-transform = Transform3D(0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.70710677, 0, 0, 0)
+[node name="DwarfBarracks" type="StaticBody3D" unique_id=946034466 node_paths=PackedStringArray("highlight_mesh", "health_component", "unit_maker_component", "body_mesh") groups=["Building", "Entity"]]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
 collision_layer = 58
 script = ExtResource("1_um0yu")
 highlight_mesh = NodePath("HighlightMesh")
 health_component = NodePath("HealthComponent")
 unit_maker_component = NodePath("UnitMakerComponent")
+body_mesh = NodePath("Meshes/BodyMesh")
 
 [node name="HighlightMesh" parent="." unique_id=283025203 instance=ExtResource("1_wtuhh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 visible = false
 mesh = SubResource("PlaneMesh_h0nwk")
 
-[node name="TailCol" type="CollisionShape3D" parent="." unique_id=52582854]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.375, 0)
-shape = SubResource("CylinderShape3D_u51tq")
-
 [node name="MainCol" type="CollisionShape3D" parent="." unique_id=1538841347]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0.75, 0)
 shape = SubResource("BoxShape3D_g6x0b")
 
-[node name="BodyMesh" type="Node3D" parent="." unique_id=469980567]
+[node name="Meshes" type="Node3D" parent="." unique_id=469980567]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0.75, 0)
 
-[node name="MainMesh" type="MeshInstance3D" parent="BodyMesh" unique_id=165756683]
-mesh = SubResource("BoxMesh_3ycct")
-
-[node name="TailMesh" type="MeshInstance3D" parent="BodyMesh" unique_id=53219023]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.5, 0)
-mesh = SubResource("CylinderMesh_u51tq")
+[node name="BodyMesh" type="MeshInstance3D" parent="Meshes" unique_id=165756683]
+mesh = ExtResource("4_yx0le")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1349025069]
 avoidance_enabled = true
@@ -111,7 +90,7 @@ neighbor_distance = 0.1
 
 [node name="HPSprite" parent="HealthComponent" index="0" unique_id=1806707282]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7510331, 0)
-texture = SubResource("ViewportTexture_k4th7")
+texture = SubResource("ViewportTexture_yx0le")
 
 [node name="SubViewport" parent="HealthComponent" index="1" unique_id=1164087689]
 size = Vector2i(96, 16)

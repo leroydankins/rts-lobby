@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dxrceo5t2rtks"]
+
+[ext_resource type="Script" uid="uid://doytopsoqqvoe" path="res://components/navigation_component/nav_component.gd" id="1_dca51"]
+
+[node name="NavigationComponent" type="NavigationAgent3D" unique_id=2119946829]
+script = ExtResource("1_dca51")

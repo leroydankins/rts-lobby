@@ -1,20 +1,5 @@
 Todo
-Isometric Grid System for objects
-
-COMPLETED
-Worker:
-	Build buildings
-		Click build building option on worker, select location
-		send command to build at given location for worker
-		worker moves to location, calls "place object" to server
-		develops object until finished building
-	Collect Resources from minerals
-		deliver in-game resources to the player
-	Command Queue
-	When command is compelte, log command completion time and command data in command_history
-	Remove command from queue
-	Play next command if another is in queue
-
+Grid tile System for objects
 1/30/26
 Create Forge prototype
 	Selectable✔️
@@ -43,33 +28,63 @@ Player technology
 	Rankorian_Research = Array[bool] [false, false, false, false]
 	Dwarf_Research = Array[bool] = [false,false,false,false,false,false,false]
 	Array of bools associated with globalconstants.upgrades
-
 #BACKLOG LOL
 	Show unit health and stats when selected
 	Flesh out score screen menu
+	CmdGUI shows command options when unconstructed building selected
 
-3/17 DONE
-	Change home resource depot on reaching target for dwarf worker class
-	catch navigation when something is already in interact area
+	Scrub current entity_holder method calls and add some protection, currently the onus is on the calling node (building or unit) to be the multiplayer authority
+		Should perhaps have the local player request the instantiation directly in a request method which then only calls the instantiation rpc as authority in entity holder
+		Ala @rpc any_peer: if (is_multiplayer_authority): call authority RPC
+	Final version of building_grid
+		each tile will decal to display the tile graphics on the ground
+		raycast from each corner to determine if it is a flat area (good for placement) and determine invalid if not
+			Different heights between the raycasts will dictate validity
+		use corner coordinates to place collision_shape that mouse click responds to
+		perhaps figure out how to bake it into each map ahead of time to not have processing required mid game
+		possibily optimize raycast number by handling it from parent and doing each raycast per index once (not 4 times per tile since the edges connect)
 
-3/18 DONE
-	create end game pop up menu to return to lobby and see post game
-	create pause (but not paused) menu
+#COMPLETED
+	Worker:
+		Build buildings
+			Click build building option on worker, select location
+			send command to build at given location for worker
+			worker moves to location, calls "place object" to server
+			develops object until finished building
+		Collect Resources from minerals
+			deliver in-game resources to the player
+		Command Queue
+		When command is compelte, log command completion time and command data in command_history
+		Remove command from queue
+		Play next command if another is in queue
+	3/17 DONE
+		Change home resource depot on reaching target for dwarf worker class
+		catch navigation when something is already in interact area
+	3/18 DONE
+		create end game pop up menu to return to lobby and see post game
+		create pause (but not paused) menu
+	3/19 DONE
+		connect menu buttons to functions and create end game event
+			create end game event
+	3/20 DONE
+		Create end game condition that triggrs end game event
+			Creating a player data manager to track player information and then this can check for if we no longer have a unit or building
+			operates by team instead of player_id, but will still have a reference to the player's id?
+	3/21DONE
+		Work on player_data_manager and player_resource
+		COMPELTELY REVAMPING SPENDING AND COST TO USE PLAYER COLOR/ID INT ISNTEAD OF PEER ID!
+		Show cost of each task in command gui
+		Sync build state between client and host
+		Complete new command component thing - I have no idea what this was but I think I did it?
+		Refactor basic unit to make them reproducible
+	4/1 DONE
+		re-implement waiting for resource mining on worker
+	4/22 DONE
+		Fix corner cases of building_grid DONE
+	4/26 DONE
+		Call entity_holder to spawn building on the grid!
+		take up the spaces that it says it took up DONE!
 
-3/19 DONE
-	connect menu buttons to functions and create end game event
-		create end game event
-
-3/20 DONE
-	Create end game condition that triggrs end game event
-		Creating a player data manager to track player information and then this can check for if we no longer have a unit or building
-		operates by team instead of player_id, but will still have a reference to the player's id?
-
-3/21DONE
-	Work on player_data_manager and player_resource
-
-COMPELTELYH REVAMPING SPENDING AND COST TO USE PLAYER COLOR/ID INT ISNTEAD OF PEER ID!
-DONE
-a
-Show cost of each task in command gui
-Sync build state between client and host
+TODO
+	4/26
+		Implement raycasts on building grid

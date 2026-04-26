@@ -5,16 +5,17 @@ const ENTITY_TYPE: GlobalConstants.EntityType = GlobalConstants.EntityType.UNIT;
 const ENTITY_NUMBER: EntityConstants.Units = EntityConstants.Units.DWARF_WORKER;
 const PREVIEW: Texture2D = preload(GlobalConstants.UNIT_PLACEHOLDER_TEXTURE);
 const ENTITY_HEIGHT_OFFSET: float = .5;
+const MOVE_SPEED: float = 4.0;
 
-@onready var highlight_mesh: MeshInstance3D = $HighlightMesh
-@onready var resource_mesh: MeshInstance3D = $ResourceMesh
-@onready var anim: AnimationPlayer = $Anim
-@onready var navigation_agent: NavigationAgent3D = $NavigationAgent
-@onready var health_component: HealthComponent = $HealthComponent
-@onready var interact_area: Area3D = $InteractArea
+@export var highlight_mesh: MeshInstance3D
+@export var resource_mesh: MeshInstance3D
+@export var unit_mesh: MeshInstance3D
+@export var anim: AnimationPlayer
+@export var navigation_agent: NavigationAgent3D
+@export var health_component: HealthComponent
+@export var interact_component: Area3D
 @export var aggro_component: AggroComponent
 
-const MOVE_SPEED: float = 4.0;
 const GET_RESOURCE_COLLISION_MASK: int = 0b1001 # This is set with direct method call atm
 const REGULAR_COLLISION_MASK: int = 0b1011; #OBE: Method Call set_collision_mask_value(3, true)
 const UNIT_COLLISION_MASK: int = 3;
@@ -22,9 +23,7 @@ const UNIT_COLLISION_MASK: int = 3;
 @export var team: int = 0;
 @export var color: int = 0;
 
-#combat things
-@export var health: int = 25;
-@export var max_health: int = 25;
+
 @export var is_alive: bool = true;
 @export var damage: int = 8;
 
@@ -45,7 +44,7 @@ var cmd_dict: Dictionary[int, Dictionary] = {
 	1: GlobalConstants.MOVE_TO_DICTIONARY,
 	2: GlobalConstants.ATTACK_MOVE_DICTIONARY,
 	3: {},
-	4: {},
+	4: GlobalConstants.BUILD_DWARF_BARRACKS2_DICTIONARY,
 	5: {},
 	6: {},
 	7: GlobalConstants.BUILD_DWARF_SETTLEMENT_DICTIONARY,
@@ -74,11 +73,12 @@ func _ready() -> void:
 	entity_holder = get_tree().get_first_node_in_group("EntityHolder");
 	player_data_manager = game.player_data_manager;
 	navigation_agent.navigation_finished.connect(on_nav_finished);
-	interact_area.body_entered.connect(on_interact_area_entered);
-	interact_area.area_entered.connect(on_interact_area_entered);
-	interact_area.body_exited.connect(on_interact_area_exited);
-	interact_area.area_exited.connect(on_interact_area_exited);
+	interact_component.body_entered.connect(on_interact_component_entered);
+	interact_component.area_entered.connect(on_interact_component_entered);
+	interact_component.body_exited.connect(on_interact_component_exited);
+	interact_component.area_exited.connect(on_interact_component_exited);
 	aggro_component.aggrod.connect(on_aggrod)
+
 	#navigation_agent.velocity_computed.connect(Callable(_on_velocity_computed))
 	#check if we don't have a correct building type for resource depot? why the fuck would it be wrong
 	if(resource_depot != null):
@@ -88,8 +88,6 @@ func _ready() -> void:
 		assert(resource_depot.BUILDING_TYPE.has(GlobalConstants.BuildingType.RESOURCE_DEPOT));
 
 func _physics_process(delta: float) ->void:
-	if(!is_alive):
-		return;
 	#only do stuff if we are
 	#1. the multipalyer authority
 	#2. we are currently navigating around or moving
@@ -112,6 +110,8 @@ func _physics_process(delta: float) ->void:
 		move_and_slide()
 
 func _on_velocity_computed(safe_velocity: Vector3) -> void:
+	if (!is_multiplayer_authority()):
+		return;
 	velocity = safe_velocity
 	move_and_slide()
 
@@ -124,7 +124,6 @@ func _process(delta: float) -> void:
 		look_at(Vector3.BACK)
 	else:
 		resource_mesh.visible = false;
-	#TEMPRORARU
 
 	if(!is_multiplayer_authority()):
 		return;
@@ -202,31 +201,6 @@ func _process(delta: float) -> void:
 			if (navigation_agent.target_position != t_pos):
 				navigation_agent.set_target_position(t_pos);
 		GlobalConstants.Commands.GET_RESOURCE:
-			pass;
-			##Eventually we dont want to get the target every frame, but whatever we need a more fleshed out game to change this and its just an optimization
-			##Find refernced target in the tree, RPC passes this data as a string nodepath
-			#if(!is_instance_valid(target)):
-				#var tar: Node3D = get_tree().root.get_node(cmd_queue[0]["target_node_path"]);
-				#if (tar == null || !is_instance_valid(tar)):
-					#push_error("target did not exist")
-					#navigating = false;
-					#finish_cmd();
-					#return;
-				#else:
-					#target = tar;
-			#if (target.ENTITY_TYPE != GlobalConstants.EntityType.RESOURCE):
-				#finish_cmd();
-				#navigating = false;
-				#return;
-			####MOVE TO RESOURCE
-			###check if we can visibly see the target when we implement fog of war
-			#var t_pos:Vector3 = target.global_position;
-			#if(t_pos != navigation_agent.target_position):
-				#navigation_agent.set_target_position(t_pos)
-			##no area3d right now, just use 2d vector distance to
-			##var tar_2d: Vector2 = Vector2(t_pos.x, t_pos.z);
-			##var pos_2d: Vector2 = Vector2(global_position.x, global_position.z)
-			##if close enough and it wasn't our turn yet on navigation finished
 			if(navigating == false && anim.current_animation != "extract_resource"):
 				if (target.resource_amount <= 0):
 					##TODO
@@ -283,7 +257,6 @@ func start_cmd() -> void:
 			if(navigating == false):
 				navigating = true;
 			target_pos = t_pos;
-
 		GlobalConstants.Commands.HOLD:
 			navigating = false;
 
@@ -315,6 +288,7 @@ func start_cmd() -> void:
 						if(!target.is_constructed):
 							building = target;
 							build_started = true;
+							cmd["command"] = GlobalConstants.Commands.BUILD;
 						elif(target.BUILDING_TYPE.has(GlobalConstants.BuildingType.RESOURCE_DEPOT) && !held_resource.is_empty()):
 							resource_depot = target;
 							cmd["command"] = GlobalConstants.Commands.RETURN_RESOURCE;
@@ -389,6 +363,7 @@ func finish_cmd() -> void:
 
 	#reinit state data
 	set_collision_mask_value(UNIT_COLLISION_MASK, true)
+	set_collision_layer_value(UNIT_COLLISION_MASK,true);
 	build_started = false;
 	if(anim.current_animation == "extract_resource"):
 		target.in_use = false;
@@ -429,10 +404,8 @@ func request_cmd(cmd_data: Dictionary) -> void:
 				if (i == 0 && build_started):
 					#backwards way of doing this if statement lol, fix later
 					continue;
-				#refund the cost if you are clearing out the queue
-				var resources: Array[int] = [cmd_queue[i]["cost"]];
 				#for those reading this, I know this is probably bad code smell or whatever to be calling a parent method but whatever dude
-				player_data_manager.refund_resources(color,resources);
+				player_data_manager.refund_resources(color,cmd_queue[i]["cost"]);
 
 
 			pass;
@@ -519,7 +492,6 @@ func spawn_building(filepath: String) -> void:
 	spawn_building_rpc.rpc(spawn_dict);
 	pass;
 
-
 #animation track calls
 func extract_resource() -> void:
 	var cmd: Dictionary = cmd_queue[0];
@@ -555,8 +527,6 @@ func extract_resource() -> void:
 
 #later this may be done via collision shapes?
 func attack_enemy() ->void:
-	if(!is_alive):
-		return;
 	if(!is_multiplayer_authority()):
 		return;
 	if(!is_instance_valid(target)):
@@ -650,7 +620,7 @@ func on_nav_finished() ->void:
 			navigating = false;
 			finish_cmd();
 
-func on_interact_area_entered(body: Node3D) ->void:
+func on_interact_component_entered(body: Node3D) ->void:
 	if(!is_multiplayer_authority()):
 		return
 	#should always be something interactable because its my god damn setting!
@@ -678,7 +648,7 @@ func on_interact_area_entered(body: Node3D) ->void:
 			anim.play("attack_target");
 
 
-func on_interact_area_exited(body: Node3D) ->void:
+func on_interact_component_exited(body: Node3D) ->void:
 	if(!is_multiplayer_authority()):
 		return
 	for i: int in interactable_array.size():
@@ -706,10 +676,8 @@ func on_aggrod(enemy: Node3D) -> void:
 			if (i == 0 && build_started):
 				#backwards way of doing this if statement lol, fix later
 				continue;
-			#refund the cost if you are clearing out the queue
-			var resources: Array[int] = [cmd_queue[i]["cost"]];
 			#for those reading this, I know this is probably bad code smell or whatever to be calling a parent method but whatever dude
-			player_data_manager.refund_resources(color,resources);
+			player_data_manager.refund_resources(color,cmd_queue[i]["cost"]);
 	#finish whatever you were doing, put that command into history dictionary
 	finish_cmd();
 	#Clear the queued commands queued after refunding for them all, if you do not want to clear the queue, use queue_cmd()

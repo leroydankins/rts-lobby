@@ -48,9 +48,6 @@ properties/6/replication_mode = 2
 properties/7/path = NodePath(".:construction_value")
 properties/7/spawn = true
 properties/7/replication_mode = 2
-properties/8/path = NodePath(".:is_constructed")
-properties/8/spawn = true
-properties/8/replication_mode = 2
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_27gdb"]
 viewport_path = NodePath("SubViewport")

@@ -1,14 +1,7 @@
 [gd_scene format=3 uid="uid://4eb3wijjcde2"]
 
 [ext_resource type="Script" uid="uid://b54457h476tw3" path="res://functional/command_controller/command_controller.gd" id="1_pbo1w"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pbo1w"]
-transparency = 1
-shading_mode = 0
-albedo_color = Color(5.2943824e-07, 0.57083136, 0.25997478, 0.6313726)
-
-[sub_resource type="SphereMesh" id="SphereMesh_ui75f"]
-material = SubResource("StandardMaterial3D_pbo1w")
+[ext_resource type="SphereMesh" uid="uid://byfj4352ef6tj" path="res://functional/command_controller/command_controller_target_mesh.tres" id="2_ui75f"]
 
 [node name="CommandController" type="Node" unique_id=93029543 groups=["CommandController"]]
 script = ExtResource("1_pbo1w")
@@ -22,4 +15,7 @@ color = Color(0.035809424, 0.45938838, 0.28883553, 0.34117648)
 
 [node name="Target" type="MeshInstance3D" parent="." unique_id=563521807]
 visible = false
-mesh = SubResource("SphereMesh_ui75f")
+mesh = ExtResource("2_ui75f")
+
+[node name="PreviewMesh" type="MeshInstance3D" parent="." unique_id=1916726066]
+visible = false

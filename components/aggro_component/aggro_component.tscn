@@ -8,9 +8,9 @@ radius = 10.0
 
 [node name="AggroComponent" type="Area3D" unique_id=1337634102]
 collision_layer = 0
-collision_mask = 2
+collision_mask = 32
 script = ExtResource("1_1ue84")
-aggro_range = 1
+aggro_range = 5
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=700555670]
 shape = SubResource("CylinderShape3D_c3t82")

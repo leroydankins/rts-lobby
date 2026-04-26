@@ -6,9 +6,15 @@ const PREVIEW: Texture2D = preload(GlobalConstants.BUILDING_PLACEHOLDER_TEXTURE)
 @export var highlight_mesh: MeshInstance3D
 @export var health_component: HealthComponent
 @export var unit_maker_component: UnitMakerComponent
+@export var body_mesh: MeshInstance3D
 var game: GameScene;
 var entity_holder: EntityHolder;
 var player_data_manager: PlayerDataManager;
+
+#resources (body mesh)
+const DB_BUILT:BoxMesh = preload("uid://tsx37vxlw7q0")
+const DB_UNBUILT: BoxMesh = preload("uid://kcy7uyo5blag")
+
 
 #export so that in test environment everything is ok
 @export_category("Test Environment Variables")
@@ -31,8 +37,8 @@ const CONSTRUCTION_COMPLETE: int = 10;
 #Shows commands that the unit can take
 var cmd_dict: Dictionary[int, Dictionary] = {
 	0: {},
-	1: {},
-	2: {},
+	1: GlobalConstants.TRAIN_DWARF_WORKER_DICTIONARY,
+	2: GlobalConstants.TRAIN_DWARF_BRAWLER_DICTIONARY,
 	3: {},
 	4: {},
 	5: {},
@@ -45,24 +51,30 @@ var cmd_dict: Dictionary[int, Dictionary] = {
 }
 
 
-
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	game = get_tree().get_first_node_in_group("Game");
 	entity_holder = get_tree().get_first_node_in_group("EntityHolder");
-	player_data_manager = game.player_data_manager;
+	if(game!=null):
+		player_data_manager = game.player_data_manager;
+	if(!is_constructed):
+		body_mesh.mesh = DB_UNBUILT;
+		body_mesh.position.y = (DB_UNBUILT.size.y / 2);
+	else:
+		body_mesh.mesh = DB_BUILT;
+		body_mesh.position.y = (DB_BUILT.size.y / 2);
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	if (!is_multiplayer_authority()):
-		return;
 	if(!is_constructed):
 		if(construction_value >= CONSTRUCTION_COMPLETE):
 			is_constructed = true;
-		else:
-			return;
+			body_mesh.mesh = DB_BUILT;
+			body_mesh.position.y = (DB_BUILT.size.y / 2);
+	if (!is_multiplayer_authority()):
+		return;
 	unit_maker_component.build(delta)
+
 
 
 #This is the only real logic in the script
@@ -85,6 +97,12 @@ func request_cmd(cmd_data: Dictionary) -> void:
 		var success: bool = player_data_manager.spend_resources(color,cost_arr);
 		if (!success):
 			return;
+	if(cmd_data["command"] == GlobalConstants.Commands.TRAIN):
+		if(unit_maker_component.build_queue.size() >= unit_maker_component.BUILD_LIMIT):
+			#we cant do this command
+			return;
+		unit_maker_component.build_queue.append(cmd_data);
+		return
 	var cmd: String = cmd_data["mnemonic"]
 	match cmd:
 		#Target unit

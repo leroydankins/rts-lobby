@@ -1,0 +1,9 @@
+[gd_resource type="SphereMesh" format=3 uid="uid://byfj4352ef6tj"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pbo1w"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(5.2943824e-07, 0.57083136, 0.25997478, 0.6313726)
+
+[resource]
+material = SubResource("StandardMaterial3D_pbo1w")

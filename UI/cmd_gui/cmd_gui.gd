@@ -52,8 +52,11 @@ func update_data(p_cmd_dict: Dictionary) -> void:
 		hotkey_container.show();
 	if(cmd_dict.has("cost")):
 		cost = cmd_dict["cost"];
+		cost_label.text = "Cost: %s Minerals, %s Gas" % [cost[0],cost[1]]
+		cost_label.show();
 	else:
 		cost = [];
+		cost_label.hide();
 	var desc: String = cmd_dict["description"];
 	command_label.text = desc;
 	button.disabled = false;
@@ -80,6 +83,7 @@ func _input(event: InputEvent) -> void:
 
 func on_hover_timeout() ->void:
 	command_info_container.show();
+
 
 func on_mouse_enter() ->void:
 	hover_timer.start();

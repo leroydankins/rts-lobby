@@ -82,7 +82,7 @@ func on_lobby_update() -> void:
 	lobby_label.text = "Lobby: %s" % Lobby.lobby_name;
 
 	#if we are not connected to any lobby
-	if (!Lobby.is_connected):
+	if (!Lobby.lobby_connected):
 		connection_status.text = "Status: Not Connected"
 		for i: int in peer_name_labels.size():
 			peer_name_labels[i].text = "Peer %s" % [i+1];

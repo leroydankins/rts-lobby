@@ -28,7 +28,7 @@ func update_dictionary_data(key: String, data: Variant) -> void:
 		push_error("couldnt update dictionary data")
 		return;
 	#if we are online, update lobby info
-	if (Lobby.is_connected):
+	if (Lobby.lobby_connected):
 		print("we are online, sending updated information in rpc to server");
 		Lobby.local_update_peer_information.rpc_id(get_multiplayer_authority(),str(Lobby.multiplayer.get_unique_id()), local_player);
 
@@ -37,7 +37,7 @@ func update_dictionary_batch(new_dict: Dictionary) -> void:
 		push_error("why are you adding an empty dictionary? Denied function call of update_dictionary_batch");
 		return;
 	local_player = new_dict;
-	if (Lobby.is_connected):
+	if (Lobby.lobby_connected):
 		print("we are online");
 		Lobby.local_update_peer_information.rpc_id(get_multiplayer_authority(),str(Lobby.multiplayer.get_unique_id()), local_player);
 

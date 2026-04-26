@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://qsudcscomium"]
+
+[ext_resource type="PackedScene" uid="uid://cnwcd7by7h4xh" path="res://functional/camera/camera_holder.tscn" id="1_pwp7i"]
+[ext_resource type="PackedScene" uid="uid://c6dfs3vjaid25" path="res://functional/building_grid/building_grid.tscn" id="2_kcaew"]
+[ext_resource type="Script" uid="uid://bb5cdfwtg4lad" path="res://TestScenes/tile_getter.gd" id="3_kcaew"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pwp7i"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_kcaew"]
+sky_material = SubResource("ProceduralSkyMaterial_pwp7i")
+
+[sub_resource type="Environment" id="Environment_um6lc"]
+background_mode = 2
+sky = SubResource("Sky_kcaew")
+tonemap_mode = 2
+
+[node name="GridTestScene" type="Node3D" unique_id=863965375]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1016270709]
+environment = SubResource("Environment_um6lc")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=527839405]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="CameraBase" parent="." unique_id=1309490017 instance=ExtResource("1_pwp7i")]
+
+[node name="BuildingGrid" parent="." unique_id=1275187485 instance=ExtResource("2_kcaew")]
+
+[node name="Node" type="Node" parent="." unique_id=1954041578]
+script = ExtResource("3_kcaew")

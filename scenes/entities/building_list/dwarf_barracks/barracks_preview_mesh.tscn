@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://plok8h7fyscc"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hd16y"]
+transparency = 1
+albedo_color = Color(0.48235294, 0.80784315, 0.30980393, 0.09411765)
+
+[sub_resource type="BoxMesh" id="BoxMesh_o6aot"]
+material = SubResource("StandardMaterial3D_hd16y")
+size = Vector3(1.5, 1.5, 1.5)
+
+[node name="BarracksPreviewMesh" type="MeshInstance3D" unique_id=466783893]
+mesh = SubResource("BoxMesh_o6aot")

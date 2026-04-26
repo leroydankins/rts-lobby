@@ -64,9 +64,9 @@ z_index = 1
 layout_mode = 1
 anchors_preset = -1
 anchor_left = -3.292
-anchor_top = -0.896
-offset_left = 0.01600647
-offset_top = 0.008003235
+anchor_top = -0.521
+offset_left = -0.98399353
+offset_top = -0.9919987
 grow_horizontal = 0
 grow_vertical = 0
 mouse_filter = 1
@@ -79,10 +79,12 @@ layout_mode = 2
 size_flags_vertical = 0
 
 [node name="CostLabel" type="Label" parent="CommandInfoContainer/VBoxContainer" unique_id=334686289]
+visible = false
 layout_mode = 2
 size_flags_vertical = 8
 
 [node name="HoverTimer" type="Timer" parent="." unique_id=285617428]
+wait_time = 0.125
 one_shot = true
 
 [node name="HotkeyContainer" type="PanelContainer" parent="." unique_id=618168948]

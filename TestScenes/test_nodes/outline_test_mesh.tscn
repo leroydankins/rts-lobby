@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://cfp5jccru54oi"]
+
+[ext_resource type="Material" uid="uid://dcvtxn47ac6q4" path="res://resources/shaders/grid_shader_mat.tres" id="1_x2yj7"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_pr60b"]
+size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x2yj7"]
+next_pass = ExtResource("1_x2yj7")
+transparency = 1
+albedo_color = Color(0.5686275, 0.827451, 0.3372549, 0.56078434)
+
+[node name="Node3D" type="MeshInstance3D" unique_id=1698900640]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+mesh = SubResource("PlaneMesh_pr60b")
+surface_material_override/0 = SubResource("StandardMaterial3D_x2yj7")

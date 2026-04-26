@@ -2,14 +2,23 @@
 
 [ext_resource type="Script" uid="uid://bxqk14jru353a" path="res://functional/building_grid/grid_tile.gd" id="1_jts7a"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_uqm5m"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_jts7a"]
+size = Vector3(1, 0.1, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jts7a"]
 size = Vector2(1, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cwp8q"]
-transparency = 1
-albedo_color = Color(1, 1, 1, 0.40784314)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7q7db"]
+resource_local_to_scene = true
 
-[node name="GridTile" type="MeshInstance3D" unique_id=1470269906]
-mesh = SubResource("PlaneMesh_uqm5m")
-surface_material_override/0 = SubResource("StandardMaterial3D_cwp8q")
+[node name="GridTIle" type="Area3D" unique_id=1321095609]
+collision_layer = 4096
+collision_mask = 0
 script = ExtResource("1_jts7a")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1090921738]
+shape = SubResource("BoxShape3D_jts7a")
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=898792772]
+mesh = SubResource("PlaneMesh_jts7a")
+surface_material_override/0 = SubResource("StandardMaterial3D_7q7db")

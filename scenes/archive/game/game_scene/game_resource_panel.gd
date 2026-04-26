@@ -60,9 +60,9 @@ func _process(delta: float) -> void:
 		if(i >= MAX_PLAYERS):
 			return;
 		if(text_arr[i].is_visible_in_tree()):
-			var min: int = game.player_game_dict[key][Game.PLAYER_RESOURCE_KEY];
+			var mins: int = game.player_game_dict[key][Game.PLAYER_RESOURCE_KEY];
 			var gas: int = game.player_game_dict[key][Game.PLAYER_GAS_KEY];
-			text_arr[i].text = "%s: min: %s gas: %s" % [username_arr[i], str(min), str(gas)]
+			text_arr[i].text = "%s: min: %s gas: %s" % [username_arr[i], str(mins), str(gas)]
 			i += 1;
 	while (i < MAX_PLAYERS):
 		box_arr[i].hide();

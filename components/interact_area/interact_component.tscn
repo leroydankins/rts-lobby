@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://jhhshf2am8jm"]
+
+[ext_resource type="Script" uid="uid://bsk2ocf66pjh6" path="res://components/interact_area/interact_component.gd" id="1_8r8g2"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_e1u8e"]
+height = 5.0
+radius = 0.75
+
+[node name="InteractComponent" type="Area3D" unique_id=1909443595]
+collision_layer = 0
+collision_mask = 2
+input_ray_pickable = false
+script = ExtResource("1_8r8g2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=338994411]
+shape = SubResource("CylinderShape3D_e1u8e")

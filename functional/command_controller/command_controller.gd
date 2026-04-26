@@ -1,6 +1,10 @@
 class_name CommandController
 extends Node
 
+const BUILDING_GRID_COLLISION_MASK: int = 0b1000000000000; #layer 13
+const WORLD_ENTITY_COLLISION_MASK: int = 0b10001; #layer 5 and 1
+const WORLD_COLLISION_MASK: int = 0b1 #layer 1
+
 ##Used by the local player to initiate commands and send commands to the units
 ##Keeps arrays of all selected units, can have hotkeys for multiple units, uses Input to read inputs before anything else and then stops their input
 ##this should not have to RPC its own functions, only the people it makes do things
@@ -18,6 +22,8 @@ var selected: Array[Node3D] = []  # Array of selected units.
 var drag_start_position: Vector2 = Vector2.ZERO  # Location where drag began.
 @onready var selection_rect: ColorRect = $SelectionRect
 @onready var target: MeshInstance3D = $Target
+@onready var preview_mesh: MeshInstance3D = $PreviewMesh
+@onready var target_mesh : Resource = preload("uid://byfj4352ef6tj")
 
 var groups_dict: Dictionary[int, Array] = {};
 
@@ -36,7 +42,31 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if (selected.is_empty()):
+		preview_mesh.hide();
 		return;
+	if(!pending_cmd.is_empty()):
+		preview_mesh.hide();
+		#display preview building
+		if (pending_cmd.has("entity_preview")):
+			if(preview_mesh.mesh != null):
+				print("we have a mesh")
+			else:
+				print("we dont have a mesh");
+				#We will perhaps move this to background thread loading
+				var mesh: Mesh = load(pending_cmd["entity_preview"]);
+				preview_mesh.mesh = mesh;
+			var result: Dictionary = get_ray_intersect(WORLD_COLLISION_MASK);
+			if (result.is_empty()):
+				return;
+			var location : Vector3 = result["position"]
+			var x: float = roundi(location.x);
+			var y: float = roundi(location.y) + preview_mesh.mesh.size.y / 2;
+			var z: float = roundi(location.z);
+			preview_mesh.global_position = Vector3(x,y,z);
+			preview_mesh.show();
+			#we have a preview mesh that should be displayed
+
+
 
 func select_units_2d_projected() -> void:
 	var loc_dict: Dictionary = game.player_data_manager.player_dict[game.player_data_manager.local_id]
@@ -80,7 +110,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				if(pending_cmd.has("cost")):
 					if(pending_cmd["cost"][0] > loc_dict[PlayerDataManager.MINERAL_KEY] || pending_cmd["cost"][1] > loc_dict[PlayerDataManager.GAS_KEY]):
 						return;
-
+				#copy command before we edit the arguments
+				var cmd_duplicate: Dictionary = pending_cmd.duplicate();
 				#the pending command requires a location input
 				if(pending_cmd.has("location")):
 					var attack_move: bool = false; #If we are attack move, we switch to regular attack command for command
@@ -90,11 +121,12 @@ func _unhandled_input(event: InputEvent) -> void:
 					if (result.is_empty()):
 						return;
 					var obj: Node3D = result["collider"];
-					if ("ENTITY_TYPE" in obj && attack_move):
-						var node_path : String = obj.get_path();
-						pending_cmd = GlobalConstants.ATTACK_TARGET_DICTIONARY.duplicate();
-						pending_cmd["target_node_path"] = node_path;
-						handle_cmd(pending_cmd);
+					if ("ENTITY_TYPE" in obj):
+						if(attack_move):
+							var node_path : String = obj.get_path();
+							pending_cmd = GlobalConstants.ATTACK_TARGET_DICTIONARY.duplicate();
+							pending_cmd["target_node_path"] = node_path;
+							handle_cmd(pending_cmd);pass;
 					else:
 						var location : Vector3 = result["position"];
 						pending_cmd["location"] = location;
@@ -109,7 +141,29 @@ func _unhandled_input(event: InputEvent) -> void:
 						var node_path : String = obj.get_path();
 						pending_cmd["target_node_path"] = node_path;
 						handle_cmd(pending_cmd);
-				pending_cmd = {};
+				#used for placing or checking locations on the building grid
+				elif(pending_cmd.has("grid_location")):
+					var result: Dictionary = get_ray_intersect(WORLD_COLLISION_MASK);
+					if (result.is_empty()):
+						return;
+					var location : Vector3 = result["position"]
+					location.x = roundi(location.x);
+					location.z = roundi(location.z);
+					pending_cmd["location"] = location;
+					handle_cmd(pending_cmd);
+					#var size: Array[int] = pending_cmd["grid_size"];
+					#var dict: Dictionary = get_ray_intersect(BUILDING_GRID_COLLISION_MASK);
+					#var loc: Vector2 = dict["position"];
+					#if (pending_cmd.has("grid_size")):
+						#var building_grid: BuildingGrid;
+
+
+				preview_mesh.mesh = null;
+				preview_mesh.hide()
+				if(Input.is_action_pressed("shift")):
+					pending_cmd = cmd_duplicate;
+				else:
+					pending_cmd = {};
 				return
 			#end pending command block
 
@@ -179,6 +233,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	#RIGHT CLICK LOGIC
 	if (event.is_action_pressed("action")):
+		preview_mesh.hide();
 		#create commands vars outside of logic since they all use it i guess?
 		var loc_dict: Dictionary = game.player_data_manager.player_dict[game.player_data_manager.local_id]
 		var cmd: Dictionary = {};
@@ -211,7 +266,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 #local method that is called before requesting the command over the server. If additional arguments required will defer cmd, otherwise will continue to request_unit_cmd
 func handle_cmd(p_cmd: Dictionary) -> void:
-
 	#ONLY PROCESS THESE IF WE HAVE SELECTED UNITS
 	if(selected.is_empty()):
 		return;
@@ -221,12 +275,19 @@ func handle_cmd(p_cmd: Dictionary) -> void:
 	#########
 	#For ones that will require an argument like a location or target, set up so unhandled input will pick up the cmd
 	#This will catch duplicated  commands that dont remove the argument section first
-	if (p_cmd.has("argument")):
-		#Only make it a pending command if this does not have an entry for the argument in question
-		if(!p_cmd.has(p_cmd["argument"])):
-			cmd[p_cmd["argument"]] = null;
+	if (cmd.has("argument")):
+		if (cmd["argument"] is Array):
+			for arg: String in cmd["argument"]:
+				if(!cmd.has(arg)):
+					cmd[arg] = null;
 			pending_cmd = cmd;
 			return;
+		else:
+			#Only make it a pending command if this does not have an entry for the argument in question
+			if(!cmd.has(cmd["argument"])):
+				cmd[p_cmd["argument"]] = null;
+				pending_cmd = cmd;
+				return;
 	#########
 	#No argument needed or argument is filled, request the command
 	var unit_path_arr: Array[String] = [];
@@ -315,14 +376,27 @@ func get_world_click() -> Dictionary:
 	var from: Vector3 = camera.project_ray_origin(mouse_pos)
 	var to: Vector3 = from + camera.project_ray_normal(mouse_pos) * ray_length
 	var space: PhysicsDirectSpaceState3D = get_viewport().get_world_3d().direct_space_state;
-	var ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from,to,0x11);
+	var ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from,to,0b10001); #this is layer 5 and 1 for unit and world
 	ray_query.collide_with_areas = true
 	var raycast_result: Dictionary = space.intersect_ray(ray_query)
 	return raycast_result;
-	#if (raycast_result.is_empty()):
-		#return null;
-	#var obj: Node3D = raycast_result["collider"];
-	#return obj;
+
+
+#THIS IS USED FOR GETTING BUILDING GRID
+func get_ray_intersect(collision_mask: int) -> Dictionary:
+	var mouse_pos: Vector2 = get_viewport().get_mouse_position()
+	var ray_length: int = 100
+	var camera: Camera3D = get_viewport().get_camera_3d();
+
+	var from: Vector3 = camera.project_ray_origin(mouse_pos)
+	var to: Vector3 = from + camera.project_ray_normal(mouse_pos) * ray_length
+	var space: PhysicsDirectSpaceState3D = get_viewport().get_world_3d().direct_space_state;
+	var ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from,to,collision_mask);
+	ray_query.collide_with_areas = true
+	var raycast_result: Dictionary = space.intersect_ray(ray_query)
+	return raycast_result;
+
+
 
 
 func clear_selection() -> void:

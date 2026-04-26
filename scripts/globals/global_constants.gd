@@ -25,6 +25,7 @@ const DWARF_SETTLEMENT_FILEPATH: String = "uid://bif7vwlmrd4j0" #building_list/d
 const DWARF_WORKER_FILEPATH: String = "uid://bk5soe7dxxfcm" #unit_list/dwarf_worker/
 const DWARF_BLUNDERBUSS_FILEPATH: String = "";
 const DWARF_BARRACKS_FILEPATH: String = "uid://sa4f355jrmcj"; #building_list/dwarf_barracks
+const DWARF_BRAWLER_FILEPATH: String = "uid://b5v73hrqfe7wf" #unit_list/dwarf_brawler
 
 #IMAGE FILEPATHS
 const BUILDING_PLACEHOLDER_TEXTURE: String = "uid://drsrhq5glvf4f" #building_placeholder.png
@@ -71,8 +72,10 @@ enum Commands
 	FOLLOW,
 	GET_RESOURCE,
 	BUILD,
+	TRAIN, #Used by buildings to train units or research
 	ATTACK_MOVE,
 	RETURN_RESOURCE,
+	GO_TO,
 }
 ##TODO
 enum Dwarf_Research
@@ -192,10 +195,10 @@ const ATTACK_MOVE_DICTIONARY: Dictionary [String, Variant] = {
 	"description" : "Move to location, attacking anything it sees",
 	"sprite_path" : ATTACK_PLACEHOLDER_TEXTURE
 }
-const BUILD_DWARF_WORKER_DICTIONARY: Dictionary[String, Variant] = {
+const TRAIN_DWARF_WORKER_DICTIONARY: Dictionary[String, Variant] = {
 	#Required command data
 	"mnemonic" : "DS001",
-	"command" : Commands.BUILD,
+	"command" : Commands.TRAIN,
 	"hotkey" : "E",
 	"is_group" : false,
 	"can_queue" : false,
@@ -210,6 +213,24 @@ const BUILD_DWARF_WORKER_DICTIONARY: Dictionary[String, Variant] = {
 	"description" : "Builds a dwarf worker",
 	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
 }
+const TRAIN_DWARF_BRAWLER_DICTIONARY: Dictionary[String, Variant] = {
+	#Required command data
+	"mnemonic" : "DB001",
+	"command" : Commands.TRAIN,
+	"hotkey" : "K",
+	"is_group" : false,
+	"can_queue" : false,
+
+	#command specific data
+	"cost" : [75,0],
+	"file_path" : DWARF_BRAWLER_FILEPATH,
+	"build_time" : 12,
+
+	#Command Metadata
+	"name" : "Brawler",
+	"description" : "Builds a dwarf brawler",
+	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
+}
 
 const BUILD_DWARF_SETTLEMENT_DICTIONARY  : Dictionary = {
 	#required command data
@@ -221,8 +242,10 @@ const BUILD_DWARF_SETTLEMENT_DICTIONARY  : Dictionary = {
 
 	#command specific data
 	"cost" : [400,0],
+	"building_array": [BuildingType.CENTER, BuildingType.RESOURCE_DEPOT],
 	"argument" : "location",
 	"file_path" : DWARF_SETTLEMENT_FILEPATH,
+
 
 	#command metadata
 	"name" : "Build Base",
@@ -240,8 +263,28 @@ const BUILD_DWARF_BARRACKS_DICTIONARY: Dictionary = {
 
 	#command specific data
 	"cost" : [150,0],
+	"building_array": [], #Check against buildingType enum for bool checks on buiilding-grid
 	"argument" : "location",
 	"file_path" : DWARF_BARRACKS_FILEPATH,
+
+	#command metadata
+	"name" : "Dwarf Barracks",
+	"description" : "Build dwarven barracks, can create warriors",
+	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
+}
+const BUILD_DWARF_BARRACKS2_DICTIONARY: Dictionary = {
+	#required command data
+	"mnemonic" : "DW003",
+	"command" : Commands.BUILD,
+	"hotkey" : "B",
+	"is_group" : false,
+	"can_queue" : true,
+
+	#command specific data
+	"cost" : [150,0],
+	"argument" : "grid_location",
+	"file_path" : DWARF_BARRACKS_FILEPATH,
+	"entity_preview" : "uid://bsqyhy830548j",
 
 	#command metadata
 	"name" : "Dwarf Barracks",
@@ -270,7 +313,7 @@ const BUILD_FORGE_DICTIONARY : Dictionary = {
 const RESEARCH_DWARF_BLUNDERBUSS_DICTIONARY : Dictionary = {
 	#Required command data
 	"mnemonic" : "F003",
-	"command" : Commands.BUILD,
+	"command" : Commands.TRAIN,
 	"hotkey" : "B",
 	"is_group" : false,
 	"can_queue" : false,
@@ -287,7 +330,7 @@ const RESEARCH_DWARF_BLUNDERBUSS_DICTIONARY : Dictionary = {
 const UPGRADE_ARMOR_1_DICTIONARY : Dictionary = {
 	#Required Command Data
 	"mnemonic" : "F003",
-	"command" : Commands.BUILD,
+	"command" : Commands.TRAIN,
 	"hotkey" : "G",
 	"is_group" : false,
 	"can_queue" : false,
@@ -304,7 +347,7 @@ const UPGRADE_ARMOR_1_DICTIONARY : Dictionary = {
 const UPGRADE_ARMOR_2_DICTIONARY : Dictionary = {
 	#Required Command Data
 	"mnemonic" : "F004",
-	"command" : Commands.BUILD,
+	"command" : Commands.TRAIN,
 	"hotkey" : "G",
 	"is_group" : false,
 	"can_queue" : false,

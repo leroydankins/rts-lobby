@@ -5,8 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://bk5soe7dxxfcm" path="res://scenes/entities/unit_list/dwarf_worker/dwarf_worker.tscn" id="3_75w43"]
 [ext_resource type="PackedScene" uid="uid://bif7vwlmrd4j0" path="res://scenes/entities/building_list/dwarf_settlement/dwarf_settlement.tscn" id="4_h2la2"]
 [ext_resource type="PackedScene" uid="uid://sa4f355jrmcj" path="res://scenes/entities/building_list/dwarf_barracks/dwarf_barracks.tscn" id="5_fnpii"]
+[ext_resource type="PackedScene" uid="uid://cfp5jccru54oi" path="res://TestScenes/test_nodes/outline_test_mesh.tscn" id="6_14n3e"]
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_fnpii"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_tskly"]
 viewport_path = NodePath("SubViewport")
 
 [node name="TestEnvironment" type="Node3D" unique_id=529187176]
@@ -21,9 +22,6 @@ text = "Unit"
 [node name="CameraBase" parent="GameScene" index="4" unique_id=1309490017]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 0, 50)
 
-[node name="Camera3D" parent="GameScene/CameraBase" index="0" unique_id=1037576770]
-transform = Transform3D(-4.371139e-08, 0.7071067, -0.70710677, 0, 0.70710677, 0.7071067, 1, 3.0908616e-08, -3.0908616e-08, 0, 0, 0)
-
 [node name="Spawn1" parent="GameScene/SpawnHolder" parent_id_path=PackedInt32Array(2086082315, 1490039800) index="0" unique_id=1798815161]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 2.5, -50)
 
@@ -37,7 +35,7 @@ team = 1
 resource_depot = NodePath("../DwarfSettlement")
 
 [node name="HPSprite" parent="GameScene/EntityHolder/DwarfWorker6/HealthComponent" parent_id_path=PackedInt32Array(1213118038, 2041268192) index="0" unique_id=1806707282]
-texture = SubResource("ViewportTexture_fnpii")
+texture = SubResource("ViewportTexture_tskly")
 
 [node name="DwarfSettlement" parent="GameScene/EntityHolder" parent_id_path=PackedInt32Array(2086082315, 1904239509) index="2" unique_id=1146713369 instance=ExtResource("4_h2la2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 2.5, 50)
@@ -45,6 +43,9 @@ is_constructed = true
 
 [node name="DwarfBarracks" parent="GameScene/EntityHolder" parent_id_path=PackedInt32Array(2086082315, 1904239509) index="3" unique_id=946034466 instance=ExtResource("5_fnpii")]
 transform = Transform3D(0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.70710677, 28, 0.75, 40)
+
+[node name="Node3D" parent="." unique_id=1698900640 instance=ExtResource("6_14n3e")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 43.044727, 2.7298489, -53.871887)
 
 [editable path="GameScene"]
 [editable path="GameScene/CameraBase"]

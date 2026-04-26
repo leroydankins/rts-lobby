@@ -36,7 +36,7 @@ const DEFAULT_SERVER_IP: String = "127.0.0.1";
 const ETHANS_EXTERNAL_IP: String = "98.204.21.100"
 const MAX_CONNECTIONS: int = 4; #CURRENT MAX CONNECTIONS
 
-var is_connected: bool = false;
+var lobby_connected: bool = false;
 var connect_port: int = PORT;
 var is_local: bool = false;
 
@@ -93,7 +93,6 @@ func join_lobby(address: String = "") -> Error:
 	var error: Error = peer.create_client(address, PORT);
 	#on connect okay, the player will send their local player information to the server and get updated
 
-	print(error);
 	#if the error exists and is not ok, return the error
 	if error != OK:
 		push_error("Error on creating a client, error code: %s" % error);
@@ -102,7 +101,7 @@ func join_lobby(address: String = "") -> Error:
 	#set this instance's multiplayer peer to this peer
 	multiplayer.multiplayer_peer = peer;
 	var id: String = str(multiplayer.get_unique_id());
-	print(id);
+	print("did we get here?", id);
 
 	#TELL THE SERVER YOU CREATED A CLIENT (does not confirm that connection was successful)
 	return error;
@@ -122,7 +121,7 @@ func create_lobby(lob_name: String) -> Error:
 	#set this instance's multiplayer peer to this peer
 	multiplayer.multiplayer_peer = peer;
 
-	is_connected = true;
+	lobby_connected = true;
 	connection_started.emit();
 
 	lobby_name = lob_name;
@@ -140,7 +139,7 @@ func remove_multiplayer_peer() -> Error:
 	#re initialzize an offline peer to make things still function
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	print("disconnected");
-	is_connected = false;
+	lobby_connected = false;
 	lobby_name = "";
 	lobby_player_dictionary.clear();
 	connection_ended.emit();
@@ -271,7 +270,7 @@ func server_update_lobby_name(lob_name: String)-> void:
 #when you connect, send your information to the server and then wait for it to add you to lobby scene
 func on_connected_ok() -> void: #Set player information if you are the authority
 	print("connected to server");
-	is_connected = true;
+	lobby_connected = true;
 	connection_started.emit();
 	#when we connect  to the server, add our own player information to the local StateData autoload
 	print("calling rpc to add player data to the server data");
@@ -281,7 +280,8 @@ func on_connected_ok() -> void: #Set player information if you are the authority
 
 
 func on_connected_fail() -> void:
-	is_connected = false;
+	print("we failed to connect")
+	lobby_connected = false;
 	connection_ended.emit();
 	var _err: Error = remove_multiplayer_peer();
 
@@ -305,7 +305,7 @@ func on_peer_disconnected(peer_id: int)->void:
 
 func on_server_disconnected() -> void:
 	print("disconnected");
-	is_connected = false;
+	lobby_connected = false;
 	lobby_name = "";
 	lobby_player_dictionary.clear();
 	connection_ended.emit();

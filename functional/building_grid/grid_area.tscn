@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://c7e3xpeg1du1o"]
+
+[ext_resource type="Script" uid="uid://c1kh050j4oqmb" path="res://functional/building_grid/grid_area.gd" id="1_g00x5"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_x7eng"]
+size = Vector3(1, 2, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_x7eng"]
+size = Vector2(1, 1)
+
+[node name="GridArea" type="Area3D" unique_id=2044066905]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_g00x5")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=118883627]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_x7eng")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=781442056]
+mesh = SubResource("PlaneMesh_x7eng")
