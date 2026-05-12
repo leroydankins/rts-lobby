@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bp1byohtd1if2"]
+
+[ext_resource type="Script" uid="uid://edmc2mk1kfm1" path="res://components/unit_trainer_component/unit_trainer_component.gd" id="1_2xpww"]
+
+[node name="UnitTrainerComponent" type="Node3D" unique_id=926730106]
+script = ExtResource("1_2xpww")
+build_time = null
+build_item = null
+build_queue = null
+build_progress = null
+build_speed_mult = null

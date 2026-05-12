@@ -240,7 +240,8 @@ K={
 3d_physics/layer_4="Buildings"
 3d_physics/layer_5="SelectLayer"
 3d_physics/layer_6="AggroLayer"
-3d_physics/layer_13="building_grid"
+3d_physics/layer_13="BuildingGridLayer"
+3d_physics/layer_14="GridBakeLayer"
 3d_physics/layer_32="NavBakeLayer"
 
 [physics]

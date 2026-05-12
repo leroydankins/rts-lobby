@@ -1,16 +1,26 @@
 [gd_scene format=3 uid="uid://c6dfs3vjaid25"]
 
 [ext_resource type="Script" uid="uid://mjwjah406hvk" path="res://functional/building_grid/building_grid.gd" id="1_cja41"]
+[ext_resource type="Script" uid="uid://cav4f6ess3y0k" path="res://functional/building_grid/grid_tool.gd" id="2_pu1pa"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_utbwi"]
-size = Vector3(20, 0.1, 20)
+size = Vector3(5, 0.1, 5)
 
 [node name="BuildingGrid" type="Area3D" unique_id=1473338741 node_paths=PackedStringArray("col")]
-collision_layer = 4096
+collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_cja41")
+grid_size_x = 5
+grid_size_z = 5
 col = NodePath("CollisionShape3D")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2037157877]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 2.5)
 shape = SubResource("BoxShape3D_utbwi")
+
+[node name="GridTool" type="Node" parent="." unique_id=2145237643 node_paths=PackedStringArray("building_grid", "col")]
+script = ExtResource("2_pu1pa")
+building_grid = NodePath("..")
+col = NodePath("../CollisionShape3D")
+grid_size_x = 5
+grid_size_z = 5

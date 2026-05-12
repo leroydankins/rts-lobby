@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://4v07y854qqlu"]
+
+[ext_resource type="PackedScene" uid="uid://c6dfs3vjaid25" path="res://functional/building_grid/building_grid.tscn" id="1_a1k8f"]
+
+[node name="Node3D" type="Node3D" unique_id=1522774044]
+
+[node name="BuildingGrid" parent="." unique_id=1473338741 instance=ExtResource("1_a1k8f")]
+grid_size_x = 1
+grid_size_z = 1

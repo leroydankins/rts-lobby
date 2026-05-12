@@ -1,4 +1,4 @@
-class_name UnitMakerComponent
+class_name UnitTrainerComponent
 extends Node3D
 @onready var parent: Node3D = get_parent();
 #constant used for spawning
@@ -112,7 +112,7 @@ func spawn_unit(filepath: String) -> void:
 	"position" = spawn_position,
 	"color" = parent.color
 	}
-	if(parent.BUILDING_TYPE.has(GlobalConstants.BuildingType.RESOURCE_DEPOT)):
+	if(parent.BUILDING_TYPE.has(GlobalConstants.BuildingType.DEPOT)):
 		spawn_dict["resource_depot"] = parent.get_path(); #set path of this unit in the tree for RPC call
 
 	var cmd: Dictionary = {}; # Set up any command you want the unit to have at start

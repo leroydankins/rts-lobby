@@ -3,6 +3,7 @@ extends CharacterBody3D
 const ENTITY_NAME: String = "DwarfWorker"
 const ENTITY_TYPE: GlobalConstants.EntityType = GlobalConstants.EntityType.UNIT;
 const ENTITY_NUMBER: EntityConstants.Units = EntityConstants.Units.DWARF_WORKER;
+const UNIT_TAGS: Array[int] = [GlobalConstants.UnitTags.LAND, GlobalConstants.UnitTags.BUILDER, GlobalConstants.UnitTags.COLLECTOR]
 const PREVIEW: Texture2D = preload(GlobalConstants.UNIT_PLACEHOLDER_TEXTURE);
 const ENTITY_HEIGHT_OFFSET: float = .5;
 const MOVE_SPEED: float = 4.0;
@@ -85,7 +86,7 @@ func _ready() -> void:
 		if(resource_depot.team != team):
 			resource_depot = null;
 			return;
-		assert(resource_depot.BUILDING_TYPE.has(GlobalConstants.BuildingType.RESOURCE_DEPOT));
+		assert(resource_depot.BUILDING_TYPE.has(GlobalConstants.BuildingType.DEPOT));
 
 func _physics_process(delta: float) ->void:
 	#only do stuff if we are
@@ -289,7 +290,7 @@ func start_cmd() -> void:
 							building = target;
 							build_started = true;
 							cmd["command"] = GlobalConstants.Commands.BUILD;
-						elif(target.BUILDING_TYPE.has(GlobalConstants.BuildingType.RESOURCE_DEPOT) && !held_resource.is_empty()):
+						elif(target.BUILDING_TYPE.has(GlobalConstants.BuildingType.DEPOT) && !held_resource.is_empty()):
 							resource_depot = target;
 							cmd["command"] = GlobalConstants.Commands.RETURN_RESOURCE;
 							set_collision_mask_value(UNIT_COLLISION_MASK,false)
@@ -564,7 +565,7 @@ func on_nav_finished() ->void:
 			finish_cmd();
 		GlobalConstants.Commands.FOLLOW:
 			if(target.ENTITY_TYPE == GlobalConstants.EntityType.BUILDING):
-				if(target.BUILDING_TYPE.has(GlobalConstants.BuildingType.RESOURCE_DEPOT)):
+				if(target.BUILDING_TYPE.has(GlobalConstants.BuildingType.DEPOT)):
 					resource_depot = target;
 				finish_cmd();
 			navigating = false;

@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://qsudcscomium"]
 
 [ext_resource type="PackedScene" uid="uid://cnwcd7by7h4xh" path="res://functional/camera/camera_holder.tscn" id="1_pwp7i"]
-[ext_resource type="PackedScene" uid="uid://c6dfs3vjaid25" path="res://functional/building_grid/building_grid.tscn" id="2_kcaew"]
 [ext_resource type="Script" uid="uid://bb5cdfwtg4lad" path="res://TestScenes/tile_getter.gd" id="3_kcaew"]
+[ext_resource type="PackedScene" uid="uid://c6dfs3vjaid25" path="res://functional/building_grid/building_grid.tscn" id="4_4ld8q"]
 [ext_resource type="Script" uid="uid://bdllmkufli582" path="res://functional/entity_holder/entity_holder.gd" id="4_um6lc"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_um6lc"]
-size = Vector3(20, 1, 20)
+size = Vector3(50, 1, 50)
 
 [sub_resource type="BoxMesh" id="BoxMesh_um6lc"]
-size = Vector3(20, 1, 20)
+size = Vector3(50, 1, 50)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pwp7i"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -28,7 +28,8 @@ tonemap_mode = 2
 [node name="GridTestScene" type="Node3D" unique_id=863965375]
 
 [node name="World" type="Area3D" parent="." unique_id=1734808348]
-visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, 25)
+collision_layer = 8192
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="World" unique_id=515806806]
@@ -47,15 +48,8 @@ shadow_enabled = true
 [node name="CameraBase" parent="." unique_id=1309490017 instance=ExtResource("1_pwp7i")]
 START_POS = Vector3(-35, 35, 0)
 
-[node name="BuildingGrid" parent="." unique_id=1275187485 instance=ExtResource("2_kcaew")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
-collision_layer = 0
-grid_size_x = 30
-grid_size_z = 30
-
-[node name="TileGetter" type="Node" parent="." unique_id=1954041578 node_paths=PackedStringArray("building_grid", "entity_holder")]
+[node name="TileGetter" type="Node" parent="." unique_id=1954041578 node_paths=PackedStringArray("entity_holder")]
 script = ExtResource("3_kcaew")
-building_grid = NodePath("../BuildingGrid")
 entity_holder = NodePath("../EntityHolder")
 
 [node name="PreviewMesh" type="MeshInstance3D" parent="TileGetter" unique_id=1270841223]
@@ -68,10 +62,22 @@ monitoring = false
 [node name="CollisionShape3D" type="CollisionShape3D" parent="TileGetter/PreviewMesh/Area3D" unique_id=1714541958]
 shape = SubResource("BoxShape3D_kcaew")
 
-[node name="EntityHolder" type="Node3D" parent="." unique_id=1645153924 node_paths=PackedStringArray("building_grid")]
+[node name="EntityHolder" type="Node3D" parent="." unique_id=1645153924]
 script = ExtResource("4_um6lc")
-building_grid = NodePath("../BuildingGrid")
 metadata/_custom_type_script = "uid://bdllmkufli582"
 metadata/_edit_lock_ = true
 
+[node name="BuildingGrid" parent="." unique_id=1473338741 instance=ExtResource("4_4ld8q")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.652884, 0)
+grid_size_x = 5
+grid_size_z = 5
+
+[node name="CollisionShape3D" parent="BuildingGrid" index="0" unique_id=2037157877]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 2.5)
+
+[node name="GridTool" parent="BuildingGrid" index="1" unique_id=2145237643]
+grid_size_x = 5
+grid_size_z = 5
+
 [editable path="CameraBase"]
+[editable path="BuildingGrid"]

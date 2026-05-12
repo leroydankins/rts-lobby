@@ -127,22 +127,22 @@ func on_selected_signal(entity: Node3D) ->void:
 			obb_progress_bar.value = entity.construction_value / entity.CONSTRUCTION_COMPLETE;
 			obb_label.text = entity.ENTITY_NAME;
 			build_queue_container.hide();
-		elif(!entity.unit_maker_component.build_item.is_empty()):
+		elif(!entity.unit_trainer_component.build_item.is_empty()):
 			object_being_built_control.show();
 			if(!build_slot.has_texture()):
-				var text: Texture2D = load(entity.unit_maker_component.build_item["sprite_path"]);
+				var text: Texture2D = load(entity.unit_trainer_component.build_item["sprite_path"]);
 				build_slot.update_data(text)
-			obb_progress_bar.max_value = entity.unit_maker_component.build_time;
-			obb_progress_bar.value = entity.unit_maker_component.build_progress;
-			obb_label.text = entity.unit_maker_component.build_item.name;
+			obb_progress_bar.max_value = entity.unit_trainer_component.build_time;
+			obb_progress_bar.value = entity.unit_trainer_component.build_progress;
+			obb_label.text = entity.unit_trainer_component.build_item.name;
 			var slots: Array = build_queue_container.get_children();
 			build_queue_container.show();
 			var slot: BuildSlot;
 			for i: int in slots.size():
 				slot = slots[i];
-				if(i < entity.unit_maker_component.build_queue.size()):
+				if(i < entity.unit_trainer_component.build_queue.size()):
 					slot.show();
-					var text: Texture2D = load(entity.unit_maker_component.build_queue[i]["sprite_path"])
+					var text: Texture2D = load(entity.unit_trainer_component.build_queue[i]["sprite_path"])
 					slot.update_data(text);
 					#set button
 				else:
@@ -200,21 +200,21 @@ func _process(_delta: float) -> void:
 			obb_progress_bar.value = (entity.construction_value / entity.CONSTRUCTION_COMPLETE) * 100;
 			obb_label.text = entity.ENTITY_NAME;
 			build_queue_container.hide();
-		elif(!entity.unit_maker_component.build_item.is_empty()):
+		elif(!entity.unit_trainer_component.build_item.is_empty()):
 			object_being_built_control.show();
 			if(!build_slot.has_texture()):
-				var text: Texture2D = load(entity.unit_maker_component.build_item["sprite_path"]);
+				var text: Texture2D = load(entity.unit_trainer_component.build_item["sprite_path"]);
 				build_slot.update_data(text)
-			obb_progress_bar.max_value = entity.unit_maker_component.build_time;
-			obb_progress_bar.value = entity.unit_maker_component.build_progress;
-			obb_label.text = entity.unit_maker_component.build_item.name;
+			obb_progress_bar.max_value = entity.unit_trainer_component.build_time;
+			obb_progress_bar.value = entity.unit_trainer_component.build_progress;
+			obb_label.text = entity.unit_trainer_component.build_item.name;
 			var slots: Array = build_queue_container.get_children();
 			build_queue_container.show();
 			for i: int in slots.size():
-				if(i < entity.unit_maker_component.build_queue.size()):
+				if(i < entity.unit_trainer_component.build_queue.size()):
 					slots[i].show();
 					if(!slots[i].has_texture()):
-						var text: Texture2D = load(entity.unit_maker_component.build_queue[i]["sprite_path"])
+						var text: Texture2D = load(entity.unit_trainer_component.build_queue[i]["sprite_path"])
 						slots[i].update_data(text);
 					#set button
 				else:

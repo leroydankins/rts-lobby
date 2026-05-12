@@ -1,12 +1,13 @@
 extends StaticBody3D
 const ENTITY_NAME: String = "Dwarf Barracks"
 const ENTITY_TYPE: GlobalConstants.EntityType = GlobalConstants.EntityType.BUILDING;
-const BUILDING_TYPE: Array[int] = [];
+const BUILDING_TYPE: Array[int] = [GlobalConstants.BuildingType.LANDPORT];
 const PREVIEW: Texture2D = preload(GlobalConstants.BUILDING_PLACEHOLDER_TEXTURE) #building_placeholder.png
 @export var highlight_mesh: MeshInstance3D
 @export var health_component: HealthComponent
-@export var unit_maker_component: UnitMakerComponent
+@export var unit_trainer_component: UnitTrainerComponent
 @export var body_mesh: MeshInstance3D
+@onready var col: CollisionShape3D = $MainCol
 var game: GameScene;
 var entity_holder: EntityHolder;
 var player_data_manager: PlayerDataManager;
@@ -60,20 +61,27 @@ func _ready() -> void:
 	if(!is_constructed):
 		body_mesh.mesh = DB_UNBUILT;
 		body_mesh.position.y = (DB_UNBUILT.size.y / 2);
+		col.shape.size = body_mesh.mesh.size;
+		col.position = body_mesh.position;
 	else:
 		body_mesh.mesh = DB_BUILT;
 		body_mesh.position.y = (DB_BUILT.size.y / 2);
+		col.shape.size = body_mesh.mesh.size;
+		col.position = body_mesh.position;
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if(!is_constructed):
 		if(construction_value >= CONSTRUCTION_COMPLETE):
+			print("this happe")
 			is_constructed = true;
 			body_mesh.mesh = DB_BUILT;
 			body_mesh.position.y = (DB_BUILT.size.y / 2);
+			col.shape.size = body_mesh.mesh.size;
+			col.position = body_mesh.position;
 	if (!is_multiplayer_authority()):
 		return;
-	unit_maker_component.build(delta)
+	unit_trainer_component.build(delta)
 
 
 
@@ -90,7 +98,7 @@ func request_cmd(cmd_data: Dictionary) -> void:
 		return;
 	if(cmd_data.has("cost")):
 		#All building commands that have a cost require building, easy check to not spend resources that will get rejected in command switch statement
-		if(unit_maker_component.build_queue.size() >= unit_maker_component.BUILD_LIMIT):
+		if(unit_trainer_component.build_queue.size() >= unit_trainer_component.BUILD_LIMIT):
 			print("Full queue, rejecting command");
 			return;
 		var cost_arr: Array = cmd_data["cost"];
@@ -98,10 +106,10 @@ func request_cmd(cmd_data: Dictionary) -> void:
 		if (!success):
 			return;
 	if(cmd_data["command"] == GlobalConstants.Commands.TRAIN):
-		if(unit_maker_component.build_queue.size() >= unit_maker_component.BUILD_LIMIT):
+		if(unit_trainer_component.build_queue.size() >= unit_trainer_component.BUILD_LIMIT):
 			#we cant do this command
 			return;
-		unit_maker_component.build_queue.append(cmd_data);
+		unit_trainer_component.build_queue.append(cmd_data);
 		return
 	var cmd: String = cmd_data["mnemonic"]
 	match cmd:
@@ -119,8 +127,8 @@ func request_cmd(cmd_data: Dictionary) -> void:
 				return;
 		#Cancel action
 		"GC002":
-			if(unit_maker_component.build_item != null):
-				unit_maker_component.cancel_build();
+			if(unit_trainer_component.build_item != null):
+				unit_trainer_component.cancel_build();
 			return;
 		#Target location / Move to Location
 		"GC003":
@@ -132,7 +140,7 @@ func request_cmd(cmd_data: Dictionary) -> void:
 		"GC004":
 			if(!cmd_data.has("int")):
 				return;
-			unit_maker_component.cancel_queued(cmd_data["int"]);
+			unit_trainer_component.cancel_queued(cmd_data["int"]);
 
 
 #highlight

@@ -2,7 +2,7 @@
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hd16y"]
 transparency = 1
-albedo_color = Color(0.48235294, 0.80784315, 0.30980393, 0.09411765)
+albedo_color = Color(0.48235294, 0.80784315, 0.30980393, 0.39215687)
 
 [resource]
 material = SubResource("StandardMaterial3D_hd16y")

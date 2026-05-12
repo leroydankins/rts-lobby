@@ -45,11 +45,25 @@ enum EntityType {
 	BUILDING,
 	RESOURCE
 }
+#Unit Type Enum
+enum UnitTags{
+LAND,
+AIR,
+SEA,
+COMBAT,
+BUILDER,
+COLLECTOR,
+}
 #BUILDING TYPE ENUM
 enum BuildingType
 {
-	CENTER,
-	RESOURCE_DEPOT,
+	TOWNHALL,
+	DEPOT,
+	LANDPORT,
+	AIRPORT,
+	SEAPORT,
+	MONUMENT,
+	RESEARCH,
 }
 #RESOURCE TYPE
 enum ResourceType{
@@ -167,7 +181,7 @@ const ATTACK_TARGET_DICTIONARY: Dictionary [String, Variant] = {
 	#Required command data
 	"mnemonic" : "GC005",
 	"command" : Commands.ATTACK,
-	"hotkey" : "X",
+	"hotkey" : "", #Not used in direct hot key
 	"is_group" : true,
 	"can_queue" : true,
 
@@ -175,7 +189,7 @@ const ATTACK_TARGET_DICTIONARY: Dictionary [String, Variant] = {
 	"argument" : "target_node_path",
 
 	#Command Metadata
-	"name" : "Attack",
+	"name" : "Attack Target",
 	"description" : "Direct selected units to attack a specific target",
 	"sprite_path" : ATTACK_PLACEHOLDER_TEXTURE
 }
@@ -209,7 +223,7 @@ const TRAIN_DWARF_WORKER_DICTIONARY: Dictionary[String, Variant] = {
 	"build_time" : 5,
 
 	#Command Metadata
-	"name" : "Worker",
+	"name" : "Dwarf Worker",
 	"description" : "Builds a dwarf worker",
 	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
 }
@@ -227,7 +241,7 @@ const TRAIN_DWARF_BRAWLER_DICTIONARY: Dictionary[String, Variant] = {
 	"build_time" : 12,
 
 	#Command Metadata
-	"name" : "Brawler",
+	"name" : "Dwarf Brawler",
 	"description" : "Builds a dwarf brawler",
 	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
 }
@@ -242,13 +256,13 @@ const BUILD_DWARF_SETTLEMENT_DICTIONARY  : Dictionary = {
 
 	#command specific data
 	"cost" : [400,0],
-	"building_array": [BuildingType.CENTER, BuildingType.RESOURCE_DEPOT],
+	"building_array": [BuildingType.TOWNHALL, BuildingType.DEPOT],
 	"argument" : "location",
 	"file_path" : DWARF_SETTLEMENT_FILEPATH,
 
 
 	#command metadata
-	"name" : "Build Base",
+	"name" : "Build Townhall",
 	"description" : "Builds Dwarven Settlement",
 	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
 }

@@ -1,57 +1,50 @@
-@tool
 class_name BuildingGrid
 extends Area3D
 
-@onready var grid_tile: PackedScene = load("uid://cj2g37cbu27v")
 
-@export var tile_size: float = 1:
-	set(new_size):
-		tile_size = new_size;
-		if Engine.is_editor_hint():
-			update_size(grid_size_x, grid_size_z);
-@export var grid_size_x: int = 10:
-	set(new_x):
-		grid_size_x = new_x;
-		if Engine.is_editor_hint():
-			update_size(grid_size_x, grid_size_z);
-@export var grid_size_z: int = 10:
-	set(new_z):
-		grid_size_z = new_z;
-		if Engine.is_editor_hint():
-			update_size(grid_size_x, grid_size_z);
-var grid: Array[Array] = [];
+@onready var grid_tile: PackedScene = preload("uid://cj2g37cbu27v")
+
+
+@export var tile_size: float = 1
+@export var grid_size_x: int = 10
+@export var grid_size_z: int = 10
+@export var grid: Array[Array] = [];
 
 @export var col: CollisionShape3D;
 
 
 
 func _ready()->void:
-	if(!Engine.is_editor_hint()):
-		print("not doing this regularly");
-		setup();
+	set_up();
 
 
 
-func setup()->void:
-	for i: int in range(grid_size_x):
-		grid.append([]);
-		for j: int in range(grid_size_z):
-			grid[i].append(null);
-			var tile: GridTile = grid_tile.instantiate()
-			add_child(tile);
-			tile.position = Vector3(tile_size * i + (tile_size/2), 0, tile_size * j + (tile_size/2));
-			grid[i][j] = tile;
-			tile.index = [i,j];
-			#as we get better at determining what is valid through checking world space, we will set flags for the tiles
-			tile.INVALID_FLAG = false;
-			tile.HIGHLIGHT_FLAG = false;
-			tile.USED_FLAG = false;
-	update_size(grid_size_x, grid_size_z);
+func set_up()->void:
+	var time: float = Time.get_ticks_msec();
+	if(grid.is_empty()):
+		return;
+	for i: int in grid.size():
+		for j: int in grid[i].size():
+			var g: GridTile = grid[i][j];
+			g.set_up();
+	#for i: int in range(grid_size_x):
+		#grid.append([]);
+		#for j: int in range(grid_size_z):
+			#grid[i].append(null);
+			#var tile: GridTile = grid_tile.instantiate()
+			#add_child(tile);
+			#tile.position = Vector3(tile_size * i + (tile_size/2), 0, tile_size * j + (tile_size/2));
+			#grid[i][j] = tile;
+			#tile.index = [i,j];
+			##as we get better at determining what is valid through checking world space, we will set flags for the tiles
+			#tile.set_up();
+	var time2: float = Time.get_ticks_msec();
+	print (time2-time);
 
 func is_tile_valid(x: int, z: int, building_array: Array )->bool: #returns if its valid
 	var tile:GridTile = grid[x][z];
 	var is_depot: bool = false;
-	if building_array.has(GlobalConstants.BuildingType.RESOURCE_DEPOT):
+	if building_array.has(GlobalConstants.BuildingType.DEPOT):
 		is_depot = true;
 	if (is_depot && tile.INVALID_DEPOT_FLAG):
 		return false;
@@ -64,7 +57,7 @@ func is_tiles_valid(x_start: int, z_start: int, size: Array, building_type: Arra
 	var z_size: int = size[1];
 	var is_valid: bool = true;
 	var is_depot: bool = false;
-	if (building_type.has(GlobalConstants.BuildingType.RESOURCE_DEPOT)):
+	if (building_type.has(GlobalConstants.BuildingType.DEPOT)):
 		is_depot = true;
 
 	if(x_start < 0): #x min case
@@ -89,7 +82,6 @@ func is_tiles_valid(x_start: int, z_start: int, size: Array, building_type: Arra
 		return is_valid
 	for i: int in range(x_start, max_x):
 		for j: int in range (z_start, max_z):
-			print(i,j)
 			var tile: GridTile = grid[i][j];
 			if (tile.INVALID_FLAG || tile.USED_FLAG || tile.TEMPORARY_INVALID_FLAG):
 				return false #one of the flags or tiles is invalid so we cant do it
@@ -118,6 +110,8 @@ func display_tiles() -> void:
 	for i: int in range(0, grid_size_x):
 		for j: int in range (0, grid_size_z):
 			var tile: GridTile = grid[i][j];
+			if (tile.INVALID_FLAG):
+				continue;
 			tile.visible = true;
 
 func hide_tiles() -> void:
@@ -150,6 +144,8 @@ func highlight_tiles(x_start: int, z_start:int, size:Array) ->void:
 	for i: int in range(x_start, max_x):
 		for j: int in range (z_start, max_z):
 			var tile: GridTile = grid[i][j];
+			if (tile.INVALID_FLAG):
+				continue;
 			tile.HIGHLIGHT_FLAG = true;
 			if(!valid):
 				tile.TEMPORARY_INVALID_FLAG = true;
@@ -180,5 +176,4 @@ func use_tiles(x: int, z:int, size: Array, building_array: Array)->bool:
 				return false;
 	for tile: int in tiles.size():
 		tiles[tile].USED_FLAG = true;
-		print(tiles[tile].index)
 	return true;  #successfully used tiles

@@ -106,7 +106,7 @@ func start_cmd() -> void:
 								building = target;
 								build_started = true;
 								cmd["command"] = GlobalConstants.Commands.BUILD;
-							elif(target.BUILDING_TYPE.has(GlobalConstants.BuildingType.RESOURCE_DEPOT) && !held_resource.is_empty()):
+							elif(target.BUILDING_TYPE.has(GlobalConstants.BuildingType.DEPOT) && !held_resource.is_empty()):
 								resource_depot = target;
 								cmd["command"] = GlobalConstants.Commands.RETURN_RESOURCE;
 								parent.set_collision_mask_value(parent.UNIT_COLLISION_MASK,false)
@@ -185,7 +185,7 @@ func complete_cmd() ->void:
 			finish_cmd();
 		GlobalConstants.Commands.FOLLOW:
 			if(target.ENTITY_TYPE == GlobalConstants.EntityType.BUILDING):
-				if(target.BUILDING_TYPE.has(GlobalConstants.BuildingType.RESOURCE_DEPOT)):
+				if(target.BUILDING_TYPE.has(GlobalConstants.BuildingType.DEPOT)):
 					resource_depot = target;
 				finish_cmd();
 			nav_component.navigating = false;

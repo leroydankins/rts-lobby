@@ -5,7 +5,7 @@
 [ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="3_nnxtk"]
 [ext_resource type="PackedScene" uid="uid://dxrceo5t2rtks" path="res://components/navigation_component/nav_component.tscn" id="4_1xdpu"]
 [ext_resource type="PackedScene" uid="uid://cv673a3v7wsju" path="res://components/aggro_component/aggro_component.tscn" id="5_wc33e"]
-[ext_resource type="PackedScene" uid="uid://jhhshf2am8jm" path="res://components/interact_area/interact_component.tscn" id="6_q2gxr"]
+[ext_resource type="PackedScene" uid="uid://jhhshf2am8jm" path="res://components/interact_component/interact_component.tscn" id="6_q2gxr"]
 [ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="7_idwqt"]
 [ext_resource type="PackedScene" uid="uid://cb4lqsexn3odw" path="res://components/command_component.tscn" id="8_40c27"]
 [ext_resource type="Script" uid="uid://swxn4x2lonig" path="res://components/command_component.gd" id="9_i8b53"]

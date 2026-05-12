@@ -7,7 +7,7 @@ const BUILDING_1: Dictionary = {
 	"entity_preview" : "uid://bsqyhy830548j",
 	"entity_size": Vector3(1.5,1.5,1.5),
 	"tile_size": [1,1],
-	"building_array": [GlobalConstants.BuildingType.CENTER, GlobalConstants.BuildingType.RESOURCE_DEPOT],
+	"building_array": [GlobalConstants.BuildingType.TOWNHALL, GlobalConstants.BuildingType.DEPOT],
 	"argument": ["grid_location", "location"],
 	"grid_location" : [],
 }
@@ -32,7 +32,7 @@ const BUILDING_4 :Dictionary = {
 	"entity_preview" : "uid://bsqyhy830548j",
 	"entity_size": Vector3(1.5,1.5,1.5), #this should be the actual size of the entity that we use for placement and y axis alignment
 	"tile_size": [4,4],
-	"building_array": [GlobalConstants.BuildingType.CENTER, GlobalConstants.BuildingType.RESOURCE_DEPOT],
+	"building_array": [GlobalConstants.BuildingType.TOWNHALL, GlobalConstants.BuildingType.DEPOT],
 	"grid_location" : [],
 }
 var pending_cmd: Dictionary = {};
@@ -161,7 +161,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				return;
 			var tiles : Array = tile_dict["tiles"]
 			#check if tiles are valid and available
-			print("checking tiles x: ", tiles[0], " \n and z: ", tiles[1], " \n with size: ", tiles[2]);
+
 			var building_arr: Array = [];
 			if (pending_cmd.has("building_type")):
 				building_arr = pending_cmd["building_array"];
@@ -192,7 +192,6 @@ func handle_cmd(cmd: Dictionary) -> void:
 	#placeholder shi rn since we arent in a full scene
 	spawn_dict["color"] = 0;
 	spawn_dict["team"] = 0;
-	print("handling command")
 	entity_holder.instantiate_building(spawn_dict);
 	pass;
 
@@ -242,7 +241,6 @@ func get_tile_placement() -> Dictionary:
 			else:
 				x_disp = (x_size / 2) - 1 # wont be a float because
 			x_start_index = tile_index[0] - x_disp
-
 		if (tile_size[1] % 2): #if the z tile_size is odd
 			z = floori(pos.z) + .5
 			var z_displacement: int = z_size - ceili(float(z_size) / 2)
@@ -259,7 +257,7 @@ func get_tile_placement() -> Dictionary:
 		#check if tiles are valid for placement maybe outside this method?
 		var placement_dict: Dictionary = {
 			# array of [starting x tile, starting z tile, size of tiles]
-			"tiles" : [x_start_index,z_start_index, tile_size],
+			"tiles" : [x_start_index, z_start_index, tile_size],
 			"world_position": Vector3(x,y,z),
 		}
 		return placement_dict;

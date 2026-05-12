@@ -88,3 +88,13 @@ Player technology
 TODO
 	4/26
 		Implement raycasts on building grid
+	Add indicator on when you right click a spot with your buildings or units
+	add click sounds
+	add colors for what color you choose
+
+
+Do NOT use your own grid tile with all that extra data, maybe keep it as the parent and use a bit map to determine location,
+when you click on a part of the world you can get that x,z coordinate and request information on what tile that WOULD be in the grid?
+building_grid handles the damn optics? that was so hard I didnt know how to do that
+use a visual shader to indicate current whatever
+Use algorithm to only do N raycasts instead of 4N raycasts

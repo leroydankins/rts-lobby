@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bq2ldfc1sxloh"]
+
+[ext_resource type="Shader" uid="uid://dbuqlcycelp50" path="res://resources/shaders/test_shaders/book_of_shader.gdshader" id="1_kvhlr"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0ajpf"]
+shader = ExtResource("1_kvhlr")
+shader_parameter/u_resolution = Vector2(0, 0)
+shader_parameter/u_mouse = Vector2(0, 0)
+shader_parameter/u_time = 0.0
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_8rctf"]
+size = Vector2(350, 350)
+
+[node name="ShaderTest" type="Sprite2D" unique_id=1878880058]
+material = SubResource("ShaderMaterial_0ajpf")
+texture = SubResource("PlaceholderTexture2D_8rctf")

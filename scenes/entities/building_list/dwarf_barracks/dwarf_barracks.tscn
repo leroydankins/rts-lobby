@@ -5,7 +5,7 @@
 [ext_resource type="Shader" uid="uid://s5sijvx0w33o" path="res://resources/highlight_mesh/highlight_shader.gdshader" id="2_um0yu"]
 [ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="3_helm7"]
 [ext_resource type="BoxMesh" uid="uid://tsx37vxlw7q0" path="res://assets/meshes/dwarf_barracks/db_built.tres" id="4_yx0le"]
-[ext_resource type="PackedScene" uid="uid://bp1byohtd1if2" path="res://components/unit_maker_component/unit_maker_component.tscn" id="5_helm7"]
+[ext_resource type="PackedScene" uid="uid://bp1byohtd1if2" path="res://components/unit_trainer_component/unit_trainer_component.tscn" id="5_helm7"]
 [ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="6_k4th7"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3ycct"]
@@ -34,35 +34,35 @@ properties/0/replication_mode = 2
 properties/1/path = NodePath("HealthComponent:health")
 properties/1/spawn = true
 properties/1/replication_mode = 2
-properties/2/path = NodePath("UnitMakerComponent:build_time")
+properties/2/path = NodePath(".:construction_value")
 properties/2/spawn = true
 properties/2/replication_mode = 2
-properties/3/path = NodePath("UnitMakerComponent:build_item")
+properties/3/path = NodePath(".:is_constructed")
 properties/3/spawn = true
-properties/3/replication_mode = 2
-properties/4/path = NodePath("UnitMakerComponent:build_queue")
+properties/3/replication_mode = 0
+properties/4/path = NodePath("UnitTrainerComponent:build_time")
 properties/4/spawn = true
 properties/4/replication_mode = 2
-properties/5/path = NodePath("UnitMakerComponent:build_progress")
+properties/5/path = NodePath("UnitTrainerComponent:build_item")
 properties/5/spawn = true
 properties/5/replication_mode = 2
-properties/6/path = NodePath("UnitMakerComponent:build_speed_mult")
+properties/6/path = NodePath("UnitTrainerComponent:build_queue")
 properties/6/spawn = true
 properties/6/replication_mode = 2
-properties/7/path = NodePath(".:construction_value")
+properties/7/path = NodePath("UnitTrainerComponent:build_progress")
 properties/7/spawn = true
 properties/7/replication_mode = 2
-properties/8/path = NodePath(".:is_constructed")
+properties/8/path = NodePath("UnitTrainerComponent:build_speed_mult")
 properties/8/spawn = true
-properties/8/replication_mode = 0
+properties/8/replication_mode = 2
 
-[node name="DwarfBarracks" type="StaticBody3D" unique_id=946034466 node_paths=PackedStringArray("highlight_mesh", "health_component", "unit_maker_component", "body_mesh") groups=["Building", "Entity"]]
+[node name="DwarfBarracks" type="StaticBody3D" unique_id=946034466 node_paths=PackedStringArray("highlight_mesh", "health_component", "unit_trainer_component", "body_mesh") groups=["Building", "Entity"]]
 transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
 collision_layer = 58
 script = ExtResource("1_um0yu")
 highlight_mesh = NodePath("HighlightMesh")
 health_component = NodePath("HealthComponent")
-unit_maker_component = NodePath("UnitMakerComponent")
+unit_trainer_component = NodePath("UnitTrainerComponent")
 body_mesh = NodePath("Meshes/BodyMesh")
 
 [node name="HighlightMesh" parent="." unique_id=283025203 instance=ExtResource("1_wtuhh")]
@@ -71,11 +71,11 @@ visible = false
 mesh = SubResource("PlaneMesh_h0nwk")
 
 [node name="MainCol" type="CollisionShape3D" parent="." unique_id=1538841347]
-transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0.75, 0)
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
 shape = SubResource("BoxShape3D_g6x0b")
 
 [node name="Meshes" type="Node3D" parent="." unique_id=469980567]
-transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0.75, 0)
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
 
 [node name="BodyMesh" type="MeshInstance3D" parent="Meshes" unique_id=165756683]
 mesh = ExtResource("4_yx0le")
@@ -95,7 +95,12 @@ texture = SubResource("ViewportTexture_yx0le")
 [node name="SubViewport" parent="HealthComponent" index="1" unique_id=1164087689]
 size = Vector2i(96, 16)
 
-[node name="UnitMakerComponent" parent="." unique_id=926730106 instance=ExtResource("5_helm7")]
+[node name="UnitTrainerComponent" parent="." unique_id=926730106 instance=ExtResource("5_helm7")]
+build_time = 0
+build_item = {}
+build_queue = Array[Dictionary]([])
+build_progress = 0.0
+build_speed_mult = 1.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1315125353 groups=["SyncComponent"]]
 replication_config = SubResource("SceneReplicationConfig_stfpi")

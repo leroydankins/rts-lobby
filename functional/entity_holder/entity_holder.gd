@@ -45,7 +45,6 @@ func instantiate_building(spawn_dict: Dictionary) ->void:
 
 	register_entity(entity);
 	entity.global_position = spawn_dict["position"];
-	print("success?")
 	#we dont need this since it is baked into position?
 	#entity.global_position.y += entity.ENTITY_HEIGHT_OFFSET;
 	#no commmand queuing needed for a building :)
