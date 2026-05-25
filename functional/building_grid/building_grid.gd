@@ -17,8 +17,6 @@ extends Area3D
 func _ready()->void:
 	set_up();
 
-
-
 func set_up()->void:
 	var time: float = Time.get_ticks_msec();
 	if(grid.is_empty()):
@@ -59,7 +57,6 @@ func is_tiles_valid(x_start: int, z_start: int, size: Array, building_type: Arra
 	var is_depot: bool = false;
 	if (building_type.has(GlobalConstants.BuildingType.DEPOT)):
 		is_depot = true;
-
 	if(x_start < 0): #x min case
 		x_size += x_start
 		x_start = 0;

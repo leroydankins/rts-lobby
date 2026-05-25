@@ -69,15 +69,6 @@ metadata/_edit_lock_ = true
 
 [node name="BuildingGrid" parent="." unique_id=1473338741 instance=ExtResource("4_4ld8q")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.652884, 0)
-grid_size_x = 5
-grid_size_z = 5
-
-[node name="CollisionShape3D" parent="BuildingGrid" index="0" unique_id=2037157877]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 2.5)
-
-[node name="GridTool" parent="BuildingGrid" index="1" unique_id=2145237643]
-grid_size_x = 5
-grid_size_z = 5
 
 [editable path="CameraBase"]
 [editable path="BuildingGrid"]

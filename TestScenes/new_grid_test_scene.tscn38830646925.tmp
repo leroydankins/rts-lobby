@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://fsahssuj2mx3"]
+
+[ext_resource type="Material" uid="uid://cchmqdj86vnbq" path="res://resources/terrain_grid_shader/terrain_grid_shader.tres" id="1_wm71l"]
+[ext_resource type="PackedScene" uid="uid://cnwcd7by7h4xh" path="res://functional/camera/camera_holder.tscn" id="2_pdcco"]
+[ext_resource type="PackedScene" uid="uid://c4ecq2fry3m3p" path="res://functional/map_grid/map_grid.tscn" id="3_l2rne"]
+[ext_resource type="Script" uid="uid://c3gfgaoyyit0k" path="res://TestScenes/tiler_getter_2.gd" id="4_vrc7c"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l2rne"]
+next_pass = ExtResource("1_wm71l")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_3ojjd"]
+material = SubResource("StandardMaterial3D_l2rne")
+size = Vector2(50, 50)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wm71l"]
+next_pass = ExtResource("1_wm71l")
+
+[sub_resource type="BoxMesh" id="BoxMesh_vrc7c"]
+material = SubResource("StandardMaterial3D_wm71l")
+size = Vector3(5, 1, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_l2rne"]
+size = Vector3(50, 1, 50)
+
+[node name="new_grid_test_scene" type="Node3D" unique_id=93284390]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1077334610]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=325930803]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, 25)
+mesh = SubResource("PlaneMesh_3ojjd")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D" unique_id=1614877581]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.458355, 0.5, 15)
+mesh = SubResource("BoxMesh_vrc7c")
+
+[node name="Area3D" type="Area3D" parent="MeshInstance3D" unique_id=1881958074]
+collision_layer = 12288
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/Area3D" unique_id=1860944657]
+shape = SubResource("BoxShape3D_l2rne")
+
+[node name="CameraBase" parent="." unique_id=1309490017 instance=ExtResource("2_pdcco")]
+START_POS = Vector3(-35, 35, 0)
+test = true
+
+[node name="Camera3D" parent="CameraBase" index="0" unique_id=1037576770]
+fov = 27.8
+size = 20.0
+
+[node name="MapGrid" parent="." unique_id=972101212 instance=ExtResource("3_l2rne")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.162657, 0)
+grid_size = 100
+
+[node name="TilerGetter2" type="Node" parent="." unique_id=793053730 node_paths=PackedStringArray("map_grid")]
+script = ExtResource("4_vrc7c")
+map_grid = NodePath("../MapGrid")
+
+[node name="PreviewMesh" type="MeshInstance3D" parent="TilerGetter2" unique_id=1273916236]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TilerGetter2" unique_id=1408131166]
+
+[editable path="CameraBase"]

@@ -44,27 +44,27 @@ func _process(_delta: float) -> void:
 	if (selected.is_empty()):
 		preview_mesh.hide();
 		return;
-	if(!pending_cmd.is_empty()):
-		preview_mesh.hide();
-		#display preview building
-		if (pending_cmd.has("entity_preview")):
-			if(preview_mesh.mesh != null):
-				print("we have a mesh")
-			else:
-				print("we dont have a mesh");
-				#We will perhaps move this to background thread loading
-				var mesh: Mesh = load(pending_cmd["entity_preview"]);
-				preview_mesh.mesh = mesh;
-			var result: Dictionary = get_ray_intersect(WORLD_COLLISION_MASK);
-			if (result.is_empty()):
-				return;
-			var location : Vector3 = result["position"]
-			var x: float = roundi(location.x);
-			var y: float = roundi(location.y) + preview_mesh.mesh.size.y / 2;
-			var z: float = roundi(location.z);
-			preview_mesh.global_position = Vector3(x,y,z);
-			preview_mesh.show();
-			#we have a preview mesh that should be displayed
+	#if(!pending_cmd.is_empty()):
+		#preview_mesh.hide();
+		##display preview building
+		#if (pending_cmd.has("entity_preview")):
+			#if(preview_mesh.mesh != null):
+				#print("we have a mesh")
+			#else:
+				#print("we dont have a mesh");
+				##We will perhaps move this to background thread loading
+				#var mesh: Mesh = load(pending_cmd["entity_preview"]);
+				#preview_mesh.mesh = mesh;
+			#var result: Dictionary = get_ray_intersect(WORLD_COLLISION_MASK);
+			#if (result.is_empty()):
+				#return;
+			#var location : Vector3 = result["position"]
+			#var x: float = roundi(location.x);
+			#var y: float = roundi(location.y) + preview_mesh.mesh.size.y / 2;
+			#var z: float = roundi(location.z);
+			#preview_mesh.global_position = Vector3(x,y,z);
+			#preview_mesh.show();
+			##we have a preview mesh that should be displayed
 
 
 

@@ -17,6 +17,7 @@ func _ready() -> void:
 	Lobby.connection_ended.connect(on_connection_ended);
 	score_screen.lobby_pressed.connect(on_return_to_lobby);
 	main_menu.play_online_pressed.connect(on_play_online);
+	main_menu.play_ai_pressed.connect(on_play_ai);
 	lobby_gui.return_main_pressed.connect(on_return_to_main);
 	score_screen.return_main_pressed.connect(on_return_to_main);
 	pass # Replace with function body.
@@ -28,6 +29,9 @@ func _process(delta: float) -> void:
 
 func on_play_online()->void:
 	lobby_gui.show();
+	main_menu.hide();
+
+func on_play_ai() ->void:
 	main_menu.hide();
 
 func on_start_game(path: String) ->void:

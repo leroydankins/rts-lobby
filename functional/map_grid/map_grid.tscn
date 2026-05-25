@@ -1,3 +1,6 @@
 [gd_scene format=3 uid="uid://c4ecq2fry3m3p"]
 
-[node name="MapGrid" type="Node3D" unique_id=972101212]
+[ext_resource type="Script" uid="uid://me7gnw2pybgj" path="res://functional/map_grid/map_grid.gd" id="1_6ptgb"]
+
+[node name="MapGrid" type="Node3D" unique_id=972101212 groups=["MapGrid"]]
+script = ExtResource("1_6ptgb")

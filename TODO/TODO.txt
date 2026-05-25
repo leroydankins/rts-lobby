@@ -84,17 +84,25 @@ Player technology
 	4/26 DONE
 		Call entity_holder to spawn building on the grid!
 		take up the spaces that it says it took up DONE!
-
-TODO
-	4/26
+	4/26 DOPNE
 		Implement raycasts on building grid
+	5/21 DONE
+	Do NOT use your own grid tile with all that extra data, maybe keep it as the parent and use a bit map to determine location,
+	when you click on a part of the world you can get that x,z coordinate and request information on what tile that WOULD be in the grid?
+	building_grid handles the damn optics? that was so hard I didnt know how to do that
+	use a visual shader to indicate current whatever
+	Use algorithm to only do N raycasts instead of 4N raycasts
+TODO
+
 	Add indicator on when you right click a spot with your buildings or units
 	add click sounds
 	add colors for what color you choose
 
+MapGrid requirements
+Maintain Matrix (Array[Array]) of grid tiles with FLAG information in an array detailing Y_layer and flags
+Provide interface functions for CommandController and EntityHolder to validate tiles, place objects on the tile, and remove from tile
 
-Do NOT use your own grid tile with all that extra data, maybe keep it as the parent and use a bit map to determine location,
-when you click on a part of the world you can get that x,z coordinate and request information on what tile that WOULD be in the grid?
-building_grid handles the damn optics? that was so hard I didnt know how to do that
-use a visual shader to indicate current whatever
-Use algorithm to only do N raycasts instead of 4N raycasts
+
+5/22 NEXT TIME
+	MapGridmust check for minerals and resources in tiles and ensure they are not prohibitive
+	Can be done after set-up, we can call addition of these resources to the grid! Or we can bake this now that its easier and include more raycasts!!

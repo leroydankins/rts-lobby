@@ -583,6 +583,11 @@ label_settings = SubResource("LabelSettings_8taj1")
 
 [node name="CameraBase" parent="." unique_id=1309490017 instance=ExtResource("9_htyio")]
 process_mode = 3
+START_POS = Vector3(-30, 35, 0)
+test = true
+
+[node name="Camera3D" parent="CameraBase" index="0" unique_id=1037576770]
+fov = 27.8
 
 [node name="SpawnHolder" type="Node3D" parent="." unique_id=1490039800]
 
@@ -712,4 +717,5 @@ avoidance_enabled = false
 
 [node name="PlayerDataManager" parent="." unique_id=844976815 instance=ExtResource("12_3di6p")]
 
+[editable path="CameraBase"]
 [editable path="NavMap/MineralField2"]

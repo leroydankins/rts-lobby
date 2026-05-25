@@ -46,7 +46,13 @@ var lobby_name: String:
 	set(name):
 		lobby_name = name;
 
-
+## Each player has a dictionary [br][br]
+## The key is the [code] sender_id [/code] as an int [br][br]
+##[code] username [/code] :[br][br]
+##[code] ready [/code] :[br][br]
+##[code] team [/code]  :[br][br]
+##[code] color [/code] :[br][br]
+##[code] race [/code] :[br][br]
 var lobby_player_dictionary: Dictionary[String, Dictionary]:
 	get:
 		return lobby_player_dictionary;
@@ -214,14 +220,14 @@ func local_register_player(sender_id: String, new_player_info: Dictionary[String
 			push_error("team number outside of bounds!");
 			break;
 
-	#PUT IN IMPLEMENTATION SPECIFIC DATA HERE
-	#Initialize assigned data to the player who is registering
+	# PUT IN IMPLEMENTATION SPECIFIC DATA HERE
+	# Initialize assigned data to the player who is registering
 	new_player_info[GlobalConstants.COLOR_KEY] = color_int;
 	new_player_info[GlobalConstants.TEAM_KEY] = team_int;
 
-	#add player information to dictionary of dictionaries
+	# add player information to dictionary of dictionaries
 	lobby_player_dictionary[sender_id] = new_player_info;
-	#send information to all others connected
+	# send information to all others connected
 	server_update_player_list.rpc(lobby_player_dictionary);
 	server_update_lobby_name.rpc(lobby_name);
 
@@ -247,11 +253,11 @@ func server_update_player_list(lobby_dict: Dictionary)-> void:
 	if(multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
 		return;
 
-	#in case the server has updated our character, update that information first so we can call local data in GUI updates
+	# in case the server has updated our character, update that information first so we can call local data in GUI updates
 	var local_player: Dictionary[String, Variant] = lobby_dict[str(multiplayer.get_unique_id())];
 	LocalPlayerData.lobby_update_dictionary(local_player);
 
-	#update our lobby's reference to players to be the same as the lobby
+	# update our lobby's reference to players to be the same as the lobby
 	lobby_player_dictionary = lobby_dict;
 
 

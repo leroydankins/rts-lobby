@@ -85,6 +85,9 @@ properties/0/replication_mode = 2
 height = 1.0
 radius = 0.25
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_oihbh"]
+size = Vector3(1, 0.05, 1)
+
 [node name="MineralDeposit" type="Area3D" unique_id=938880175 groups=["Entity", "Resource"]]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
 collision_layer = 18
@@ -112,3 +115,10 @@ replication_config = SubResource("SceneReplicationConfig_oihbh")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=1459947666]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 shape = SubResource("CylinderShape3D_oihbh")
+
+[node name="GridArea" type="Area3D" parent="." unique_id=1687730365]
+collision_layer = 8192
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GridArea" unique_id=26676030]
+shape = SubResource("BoxShape3D_oihbh")

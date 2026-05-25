@@ -1,5 +1,12 @@
 extends Node
 
+
+## Each player has a dictionary of the following values [br][br]
+##[code] username [/code] :[br][br]
+##[code] ready [/code] :[br][br]
+##[code] team [/code]  :[br][br]
+##[code] color [/code] :[br][br]
+##[code] race [/code] :[br][br]
 var local_player: Dictionary[String, Variant];
 
 const USERNAME_KEY: String = "username";

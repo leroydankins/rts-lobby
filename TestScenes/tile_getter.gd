@@ -1,4 +1,3 @@
-
 extends Node
 
 const BUILDING_GRID_COLLISION_MASK: int = 0b1000000000000; #layer 13

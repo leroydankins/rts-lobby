@@ -8,6 +8,18 @@ signal team_won(winning_team: int);
 
 #dictionary of all players and their in game data (like resources)
 
+## Each player has a dictionary of the following values
+## Accessed by the int value of their player id
+##[code] player_id [/code] = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY],  [br][br]
+##[code] player_username [/code] = Lobby.lobby_player_dictionary[player_id][GlobalConstants.USERNAME_KEY], [br][br]
+##[code] player_race [/code] = Lobby.lobby_player_dictionary[player_id][GlobalConstants.RACE_KEY], [br][br]
+##[code] player_team [/code] = Lobby.lobby_player_dictionary[player_id][GlobalConstants.TEAM_KEY], [br][br]
+##[code] player_color [/code] = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY], [br][br]
+##[code] player_mineral [/code] = player_resource, [br][br]
+##[code] player_gas [/code] = player_gas, [br][br]
+##[code] player_supply [/code] = [0,0], [br][br]
+##[code] player_peer_id [/code] = player_id, [br][br]
+##[code] player_playing [/code] = true, [br][br]
 var player_dict: Dictionary[int, Dictionary] = {};
 var local_id: int #this is the player color id number that is tied to this player
 

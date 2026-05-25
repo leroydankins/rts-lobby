@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cchmqdj86vnbq"]
+
+[ext_resource type="Shader" uid="uid://d0n4ohnav2yha" path="res://resources/terrain_grid_shader/terrain_grid_shader.gdshader" id="1_412gn"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_412gn")
+shader_parameter/gridlineOnEvery = 1.0
+shader_parameter/lineThickness = 0.06
+shader_parameter/originOffset = Vector2(0, 0)
+shader_parameter/color = Color(0, 0, 0, 0.5)

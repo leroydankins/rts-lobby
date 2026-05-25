@@ -4,14 +4,17 @@ extends Node3D
 @export var START_POS: Vector3 = Vector3(-50,50, 0);
 @export_category("Camera movement")
 @export var camera_speed: float = 6.0
+@export var test: bool = false;
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	camera.position = START_POS
+	if(test):
+		camera.look_at(position);
 
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	var movement : Vector3 = Vector3.ZERO
 
 	# Keyboard movement (uses default ui_* actions)
