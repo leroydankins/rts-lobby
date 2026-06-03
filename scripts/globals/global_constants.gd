@@ -1,15 +1,20 @@
 class_name GlobalConstants
+## Global Constants holds constant dictionaries, filepaths, and game data that is unchanging [br][br]
+## The utilization of a global constants page allows a reduction in data transfer size by sending integer values which are keys to GlobalConstant dictionaries[br][br]
+## Each command is currently in GlobalConstants with the assorted data structure required to function with [CommandController] and Entity Command Handling
+
+
 
 #Brother we should not have 1 2 3 4 be the team numbers but whatever
 const TEAMS: Dictionary[int, String] = {0 : "1", 1: "2", 2: "3", 3: "4", 99: "neutral"}
 const COLORS: Dictionary[int, Color] = {0 : Color.NAVY_BLUE, 1: Color.DARK_RED, 2: Color.DARK_GREEN, 3: Color.REBECCA_PURPLE}
 const RACES: Dictionary[int, String] = {0 : "dwarves"}
 #LOBBY DICTIONARY KEYS
-const USERNAME_KEY: String = "username";
-const READY_KEY: String = "ready";
-const TEAM_KEY: String = "team";
-const COLOR_KEY: String = "color";
-const RACE_KEY: String = "race";
+const USERNAME_KEY: String = "username"; ## [member Lobby.lobby_player_dictionary] Username [string] Access Key
+const READY_KEY: String = "ready"; ## [member Lobby.lobby_player_dictionary] Ready [bool] Access Key
+const TEAM_KEY: String = "team"; ## [member Lobby.lobby_player_dictionary] Team [int] Access Key
+const COLOR_KEY: String = "color"; ## [member Lobby.lobby_player_dictionary] Color [int] Access Key
+const RACE_KEY: String = "race"; ## [member Lobby.lobby_player_dictionary] Race [int] Access Key
 
 const KEY_ARRAY: Array[String] = [USERNAME_KEY,READY_KEY,TEAM_KEY,COLOR_KEY,RACE_KEY];
 #GAME PATHS
@@ -70,12 +75,17 @@ enum ResourceType{
 	MINERAL,
 	GAS
 }
-#BUILDING STATE ENUM
+## Enum determining the state a Building can be in
+## Currently unused due to usage of bools in initial test buildings
+## [code] IDLE[/code] : Unused In Game
 enum BuildingState{
 	IDLE,
 	ACTIVE,
 	UNCONSTRUCTED,
 }
+var state: int = BuildingState.IDLE
+## Commands drive the actions of each [Entity] [br]
+## The Command and the associated argument information is used by receiving Entities to perform their actions
 enum Commands
 {
 	CANCEL,
@@ -86,21 +96,18 @@ enum Commands
 	FOLLOW,
 	GET_RESOURCE,
 	BUILD,
-	TRAIN, #Used by buildings to train units or research
+	## Used by buildings to train units or research
+	TRAIN,
 	ATTACK_MOVE,
 	RETURN_RESOURCE,
 	GO_TO,
 }
-##TODO
+## @deprecated
 enum Dwarf_Research
 {
 
 }
-##TODO
-enum Rancorian_Research
-{
-
-}
+## @deprecated
 enum Upgrades
 {
 	ARMOR_1,
@@ -111,7 +118,31 @@ enum Upgrades
 ### END ENUMS
 
 #command dictionaries in GlobalConstants otherwise it will be empty
-###COMMAND DICTIONARIES
+##[center] This section details out Command Dictionaries  [/center] [br][br][br]
+##  Command Dictionaries are constant predefined Dictionaries held in a [Dictionary] by each [Entity]. The dictionary data is used to populate the
+##  in-game action UI for commanding selected units. Each constant dictionary held by the Entity is duplicated and used by [CommandController]
+##  to send commands to the selected unit [br][br]
+##
+##
+## They contain the following Required and Optional Information [br][br]
+## [code]mnemonic[/code]   :     [String] checked by receiving [Entity] to determine individual actions, somewhat deprecated due to [enum Commands] [br][br]
+## [code]command[/code]   :     [enum Commands] enum used in Command Processing and State Machine of receiving Entity [br][br]
+## [code]hotkey[/code]   :      [String] used in [CmdGUI] with [method InputEvent.is_action_pressed] to determine if command was pressed without mouse input, the key MUST be in InputMap as a created string [br][br]
+## [code]is_group[/code]   :
+## [code]can_queue[/code]   : [br][br]
+## Optional [br][br]
+## [code]argument[/code] : value will be string keys that get added to command when they require additional data, like location or target
+## Command Metadata [br][br]
+## [code] hotkey [/code]
+## [code] mnemonic [/code]
+## [code] mnemonic [/code]
+## [code] mnemonic [/code]
+## [code] mnemonic [/code]
+## In-Game Entities that can accept and act on commands contain a Command List currently called cmd_dict
+## The InGame UI and Command
+const COMMAND_DICTIONARY : Dictionary[String, Dictionary] = {
+
+}
 const TARGET_UNIT_DICTIONARY : Dictionary[String, Variant] = {
 	#Required command data
 	"mnemonic" : "GC001",
@@ -245,7 +276,6 @@ const TRAIN_DWARF_BRAWLER_DICTIONARY: Dictionary[String, Variant] = {
 	"description" : "Builds a dwarf brawler",
 	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
 }
-
 const BUILD_DWARF_SETTLEMENT_DICTIONARY  : Dictionary = {
 	#required command data
 	"mnemonic" : "DW001",
@@ -259,6 +289,7 @@ const BUILD_DWARF_SETTLEMENT_DICTIONARY  : Dictionary = {
 	"building_array": [BuildingType.TOWNHALL, BuildingType.DEPOT],
 	"argument" : "location",
 	"file_path" : DWARF_SETTLEMENT_FILEPATH,
+	"entity_preview" : "uid://bsqyhy830548j", #GET A NEW ONE
 
 
 	#command metadata
@@ -266,7 +297,6 @@ const BUILD_DWARF_SETTLEMENT_DICTIONARY  : Dictionary = {
 	"description" : "Builds Dwarven Settlement",
 	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
 }
-
 const BUILD_DWARF_BARRACKS_DICTIONARY: Dictionary = {
 	#required command data
 	"mnemonic" : "DW003",
@@ -280,6 +310,7 @@ const BUILD_DWARF_BARRACKS_DICTIONARY: Dictionary = {
 	"building_array": [], #Check against buildingType enum for bool checks on buiilding-grid
 	"argument" : "location",
 	"file_path" : DWARF_BARRACKS_FILEPATH,
+	"entity_preview" : "uid://bsqyhy830548j",
 
 	#command metadata
 	"name" : "Dwarf Barracks",
@@ -386,7 +417,7 @@ const BUILD_BASE_DICTIONARY  : Dictionary = {
 	"argument" : "location",
 	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
 }
-##DEPRECATED
+## @deprecated: Use [constant TRAIN_DWARF_WORKER_DICTIONARY] instead.
 const BUILD_WORKER_DICTIONARY: Dictionary[String, Variant] = {
 	"name" : "Worker",
 	"mnemonic" : "CC001",

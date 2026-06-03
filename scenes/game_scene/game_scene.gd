@@ -21,17 +21,17 @@ signal game_finished();
 ## Array Marker3Ds of used in establishing each player's initial TownHall and Workers
 var spawns: Array[Node3D];
 
-## Each player has a dictionary of the following values used in creation, assigned to [PlayerDataManager] [br][br]
-##[code] player_id [/code] = Integer used to associate all units with their controlled player, same as player_color  [br][br]
-##[code] player_username [/code] = Username associated with the player established in the Menus, [br][br]
-##[code] player_race [/code] = Player Race chosen in [Lobby] [br][br]
-##[code] player_team [/code] = Integer value representing Team, used in win condition testing and for determining what is visible [br][br]
-##[code] player_color [/code] = Int value same as player_id but used to determine color of units [br][br]
-##[code] player_mineral [/code] = Amount of mineral resource, managed by [PlayerDataManager] [br][br]
-##[code] player_gas [/code] = player_gas, [br][br]
-##[code] player_supply [/code] = [0,0], [br][br]
-##[code] player_peer_id [/code] = player_id, [br][br]
-##[code] player_playing [/code] = true, [br][br]
+## Each player has a dictionary of the following fields used in creation, assigned to [PlayerDataManager] [br][br]
+##[code] player_id[/code] :  [int] Assigned to all units owned by of player_id player, same as player_color  [br][br]
+##[code] player_username[/code] :  [String] Username associated with the player established in the Menus, [br][br]
+##[code] player_race[/code] :  [int] Player Race chosen in [Lobby], Race string is accessed from [constant GlobalConstants.RACES] [br][br]
+##[code] player_team[/code] :  [int] value representing Team, used in win condition testing and for determining what is visible [br][br]
+##[code] player_color[/code] :  [int] value same as player_id but used to determine color of units [br][br]
+##[code] player_mineral[/code] :  [int] Amount of mineral resource, managed by [PlayerDataManager] [br][br]
+##[code] player_gas[/code] :  [int] Amount of gas resource, managed by [PlayerDataManager] [br][br]
+##[code] player_supply[/code] :  [Array] of Initialized Supply, [ [code]used[/code] ,  [code]capacity[/code] ] [br][br]
+##[code] player_peer_id[/code] :  [String] Online Multiplayer Peer ID for the individual, used in RPC ID calls but game logic should rely on player_id [br][br]
+##[code] player_playing[/code] :  [bool] for checking players still in game in win/loss conditionals, [br][br]
 var initializing_player_dict: Dictionary[String, Variant];
 
 var player_resource: int = 50; ## Initial [code] Mineral [/code] count at the start of the game

@@ -1,14 +1,14 @@
 class_name MapGrid
 extends Node3D
 
-## Handles the grid system used for building placement.
+## Handles the grid system used for building placement. [br][br]
 ##
-## MapGrid contains a 2D array grid of building squares for placement of building entities
-## Each index in the array grid represents one square, and is a packed byte array of flags and information
-## Data type as a struct: [Flags.TEMPORARY_INVALID_FLAG] HIGHLIGHT_FLAG, INVALID_FLAG, USED_FLAG, INVALID_DEPOT_FLAG]
-## Grid data is used to update shader on terrain materials
+## MapGrid contains a 2D array grid of building squares for placement of building entities[br][br]
+## Each index in the array grid represents one square, and is a packed byte array of flags and information[br][br]
+## Data type as a struct: [Flags.TEMPORARY_INVALID_FLAG] HIGHLIGHT_FLAG, INVALID_FLAG, USED_FLAG, INVALID_DEPOT_FLAG][br]
+## Grid data is used to update shader on terrain materials[br]
 ##
-## [CommandComponent] utilizes functions in this script to establish command data for instantiation of buildings
+## [CommandController] utilizes functions in this script to establish command data for instantiation of buildings[br]
 ##
 ## Each
 
@@ -34,6 +34,8 @@ const GRID_BAKE_MASK: int = 0b0010000000000000 # 8196 or mask 13th bit layer 14
 @export var grid_size: int = 10 # goes in both directions
 ## Actual Grid Array, may not need to be exported
 @export var grid: Array[Array] = [];
+
+
 ## Vector array of what squares are currently highlighted to make iterating and removing highlight quick during physics process
 var highlight_arr: Array[Array] = [];
 
@@ -181,6 +183,7 @@ func setup()->void:
 	var time: float = Time.get_ticks_usec()
 	var ray_length: int = 15;
 	var vec_dict: Dictionary
+	var vec_arr: PackedFloat32Array;
 	var y_check_var: float;
 	var y_layer: int
 	## [Y_LAYER, USED_FLAG, HIGHLIGHT_FLAG, INVALID_TILE_FLAG, TEMPORARY_INVALID_FLAG,  INVALID_DEPOT_FLAG]
@@ -192,8 +195,6 @@ func setup()->void:
 	var raycast_result: Dictionary;
 	#We should be doing this only in positive values due to the fact that this shit is ass
 	for x: int in (grid_size + 1):
-		#if (x > 0):
-			#grid.append([])
 		for z: int in (grid_size + 1):
 			# Iterate through each of the
 			from = global_position + Vector3(x,0,z);
@@ -202,7 +203,7 @@ func setup()->void:
 			space = get_viewport().get_world_3d().direct_space_state;
 			ray_query.collide_with_areas = true
 			raycast_result = space.intersect_ray(ray_query)
-			# This way is slightly more performant but I cannot make grabbing the locations very easy this way
+			## This way is slightly more performant but I cannot make grabbing the locations very easy this way
 			#if(raycast_result.is_empty()):
 				#vec_arr.append(0);
 			#else:
@@ -212,23 +213,7 @@ func setup()->void:
 				vec_dict[[x,z]] = -1;
 			else:
 				vec_dict[[x,z]] = raycast_result["position"].y;
-			#if(x > 0 && z > 0):
-				#data_arr = [0,0,0,0,0,0];
-				#y_check_var = vec_dict[[x-1,z-1]]
-				#y_layer = roundi(y_check_var);
-				#if(!vec_dict.has([x,z])):
-					#data_arr[Flags.INVALID_TILE_FLAG] = 1;
-				#elif (y_check_var != vec_dict[[x,z-1]]):
-					#data_arr[Flags.INVALID_TILE_FLAG] = 1;
-				#elif(y_check_var != vec_dict[[x-1,z]]):
-					#data_arr[Flags.INVALID_TILE_FLAG] = 1;
-				#elif(y_check_var != vec_dict[[x,z]]):
-					#data_arr[Flags.INVALID_TILE_FLAG] = 1;
-				## After this, we consider the tile to be valid for placement
-				#elif(!y_layers.has(y_layer)): # We only care that we encompass all Y layers for validating Vector3 checks by the controller
-					#y_layers.append(y_layer)
-				#data_arr[Flags.Y_LAYER] = y_layer #The value must be less than 128 since we are representing this with a Byte in the flag array
-				#grid[x-1].append(data_arr)
+
 	for i: int in grid_size:
 		grid.append([])
 		for j: int in grid_size:
@@ -247,8 +232,6 @@ func setup()->void:
 			grid[i].append(data_arr)
 	var time2: float = Time.get_ticks_usec();
 	print ("time is %s" % [(time2 - time) / 1000])
-	highlight_tiles(5,5,[3,3]);
-	clear_highlight();
 
 
 ## Validates if the tiles remain in bounds of the grid map

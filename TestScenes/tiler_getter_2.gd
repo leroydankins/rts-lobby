@@ -49,17 +49,15 @@ var prev_z_bool: bool;
 func _physics_process(_delta: float) -> void:
 	if (pending_cmd.is_empty()):
 		return;
-	var time: float = Time.get_ticks_usec();
-	var time2: float = Time.get_ticks_usec();
 	var result: Dictionary;
 	var pos: Vector3;
-	var tile_index: Array[int]; #this will be the floor int value of the collider position
-	var tile_size: Array; #this is how many tiles we take up with our building, untyped due to constant in thing
+	var tile_index: Array[int]; ## this will be the floor int value of the collider position
+	var tile_size: Array; ## this is how many tiles we take up with our building, untyped due to constant in thing
 	var x_bool: bool;
 	var z_bool: bool;
-	#we want to snap to grid tile corners if its an eventile_size, if its odd we want dead center of center
+	## we want to snap to grid tile corners if its an even tile_size, if its odd we want dead center of center
 	var mesh_x: float
-	var mesh_y: float #We will have the meshes auto size so that we dont have to move the pos aside from terrain height
+	var mesh_y: float ## We will have the meshes auto size so that we dont have to move the pos aside from terrain height
 	var mesh_z: float
 	var x_size: int
 	var z_size: int
@@ -68,7 +66,6 @@ func _physics_process(_delta: float) -> void:
 	var x_displacement: int
 	var z_displacement: int
 	var mesh: Mesh #declaring it here helps with an unsafe access warning on the var y line
-
 	result = get_world_raycast(BUILDING_GRID_COLLISION_MASK);
 	if (!result): #if the dictionary is empty
 		prev_x_bool = 0;
@@ -80,8 +77,9 @@ func _physics_process(_delta: float) -> void:
 			map_grid.clear_highlight();
 	else: #dictionary is not empty
 		pos = result["position"];
+		# Define the mesh's Y pos early because we can
 		mesh_y = pos.y
-		tile_index= [floori(pos.x),floori(pos.z)]; #this will be the floor int value of the collider position
+		tile_index= [floori(pos.x),floori(pos.z)];
 		tile_size = pending_cmd["tile_size"];
 		x_size = tile_size[0];
 		z_size = tile_size[1];
@@ -102,12 +100,10 @@ func _physics_process(_delta: float) -> void:
 			mesh = preview_mesh.mesh;
 
 		if (tile_index == previous_index && tile_size == previous_size): #this is to deal with micro-tile adjustments?
-			if (pos.x - floori(pos.x) > .5): #if we didnt change which tile
+			if (pos.x - floori(pos.x) > .5): #if we didnt change which tile in the x direction
 				x_bool = 1;
-
-			if (pos.z - floori(pos.z) > .5): #if we didnt change which tile
+			if (pos.z - floori(pos.z) > .5): #if we didnt change which tile in the z direction
 				z_bool = 1;
-
 			if (x_bool == prev_x_bool && z_bool == prev_z_bool):
 				return;
 			else:
@@ -117,7 +113,6 @@ func _physics_process(_delta: float) -> void:
 		else:
 			map_grid.clear_highlight();
 
-		#
 		x_displacement = floori(float(x_size) / 2)  #if tile_size is 9, this would be 9 - 5 = 4;, if this was 8, this would be 8 - 4 = 4
 		z_displacement = floori(float(z_size) / 2) #maybe we dont need to do an int and we can instead just div
 		if (x_size % 2): #if the xtile_size is odd, we want to get the x starting value
@@ -144,8 +139,7 @@ func _physics_process(_delta: float) -> void:
 		preview_mesh.global_position = Vector3(mesh_x,mesh_y,mesh_z);
 		previous_index = tile_index;
 		previous_size = tile_size;
-
-
+# End Process
 
 func _unhandled_input(event: InputEvent) -> void:
 	if(event.is_action_pressed("1")):
@@ -169,8 +163,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if(pending_cmd.is_empty()):
 			return;
 		var cmd_duplicate: Dictionary = pending_cmd.duplicate(); #this is already a duplicate in prod I think
-		#the pending command requires a location input
-		#used for placing or checking locations on the building grid
+		# the pending command requires a location input
+		# used for placing or checking locations on the building grid
 		if(cmd_duplicate.has("grid_location")):
 			# Local Var Defines
 			var building_properties: Array = cmd_duplicate["building_properties"];
@@ -188,31 +182,32 @@ func _unhandled_input(event: InputEvent) -> void:
 			result = get_world_raycast(BUILDING_GRID_COLLISION_MASK)
 			if(!result):
 				pending_cmd = {};
+				preview_mesh.hide();
 				return;
 
 			result_position = result["position"];
 
 			if(!map_grid.is_location_in_tile_layer(result_position)):
-
 				pending_cmd = {};
+				preview_mesh.hide();
 				return;
 
 			resultant_grid_dictionary = map_grid.get_building_placement_dictionary(result_position, x_size, z_size, building_properties);
-			#If this was not a part of the grid
-			if(!resultant_grid_dictionary):
 
+			# If this was not a part of the grid we quit and return
+			if(!resultant_grid_dictionary):
 				pending_cmd = {};
 				preview_mesh.hide();
 				return;
 
 
-			#Add gained grid_tile data and associated world position to command
+			# Add gained grid_tile data and associated world position to command
 			cmd_duplicate.merge(resultant_grid_dictionary)
 
-			#process command
+			# process command
 			handle_cmd(cmd_duplicate);
 
-			#clear data
+			# clear data
 			preview_mesh.hide();
 			map_grid.hide_tiles();
 			map_grid.clear_highlight();

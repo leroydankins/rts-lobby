@@ -47,12 +47,13 @@ var lobby_name: String:
 		lobby_name = name;
 
 ## Each player has a dictionary [br][br]
-## The key is the [code] sender_id [/code] as an int [br][br]
-##[code] username [/code] :[br][br]
-##[code] ready [/code] :[br][br]
-##[code] team [/code]  :[br][br]
-##[code] color [/code] :[br][br]
-##[code] race [/code] :[br][br]
+## Access each field via [GlobalConstants]
+## The key is the multiplayer caller's peer_id as [String] [br][br]
+##[code] username[/code] :                [br][br]
+##[code] ready[/code] :                   [br][br]
+##[code] team[/code]  :                    [br][br]
+##[code] color[/code] :                    [br][br]
+##[code] race[/code] :                [br][br]
 var lobby_player_dictionary: Dictionary[String, Dictionary]:
 	get:
 		return lobby_player_dictionary;

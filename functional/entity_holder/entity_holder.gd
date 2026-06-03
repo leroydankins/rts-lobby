@@ -19,7 +19,11 @@ var global_building_array: Array[Node3D] = [];
 var building_dictionary: Dictionary[String, Array] = {};
 ## Not sure
 var global_resource_array: Array[Node3D] = [];
-## TBD
+## Each player has a [Dictionary] of Arrays for units and buildings owned by their player, tracked here
+## Keys: [br][br]
+## [code]buildings[/code] : [Array][[Node3D]] of each instanced Building for given Player [br][br]
+## [code]units[/code] : [Array][[Node3D]] of each instanced Unit for given Player[br][br]
+## Each array is looped through when registering or deregistering units, the  owning player's [Dictionary] is accessed via the color [int] of the entity
 var player_arr: Dictionary[int, Dictionary] = {};
 
 

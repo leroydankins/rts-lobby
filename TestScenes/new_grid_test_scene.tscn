@@ -80,6 +80,4 @@ entity_holder = NodePath("../EntityHolder")
 
 [node name="PreviewMesh" type="MeshInstance3D" parent="TilerGetter2" unique_id=1273916236]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="TilerGetter2" unique_id=1408131166]
-
 [editable path="CameraBase"]

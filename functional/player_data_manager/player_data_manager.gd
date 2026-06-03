@@ -8,35 +8,31 @@ signal team_won(winning_team: int);
 
 #dictionary of all players and their in game data (like resources)
 
-## Each player has a dictionary of the following values
-## Accessed by the int value of their player id
-##[code] player_id [/code] = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY],  [br][br]
-##[code] player_username [/code] = Lobby.lobby_player_dictionary[player_id][GlobalConstants.USERNAME_KEY], [br][br]
-##[code] player_race [/code] = Lobby.lobby_player_dictionary[player_id][GlobalConstants.RACE_KEY], [br][br]
-##[code] player_team [/code] = Lobby.lobby_player_dictionary[player_id][GlobalConstants.TEAM_KEY], [br][br]
-##[code] player_color [/code] = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY], [br][br]
-##[code] player_mineral [/code] = player_resource, [br][br]
-##[code] player_gas [/code] = player_gas, [br][br]
-##[code] player_supply [/code] = [0,0], [br][br]
-##[code] player_peer_id [/code] = player_id, [br][br]
-##[code] player_playing [/code] = true, [br][br]
+## Each player has a dictionary of the following fields
+## Accessed by the int value of their player id [br][br]
+##[code] player_id[/code] :  [int] Assigned to all units owned by of player_id player, same as player_color  [br][br]
+##[code] player_username[/code] :  [String] Username associated with the player established in the Menus, [br][br]
+##[code] player_race[/code] :  [int] Player Race chosen in [Lobby], Race string is accessed from [constant GlobalConstants.RACES] [br][br]
+##[code] player_team[/code] :  [int] value representing Team, used in win condition testing and for determining what is visible [br][br]
+##[code] player_color[/code] :  [int] value same as player_id but used to determine color of units [br][br]
+##[code] player_mineral[/code] :  [int] Amount of mineral resource, managed by [PlayerDataManager] [br][br]
+##[code] player_gas[/code] :  [int] Amount of gas resource, managed by [PlayerDataManager] [br][br]
+##[code] player_supply[/code] :  [Array] of Initialized Supply, [ [code]used[/code] ,  [code]capacity[/code] ] [br][br]
+##[code] player_peer_id[/code] :  [String] Online Multiplayer Peer ID for the individual, used in RPC ID calls but game logic should rely on player_id [br][br]
+##[code] player_playing[/code] :  [bool] for checking players still in game in win/loss conditionals [br][br]
 var player_dict: Dictionary[int, Dictionary] = {};
-var local_id: int #this is the player color id number that is tied to this player
 
+var local_id: int ## This is the player color id number that is tied to local machine's player identity
 const USERNAME_KEY: String = "player_username";
 const GAS_KEY: String = "player_gas";
 const RACE_KEY: String = "player_race";
-const COLOR_KEY: String = "player_color"; #the color will be the same as the player id!
+const COLOR_KEY: String = "player_color"; ##the color will be the same as the player id!
 const TEAM_KEY: String = "player_team";
 const PEER_ID_KEY: String = "player_peer_id";
 const SUPPLY_KEY: String = "player_supply";
 const MINERAL_KEY: String = "player_mineral";
 const PLAYING_KEY: String = "player_playing";
 
-
-
-
-#Array of team's units
 
 
 @rpc("any_peer", "call_local", "reliable")
