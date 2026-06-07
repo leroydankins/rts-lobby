@@ -49,7 +49,7 @@ func _ready() -> void:
 	var _null_var: int = Lobby.start_game.connect(on_start);
 	Lobby.game_scene_loaded.rpc_id(Lobby.multiplayer_server_id);
 	team_label.text = "Team %s" % GlobalConstants.TEAMS[LocalPlayerData.local_player[GlobalConstants.TEAM_KEY]];
-	pass # Replace with function body.
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -72,6 +72,7 @@ func on_start() -> void:
 	var init_dict: Dictionary = {};
 	var start_spot: int = 0;
 
+	# Iterate through the Lobby player dictionary, but this maybe should be passed as a dictionary
 	for player_id: String in Lobby.lobby_player_dictionary:
 		#create the peer's local player data
 		var player_dictionary: Dictionary[String, Variant] = {
@@ -207,7 +208,7 @@ func push_player_data_update_batch(updated_player:String, dict: Dictionary[Strin
 		local_game_dict = dict;
 
 
-#Called during the game initialization startup
+# Called during the game initialization startup
 @rpc("authority","call_local","reliable")
 func push_game_data_batch(dict: Dictionary[String, Dictionary]) ->void:
 	#if this was not called by the authority return;

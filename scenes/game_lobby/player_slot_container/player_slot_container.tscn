@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://bonaxfd6o0c4u"]
+
+[ext_resource type="Script" uid="uid://dvk2qpbd0q6ns" path="res://scenes/game_lobby/player_slot_container/player_slot_container.gd" id="1_oi0ho"]
+
+[node name="PlayerSlotContainer" type="PanelContainer" unique_id=1349363728]
+script = ExtResource("1_oi0ho")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1178317810]
+layout_mode = 2
+
+[node name="PlayerSlot" type="HBoxContainer" parent="MarginContainer" unique_id=67944558]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+
+[node name="PlayerLabel" type="Label" parent="MarginContainer/PlayerSlot" unique_id=1404056868]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "empty"
+horizontal_alignment = 1
+
+[node name="OptionContainer" type="HBoxContainer" parent="MarginContainer/PlayerSlot" unique_id=2032483266]
+layout_mode = 2
+
+[node name="RaceOption" type="OptionButton" parent="MarginContainer/PlayerSlot/OptionContainer" unique_id=1917007597]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 10
+selected = 0
+item_count = 2
+popup/item_0/text = "Dwarf"
+popup/item_0/id = 0
+popup/item_1/text = "Orc"
+popup/item_1/id = 1
+
+[node name="ColorOption" type="OptionButton" parent="MarginContainer/PlayerSlot/OptionContainer" unique_id=1099589897]
+layout_mode = 2
+size_flags_horizontal = 10
+selected = 0
+item_count = 1
+popup/item_0/text = "Blue"
+popup/item_0/id = 0
+
+[node name="ColorDisplay" type="ColorRect" parent="MarginContainer/PlayerSlot/OptionContainer" unique_id=2107210860]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+
+[node name="TeamOption" type="OptionButton" parent="MarginContainer/PlayerSlot/OptionContainer" unique_id=1440875461]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "Team 1"
+popup/item_0/id = 0
+popup/item_1/text = "Team 2"
+popup/item_1/id = 1
+popup/item_2/text = "Team 3"
+popup/item_2/id = 2
+popup/item_3/text = "Team 4"
+popup/item_3/id = 3
+
+[node name="CPULabel" type="Label" parent="MarginContainer/PlayerSlot/OptionContainer" unique_id=688814010]
+layout_mode = 2
+text = "(CPU)"
+
+[node name="ReadyBox" type="CheckBox" parent="MarginContainer/PlayerSlot/OptionContainer" unique_id=766404830]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Ready"
+
+[node name="RemoveButton" type="Button" parent="MarginContainer/PlayerSlot/OptionContainer" unique_id=499521743]
+layout_mode = 2
+text = "Remove"
+
+[node name="AddCPUButton" type="Button" parent="MarginContainer/PlayerSlot" unique_id=2118528830]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+text = "Add CPU"

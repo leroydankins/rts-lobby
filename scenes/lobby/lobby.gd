@@ -1,15 +1,14 @@
 extends Node
-##############
-### This lobby does not act on its own, you will need to create an interface/ui that will call the join_game
-### and create_game functions with the required arguments (Username, IP address for joining, lobby name for hosting)
-### Lobby GUI will collect this information and contain buttons for joining or creating lobby.
-### Works in tandem with another local autoload called LocalPlayerData, this data gets sent out to the server on connecting
-### and will request the lobby update this information for all clients
 
-###RPC Calls to start the game will be handled here, but for modularity I will attempt to keep actual code for loading level in outside script
-###Main will subscribe to set of signals from this lobby, which will handle the actual gameplay
-##############
+## This lobby does not act on its own, you will need to create an interface/ui that will call the join_game
+## and create_game functions with the required arguments (Username, IP address for joining, lobby name for hosting)
+## Lobby GUI will collect this information and contain buttons for joining or creating lobby.
+## Works in tandem with another local autoload called LocalPlayerData, this data gets sent out to the server on connecting
+## and will request the lobby update this information for all clients
+##RPC Calls to start the game will be handled here, but for modularity I will attempt to keep actual code for loading level in outside script
+##Main will subscribe to set of signals from this lobby, which will handle the actual gameplay
 
+## Local games will still interface with the lobby dictionary but just create individial peer IDs for AI
 
 
 #UPNP Signal, emitted when port mapping is complete, success or failure
@@ -39,6 +38,7 @@ const MAX_CONNECTIONS: int = 4; #CURRENT MAX CONNECTIONS
 var lobby_connected: bool = false;
 var connect_port: int = PORT;
 var is_local: bool = false;
+var password: String = ""
 
 var lobby_name: String:
 	get:
@@ -49,11 +49,13 @@ var lobby_name: String:
 ## Each player has a dictionary [br][br]
 ## Access each field via [GlobalConstants]
 ## The key is the multiplayer caller's peer_id as [String] [br][br]
-##[code] username[/code] :                [br][br]
-##[code] ready[/code] :                   [br][br]
-##[code] team[/code]  :                    [br][br]
-##[code] color[/code] :                    [br][br]
-##[code] race[/code] :                [br][br]
+##[code] username[/code] : String               [br][br]
+##[code] team[/code]  : int                   [br][br]
+##[code] color[/code] : int                   [br][br]
+##[code] race[/code] : int               [br][br]
+##[code] slot[/code] : int                 [br][br]
+##[code] ready[/code] : bool                 [br][br]
+##[code] is_cpu [/code] : bool             [br][br]
 var lobby_player_dictionary: Dictionary[String, Dictionary]:
 	get:
 		return lobby_player_dictionary;
@@ -62,12 +64,6 @@ var lobby_player_dictionary: Dictionary[String, Dictionary]:
 		data_updated.emit();
 
 var players_loaded: int = 0
-	#get:
-		#return players_loaded;
-	#set(value):
-		#players_loaded = value;
-		#data_updated.emit();
-
 
 var _null_var: int;
 
@@ -113,19 +109,20 @@ func join_lobby(address: String = "") -> Error:
 	#TELL THE SERVER YOU CREATED A CLIENT (does not confirm that connection was successful)
 	return error;
 
-#create game function
-func create_lobby(lob_name: String) -> Error:
-	#player data is initialzed before this method is called
-	#create a multiplayer peer and set this instance to be this peer
+## Creates an online lobby for connecting to with peers [br][br]
+## Uses the lobby name to establish what the lobby name is?
+func create_lobby(lob_name: String, p_word: String) -> Error:
+	# player data is initialzed before this method is called
+	# create a multiplayer peer and set this instance to be this peer
 	var peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new();
 	var error: Error = peer.create_server(PORT, MAX_CONNECTIONS);
 
-	#if the error exists and is not ok, return the error
+	# if the error exists and is not ok, return the error
 	if error != OK:
 		push_error("Error on creating a client, error code: %s" % error);
 		return error;
 
-	#set this instance's multiplayer peer to this peer
+	# set this instance's multiplayer peer to this peer
 	multiplayer.multiplayer_peer = peer;
 
 	lobby_connected = true;
@@ -135,13 +132,15 @@ func create_lobby(lob_name: String) -> Error:
 
 	var peer_id: String = str(multiplayer.get_unique_id());
 
-	##add the player information to the server data holder here
+	# add the player information to the server data holder here
 	local_register_player.rpc_id(1,peer_id,LocalPlayerData.local_player);
 
-	#STAY IN THE LOBBY
+	password = p_word;
+	
+	# STAY IN THE LOBBY
 	return Error.OK;
 
-#call this to end session
+##  This is called to end the lobby session by [Main] and [Lobby] 
 func remove_multiplayer_peer() -> Error:
 	#re initialzize an offline peer to make things still function
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
@@ -180,10 +179,10 @@ func game_scene_loaded() -> void:
 	players_loaded += 1;
 	if players_loaded == lobby_player_dictionary.size():
 		print("emitted game start at %s" % Time.get_ticks_msec())
-		start_game.emit()
+		start_game.emit();
 		players_loaded = 0;
 
-#when the server starts a game from a UI scene, do Lobby.load_game.rpc(filepath)
+# when the server starts a game from a UI scene, do Lobby.load_game.rpc(filepath)
 @rpc("authority","call_local","reliable")
 func load_game(game_scene_path: String) -> void:
 	#The local main scene will then add the scene and hide the UI
@@ -191,30 +190,47 @@ func load_game(game_scene_path: String) -> void:
 	pass;
 
 
-#the connecting player will call this when they connect
-#Assign them a team color as well and send that information back to them
+## the connecting player will call this when they connect
+## Assign them a team color as well and send that information back to them
 @rpc("any_peer","call_local", "reliable")
 func local_register_player(sender_id: String, new_player_info: Dictionary[String, Variant]) -> void:
+	## Defines the color of the player when they join
+	var color_int: int = 0;
+	## Array of already used colors by int in the lobby
+	var color_arr: Array[int] = [];
+	## Defines the team_int of the player when they join
+	var team_int: int = 0;
+	## Array of already used teams by int in the lobby
+	var team_arr: Array[int] = [];
+	var slot_arr: Array[int] = [];
+	var slot_int: int = 0;
+
 	if (!multiplayer.is_server()):
 		return;
-	#only register the player on the server, you will then send this information out on update_player_list function
+	# only register the player on the server, you will then send this information out on update_player_list function
 	if (lobby_player_dictionary.has(sender_id)):
 		push_error("Recieved register player request on a player that already exists, overwriting previous entry");
-	#IMPLEMENTATION SPECIFIC DATA GOES HERE
-	#choose the color of the player for them when they join
-	var color_int: int = 0;
-	var color_arr: Array[int] = [];
-	#go over the list of players, get array of the colors
+	# IMPLEMENTATION SPECIFIC DATA GOES HERE
+	# choose the color of the player for them when they join
+
 	for player: String in lobby_player_dictionary:
+		# go over the list of players, get array of the colors
 		color_arr.append(lobby_player_dictionary[player][GlobalConstants.COLOR_KEY])
+		team_arr.append(lobby_player_dictionary[player][GlobalConstants.TEAM_KEY])
+		slot_arr.append(lobby_player_dictionary[player][GlobalConstants.SLOT_KEY])
+	
+	while(slot_arr.has(slot_int)):
+		slot_int += 1;
+		if(slot_int >= MAX_CONNECTIONS):
+			push_error("Slot size outside of max connections allowed")
+			break
+	
+	# I do not like how I code this, but honestly it works kind of well, while loops just scare me
 	while (color_arr.has(color_int)):
 		color_int += 1;
 		if (color_int >= GlobalConstants.COLORS.size()):
 			push_error("color outside of bounds!");
 			break;
-
-	var team_int: int = 0;
-	var team_arr: Array[Variant] = GlobalFunctions.get_player_property_array(lobby_player_dictionary, GlobalConstants.TEAM_KEY);
 	while (team_arr.has(team_int)):
 		team_int += 1;
 		if (team_int >= GlobalConstants.TEAMS.size()):
@@ -230,13 +246,14 @@ func local_register_player(sender_id: String, new_player_info: Dictionary[String
 	lobby_player_dictionary[sender_id] = new_player_info;
 	# send information to all others connected
 	server_update_player_list.rpc(lobby_player_dictionary);
+	# So the new connector has data
 	server_update_lobby_name.rpc(lobby_name);
 
 
 #send updated player dictionary when we make changes locally
 @rpc("any_peer","call_local", "reliable")
 func local_update_peer_information(sender_id: String, updated_dictionary: Dictionary[String, Variant]) -> void:
-	if (!multiplayer.is_server()):
+	if (!is_multiplayer_authority()):
 		return;
 		#only update the player on the server, you will then send this information out on update_player_list function
 	if (!lobby_player_dictionary.has(sender_id)):
@@ -245,12 +262,24 @@ func local_update_peer_information(sender_id: String, updated_dictionary: Dictio
 	lobby_player_dictionary[sender_id] = updated_dictionary;
 	#send information to all others connected
 	server_update_player_list.rpc(lobby_player_dictionary);
-	pass;
 
-#The multiplayer server will call this on all players to update the information of the dictionary
+@rpc("any_peer", "call_local", "reliable")
+func local_update_peer_key(u_peer: String, u_key: String, u_value: Variant) ->void:
+	if (!is_multiplayer_authority()):
+		return;
+	#only update the player on the server, you will then send this information out on update_player_list function
+	if (!lobby_player_dictionary.has(u_peer)):
+		push_error("Recieved update player data request on a player that does not exist");
+	# add player information to dictionary of dictionaries
+	# There is some risk that if we are updating a key with an invalid variant type, we can break our dictionary
+	lobby_player_dictionary[u_peer][u_key] = u_value;
+	#send information to all others connected
+	server_update_player_list.rpc(lobby_player_dictionary);
+
+## The multiplayer server will call this on all players to update the information of the dictionary
 @rpc("authority","call_local","reliable")
 func server_update_player_list(lobby_dict: Dictionary)-> void:
-	#Multiplayer server ID is 1
+	## Multiplayer server ID is 1
 	if(multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
 		return;
 

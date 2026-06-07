@@ -93,7 +93,7 @@ func cancel_build() ->void:
 		start_build();
 
 
-#called by multipalyer authority only
+#called by multiplayer authority only
 func spawn_unit(filepath: String) -> void:
 	if (!is_multiplayer_authority()): # Will call RPC to sync with all players
 		return;

@@ -1,0 +1,287 @@
+[gd_scene format=3 uid="uid://baoc76jkunmwq"]
+
+[ext_resource type="Script" uid="uid://c78wkv1os2dqm" path="res://scenes/join_lobby_scene/join_lobby_scene.gd" id="1_4oh5s"]
+
+[node name="JoinLobbyScene" type="Control" unique_id=1124234939]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4oh5s")
+
+[node name="JoinData" type="Panel" parent="." unique_id=1758946736]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.067
+anchor_top = 0.08337779
+anchor_right = 0.41599998
+anchor_bottom = 0.69877785
+offset_left = 0.81599426
+offset_top = -0.03201294
+offset_right = -0.23199463
+offset_bottom = -0.12005615
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="JoinData" unique_id=68514966]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="JoinBox" type="VBoxContainer" parent="JoinData/MarginContainer" unique_id=441210497]
+layout_mode = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="DirectConnect" type="Label" parent="JoinData/MarginContainer/JoinBox" unique_id=1585485603]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Direct Connect"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="JoinData/MarginContainer/JoinBox" unique_id=729396083]
+layout_mode = 2
+
+[node name="UserLabel" type="Label" parent="JoinData/MarginContainer/JoinBox/HBoxContainer" unique_id=1791029486]
+layout_mode = 2
+text = "Username:"
+
+[node name="UsernameEdit" type="TextEdit" parent="JoinData/MarginContainer/JoinBox/HBoxContainer" unique_id=207407521]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Doesnt Make Sense If We Use Steam"
+tab_input_mode = false
+virtual_keyboard_enabled = false
+
+[node name="ByIPLabel" type="Label" parent="JoinData/MarginContainer/JoinBox" unique_id=856859920]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "By IP Address (Not Recommended)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IPBox" type="HBoxContainer" parent="JoinData/MarginContainer/JoinBox" unique_id=1452725045]
+layout_mode = 2
+
+[node name="IPLabel" type="Label" parent="JoinData/MarginContainer/JoinBox/IPBox" unique_id=1080487416]
+layout_mode = 2
+text = "IP Address:"
+
+[node name="IPTextBox" type="TextEdit" parent="JoinData/MarginContainer/JoinBox/IPBox" unique_id=688301110]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "127.0.0.1"
+placeholder_text = "127.0.0.1"
+tab_input_mode = false
+
+[node name="IPPasswordBox" type="HBoxContainer" parent="JoinData/MarginContainer/JoinBox" unique_id=1176105689]
+layout_mode = 2
+
+[node name="PasswordLabel" type="Label" parent="JoinData/MarginContainer/JoinBox/IPPasswordBox" unique_id=2081490083]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+text = "Password: "
+
+[node name="PasswordTextBox" type="TextEdit" parent="JoinData/MarginContainer/JoinBox/IPPasswordBox" unique_id=1384176111]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "password (optional)"
+tab_input_mode = false
+
+[node name="ByIPJoinButton" type="Button" parent="JoinData/MarginContainer/JoinBox" unique_id=75121688]
+custom_minimum_size = Vector2(128, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Join"
+metadata/_edit_use_anchors_ = true
+
+[node name="UniqueIDLabel" type="Label" parent="JoinData/MarginContainer/JoinBox" unique_id=1461558280]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "By Lobby ID"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UniqueIDBox" type="HBoxContainer" parent="JoinData/MarginContainer/JoinBox" unique_id=2068319954]
+layout_mode = 2
+
+[node name="IDLabel" type="Label" parent="JoinData/MarginContainer/JoinBox/UniqueIDBox" unique_id=975191447]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+text = "Lobby ID: "
+
+[node name="IDTextBox" type="TextEdit" parent="JoinData/MarginContainer/JoinBox/UniqueIDBox" unique_id=1631150786]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Enter Unique ID
+"
+tab_input_mode = false
+
+[node name="PasswordBox" type="HBoxContainer" parent="JoinData/MarginContainer/JoinBox" unique_id=56181617]
+layout_mode = 2
+
+[node name="PasswordLabel" type="Label" parent="JoinData/MarginContainer/JoinBox/PasswordBox" unique_id=298054582]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+text = "Password: "
+
+[node name="PasswordTextBox" type="TextEdit" parent="JoinData/MarginContainer/JoinBox/PasswordBox" unique_id=903432930]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "password (optional)"
+tab_input_mode = false
+
+[node name="JoinLobbyButton" type="Button" parent="JoinData/MarginContainer/JoinBox" unique_id=1589218192]
+custom_minimum_size = Vector2(128, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Join "
+metadata/_edit_use_anchors_ = true
+
+[node name="OpenLobbiesControl" type="Control" parent="." unique_id=423328517]
+layout_mode = 1
+anchor_left = 0.47200003
+anchor_top = 0.49300003
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -0.16003418
+offset_top = 0.039978027
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Control" type="PanelContainer" parent="OpenLobbiesControl" unique_id=328386235]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.08888889
+grow_horizontal = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="PublicLobbies" type="Label" parent="OpenLobbiesControl/Control" unique_id=1966857760]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Public Lobbies"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="PanelContainer" type="PanelContainer" parent="OpenLobbiesControl" unique_id=936180986]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.10555556
+anchor_right = 1.0
+anchor_bottom = 0.87222224
+grow_horizontal = 2
+grow_vertical = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="OpenLobbiesControl/PanelContainer" unique_id=92366893]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="OpenLobbiesControl/PanelContainer/MarginContainer" unique_id=2106391791]
+layout_mode = 2
+
+[node name="PlaceholderLobby" type="HBoxContainer" parent="OpenLobbiesControl/PanelContainer/MarginContainer/VBoxContainer" unique_id=1035899898]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="LobbyName" type="Label" parent="OpenLobbiesControl/PanelContainer/MarginContainer/VBoxContainer/PlaceholderLobby" unique_id=1395612190]
+layout_mode = 2
+text = "[Lobby Name]"
+
+[node name="PlayerCount" type="Label" parent="OpenLobbiesControl/PanelContainer/MarginContainer/VBoxContainer/PlaceholderLobby" unique_id=2057806680]
+layout_mode = 2
+text = "[X / X Players] "
+
+[node name="JoinLobbyButton" type="Button" parent="OpenLobbiesControl/PanelContainer/MarginContainer/VBoxContainer/PlaceholderLobby" unique_id=1387110021]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+text = "Join Lobby"
+
+[node name="FriendsLobbiesControl" type="Control" parent="." unique_id=136892248]
+layout_mode = 1
+anchor_left = 0.47400004
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 0.27996826
+offset_right = 3.0
+offset_bottom = 5.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Control" type="PanelContainer" parent="FriendsLobbiesControl" unique_id=1926587826]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.08888889
+grow_horizontal = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="FriendsLobbiesControl/Control" unique_id=1298809051]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Friends Lobbies"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="PanelContainer" type="PanelContainer" parent="FriendsLobbiesControl" unique_id=494535319]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.10555556
+anchor_right = 1.0
+anchor_bottom = 0.87222224
+grow_horizontal = 2
+grow_vertical = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="FriendsLobbiesControl/PanelContainer" unique_id=552737173]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="FriendsLobbiesControl/PanelContainer/MarginContainer" unique_id=1993797202]
+layout_mode = 2
+
+[node name="PlaceholderLobby" type="HBoxContainer" parent="FriendsLobbiesControl/PanelContainer/MarginContainer/VBoxContainer" unique_id=676713499]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="LobbyName" type="Label" parent="FriendsLobbiesControl/PanelContainer/MarginContainer/VBoxContainer/PlaceholderLobby" unique_id=254433279]
+layout_mode = 2
+text = "[Lobby Name]"
+
+[node name="PlayerCount" type="Label" parent="FriendsLobbiesControl/PanelContainer/MarginContainer/VBoxContainer/PlaceholderLobby" unique_id=1159737673]
+layout_mode = 2
+text = "[X / X Players] "
+
+[node name="JoinLobbyButton" type="Button" parent="FriendsLobbiesControl/PanelContainer/MarginContainer/VBoxContainer/PlaceholderLobby" unique_id=150220358]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+text = "Join Lobby"
+
+[node name="ReturnToMain" type="Button" parent="." unique_id=537832587]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.03484375
+anchor_top = 0.87344444
+anchor_right = 0.19084375
+anchor_bottom = 0.9372223
+offset_left = -0.5999985
+offset_top = 0.11999512
+offset_right = -0.2800064
+offset_bottom = 0.19995117
+text = "Return To Main Menu"
+metadata/_edit_use_anchors_ = true

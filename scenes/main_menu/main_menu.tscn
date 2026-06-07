@@ -70,6 +70,26 @@ custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 text = "Options"
 
+[node name="CGContainer" type="MarginContainer" parent="Panel/VBoxContainer" unique_id=629886900]
+layout_mode = 2
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="CreateGameButton" type="Button" parent="Panel/VBoxContainer/CGContainer" unique_id=171569088]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Create Game"
+
+[node name="JGContainer" type="MarginContainer" parent="Panel/VBoxContainer" unique_id=1025779478]
+layout_mode = 2
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="JoinGame" type="Button" parent="Panel/VBoxContainer/JGContainer" unique_id=1256479738]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Join Game"
+
 [node name="Title" type="Label" parent="." unique_id=894619192]
 layout_mode = 1
 anchors_preset = -1

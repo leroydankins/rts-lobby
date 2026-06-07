@@ -271,7 +271,6 @@ func get_player_history() ->Dictionary:
 	return {};
 func get_cmd_array() -> Dictionary:
 	return {};
-
 func get_elapsed_time() -> float:
 	var time: float = Time.get_ticks_msec() - start_time;
 	return time;

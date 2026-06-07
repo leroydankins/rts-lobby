@@ -1,6 +1,7 @@
 class_name LobbyGUI
 extends Control
 
+## This signals to Main to hide the LobbyGUI and show the MainMenu control node
 signal return_main_pressed();
 
 @onready var return_to_main: Button = $ReturnToMain
@@ -13,7 +14,7 @@ signal return_main_pressed();
 @onready var ip_text_box: TextEdit = $JoinData/JoinBox/HBoxContainer2/IPTextBox
 
 
-#Lobby Option Vars
+# Lobby Option Vars
 @onready var disconnect_button: Button = $LobbyControls/VBoxContainer/DisconnectBox/DisconnectButton
 @onready var ready_button: Button = $LobbyControls/VBoxContainer/ReadyBox/ReadyButton
 @onready var start_button: Button = $LobbyControls/VBoxContainer/StartBox/StartButton
@@ -22,7 +23,7 @@ signal return_main_pressed();
 @onready var race_dropdown: OptionButton = $LobbyControls/VBoxContainer/RacePickerHbox/RaceDropdown
 
 
-#Lobby Status Vars
+# Lobby Status Vars
 @onready var lobby_data: Control = $LobbyData
 @onready var lobby_label: Label = $LobbyData/LobbyBox/LobbyLabel
 @onready var connection_status: Label = $LobbyData/LobbyBox/ConnectionStatus
@@ -76,12 +77,13 @@ func _ready() -> void:
 	_null_var = return_to_main.pressed.connect(on_return_to_main);
 
 
-#MAJOR FUNCTION
+## Main function of LobbyGUI [br][br]
+## Sets the displayed information of the lobby based on connections
 func on_lobby_update() -> void:
-	#Lobby Name
+	# Lobby Name
 	lobby_label.text = "Lobby: %s" % Lobby.lobby_name;
 
-	#if we are not connected to any lobby
+	# if we are not connected to any lobby
 	if (!Lobby.lobby_connected):
 		connection_status.text = "Status: Not Connected"
 		for i: int in peer_name_labels.size():
@@ -115,8 +117,8 @@ func on_lobby_update() -> void:
 				peer_colors[i].hide();
 		#update local controls if things change
 
-		#DISABLE AVAILABLE COLORS IF IT IS ALREADY BEING USED
-		var colors_in_use_arr: Array[Variant] = GlobalFunctions.get_player_property_array(Lobby.lobby_player_dictionary, GlobalConstants.COLOR_KEY) #get array of used colors
+		# DISABLE AVAILABLE COLORS IF IT IS ALREADY BEING USED
+		var colors_in_use_arr: Array[Variant] = GlobalFunctions.get_player_property_array(Lobby.lobby_player_dictionary, GlobalConstants.COLOR_KEY) 
 		for i: int in GlobalConstants.COLORS.size():
 			#if someone is currently using the color, disable the button
 			if colors_in_use_arr.has(i):
@@ -186,7 +188,7 @@ func on_start_pressed() -> void:
 			return
 
 
-	##CALL START GAME RPC AS THE SERVER
+	# CALL START GAME RPC AS THE SERVER
 	print("did we get here");
 	Lobby.load_game.rpc(GlobalConstants.GAME_PATH);
 
@@ -218,7 +220,7 @@ func on_connection_ended() -> void:
 	disconnect_button.disabled = true;
 	ready_button.disabled = true;
 	start_button.disabled = true;
-	#customizing options
+	# customizing options
 	team_dropdown.disabled = true;
 	color_dropdown.disabled = true;
 	race_dropdown.disabled = true;
@@ -233,8 +235,7 @@ func on_create_lobby_pressed()-> Error:
 	if(lobby_edit.text.is_empty()):
 		return Error.FAILED
 	LocalPlayerData.update_dictionary_data(GlobalConstants.USERNAME_KEY, username_edit.text);
-	var err: Error = Lobby.create_lobby(lobby_edit.text);
-
+	var err: Error = Lobby.create_lobby(lobby_edit.text, "");
 	return err;
 
 func on_join_lobby_pressed()-> Error:
@@ -246,7 +247,7 @@ func on_join_lobby_pressed()-> Error:
 	return err;
 
 func on_return_to_main() ->void:
-	#Setting button_pressed to false will call emit the toggle signal automatically
+	# Setting button_pressed to false will call emit the toggle signal automatically
 	ready_button.button_pressed = false;
-	#call disconnect pressed
+	# call disconnect pressed
 	return_main_pressed.emit();

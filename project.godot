@@ -18,7 +18,7 @@ config/icon="res://assets/placeholder/icon.svg"
 
 [autoload]
 
-LocalPlayerData="*uid://4cebbyiw6dgv"
+LocalPlayerData="*uid://cfid85p1ex0xi"
 ReplayManager="*uid://c52xk0rxkg112"
 DebugGlobal="*uid://cvjfea0q8veg8"
 Lobby="*uid://dcc12p4tfdrvs"

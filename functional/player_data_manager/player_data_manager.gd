@@ -90,7 +90,7 @@ func push_player_data_update_batch(updated_player:int, dict: Dictionary[int, Var
 
 
 
-#Called during the game initialization startup
+# Called during the game initialization startup
 @rpc("authority","call_local","reliable")
 func push_game_data_batch(dict: Dictionary[int, Dictionary]) ->void:
 	#if this was not called by the authority return;

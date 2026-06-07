@@ -8,13 +8,15 @@ class_name GlobalConstants
 #Brother we should not have 1 2 3 4 be the team numbers but whatever
 const TEAMS: Dictionary[int, String] = {0 : "1", 1: "2", 2: "3", 3: "4", 99: "neutral"}
 const COLORS: Dictionary[int, Color] = {0 : Color.NAVY_BLUE, 1: Color.DARK_RED, 2: Color.DARK_GREEN, 3: Color.REBECCA_PURPLE}
-const RACES: Dictionary[int, String] = {0 : "dwarves"}
+const RACES: Dictionary[int, String] = {0 : "Dwarf", 1: "Orc"}
 #LOBBY DICTIONARY KEYS
 const USERNAME_KEY: String = "username"; ## [member Lobby.lobby_player_dictionary] Username [string] Access Key
 const READY_KEY: String = "ready"; ## [member Lobby.lobby_player_dictionary] Ready [bool] Access Key
 const TEAM_KEY: String = "team"; ## [member Lobby.lobby_player_dictionary] Team [int] Access Key
 const COLOR_KEY: String = "color"; ## [member Lobby.lobby_player_dictionary] Color [int] Access Key
 const RACE_KEY: String = "race"; ## [member Lobby.lobby_player_dictionary] Race [int] Access Key
+const IS_CPU_KEY: String = "is_cpu"; ## [member Lobby.lobby_player_dictionary] Is_CPU [bool] Access Key
+const SLOT_KEY: String = "slot"; ## [member Lobby.lobby_player_dictionary] Slot [bool] Access Key
 
 const KEY_ARRAY: Array[String] = [USERNAME_KEY,READY_KEY,TEAM_KEY,COLOR_KEY,RACE_KEY];
 #GAME PATHS

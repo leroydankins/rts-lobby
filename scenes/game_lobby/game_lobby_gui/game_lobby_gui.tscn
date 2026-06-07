@@ -1,0 +1,377 @@
+[gd_scene format=3 uid="uid://bhdpghl85vclq"]
+
+[ext_resource type="Script" uid="uid://ce6b25yi4aju4" path="res://scenes/game_lobby/game_lobby_gui/game_lobby_gui.gd" id="1_ql525"]
+[ext_resource type="PackedScene" uid="uid://bonaxfd6o0c4u" path="res://scenes/game_lobby/player_slot_container/player_slot_container.tscn" id="2_vml2m"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pb32r"]
+bg_color = Color(0.080465816, 0.370062, 0.48236883, 0.38431373)
+
+[node name="GameLobbyGUI" type="Control" unique_id=375576163]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ql525")
+
+[node name="LobbyGUI" type="Panel" parent="." unique_id=167818043]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pb32r")
+
+[node name="PlayerData" type="Control" parent="LobbyGUI" unique_id=526974504]
+layout_mode = 1
+anchor_left = 0.378125
+anchor_top = 0.05
+anchor_right = 0.9511458
+anchor_bottom = 0.51552224
+offset_right = -0.3199997
+offset_bottom = -0.1760025
+metadata/_edit_use_anchors_ = true
+
+[node name="PanelContainer" type="PanelContainer" parent="LobbyGUI/PlayerData" unique_id=1661961502]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="LobbyGUI/PlayerData/PanelContainer" unique_id=482547692]
+layout_mode = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="PlayerBox" type="VBoxContainer" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer" unique_id=135051418]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer/PlayerBox" unique_id=720316933]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Players"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ListVBox" type="VBoxContainer" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer/PlayerBox" unique_id=97489338]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer/PlayerBox/ListVBox" unique_id=1255533426]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="PlayerSlotContainer" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer/PlayerBox/ListVBox/MarginContainer" unique_id=1349363728 instance=ExtResource("2_vml2m")]
+layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer/PlayerBox/ListVBox" unique_id=140562412]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="PlayerSlotContainer" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer/PlayerBox/ListVBox/MarginContainer2" unique_id=1628260764 instance=ExtResource("2_vml2m")]
+layout_mode = 2
+slot_num = 1
+
+[node name="MarginContainer3" type="MarginContainer" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer/PlayerBox/ListVBox" unique_id=167173841]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="PlayerSlotContainer" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer/PlayerBox/ListVBox/MarginContainer3" unique_id=1815887240 instance=ExtResource("2_vml2m")]
+layout_mode = 2
+slot_num = 2
+
+[node name="MarginContainer4" type="MarginContainer" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer/PlayerBox/ListVBox" unique_id=565280108]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="PlayerSlotContainer" parent="LobbyGUI/PlayerData/PanelContainer/MarginContainer/PlayerBox/ListVBox/MarginContainer4" unique_id=2023166977 instance=ExtResource("2_vml2m")]
+layout_mode = 2
+slot_num = 3
+
+[node name="LobbyControls" type="Control" parent="LobbyGUI" unique_id=1688437660]
+layout_mode = 1
+anchor_left = 1.1696688
+anchor_top = 0.43017778
+anchor_right = 1.5166688
+anchor_bottom = 0.8737581
+offset_left = -0.17602539
+offset_top = 0.27199936
+offset_right = 0.079956055
+offset_bottom = -0.16802979
+metadata/_edit_use_anchors_ = true
+
+[node name="Panel" type="Panel" parent="LobbyGUI/LobbyControls" unique_id=1414996029]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LobbyGUI/LobbyControls" unique_id=1220694567]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="TeamPickerHbox" type="HBoxContainer" parent="LobbyGUI/LobbyControls/VBoxContainer" unique_id=267700528]
+layout_mode = 2
+
+[node name="TeamLabel" type="Label" parent="LobbyGUI/LobbyControls/VBoxContainer/TeamPickerHbox" unique_id=485514514]
+layout_mode = 2
+text = "Team:"
+
+[node name="TeamDropdown" type="OptionButton" parent="LobbyGUI/LobbyControls/VBoxContainer/TeamPickerHbox" unique_id=1867721414]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+disabled = true
+item_count = 4
+popup/item_0/text = "1"
+popup/item_0/id = 0
+popup/item_1/text = "2"
+popup/item_1/id = 1
+popup/item_2/text = "3"
+popup/item_2/id = 2
+popup/item_3/text = "4"
+popup/item_3/id = 3
+
+[node name="ColorPickerHbox" type="HBoxContainer" parent="LobbyGUI/LobbyControls/VBoxContainer" unique_id=904349981]
+layout_mode = 2
+
+[node name="ColorLabel" type="Label" parent="LobbyGUI/LobbyControls/VBoxContainer/ColorPickerHbox" unique_id=670029867]
+layout_mode = 2
+text = "Color:"
+
+[node name="ColorDropdown" type="OptionButton" parent="LobbyGUI/LobbyControls/VBoxContainer/ColorPickerHbox" unique_id=2031197495]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+disabled = true
+item_count = 4
+popup/item_0/text = "Blue"
+popup/item_0/id = 0
+popup/item_1/text = "Red"
+popup/item_1/id = 1
+popup/item_2/text = "Green"
+popup/item_2/id = 2
+popup/item_3/text = "Purple"
+popup/item_3/id = 3
+
+[node name="RacePickerHbox" type="HBoxContainer" parent="LobbyGUI/LobbyControls/VBoxContainer" unique_id=1233589948]
+layout_mode = 2
+
+[node name="RaceLabel" type="Label" parent="LobbyGUI/LobbyControls/VBoxContainer/RacePickerHbox" unique_id=1937590590]
+layout_mode = 2
+text = "Race:"
+
+[node name="RaceDropdown" type="OptionButton" parent="LobbyGUI/LobbyControls/VBoxContainer/RacePickerHbox" unique_id=111227836]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+disabled = true
+item_count = 1
+popup/item_0/text = "Dwarves"
+popup/item_0/id = 0
+
+[node name="ReadyBox" type="HBoxContainer" parent="LobbyGUI/LobbyControls/VBoxContainer" unique_id=175380633]
+layout_mode = 2
+alignment = 1
+
+[node name="ReadyButton" type="CheckButton" parent="LobbyGUI/LobbyControls/VBoxContainer/ReadyBox" unique_id=1957091661]
+layout_mode = 2
+disabled = true
+text = "Ready"
+
+[node name="StartBox" type="HBoxContainer" parent="LobbyGUI/LobbyControls/VBoxContainer" unique_id=818435238]
+layout_mode = 2
+alignment = 1
+
+[node name="StartButton" type="Button" parent="LobbyGUI/LobbyControls/VBoxContainer/StartBox" unique_id=1518348649]
+layout_mode = 2
+disabled = true
+text = "Start Game"
+
+[node name="DisconnectBox" type="HBoxContainer" parent="LobbyGUI/LobbyControls/VBoxContainer" unique_id=559331249]
+layout_mode = 2
+alignment = 1
+
+[node name="DisconnectButton" type="Button" parent="LobbyGUI/LobbyControls/VBoxContainer/DisconnectBox" unique_id=403487854]
+layout_mode = 2
+disabled = true
+text = "Disconnect"
+
+[node name="HostData" type="Control" parent="LobbyGUI" unique_id=1408902647]
+layout_mode = 1
+anchor_left = 0.032175004
+anchor_top = 0.3223556
+anchor_right = 0.33353752
+anchor_bottom = 0.80196667
+offset_left = -1.1840057
+offset_top = -0.09602356
+offset_right = 0.07196045
+offset_bottom = -0.184021
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="HostBox" type="VBoxContainer" parent="LobbyGUI/HostData" unique_id=511278821]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Container" type="PanelContainer" parent="LobbyGUI/HostData/HostBox" unique_id=412429812]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="LobbyGUI/HostData/HostBox/Container" unique_id=1915704794]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "For Hosting A Game"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="LobbyGUI/HostData/HostBox" unique_id=623508198]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="LobbyGUI/HostData/HostBox/HBoxContainer" unique_id=1636937623]
+layout_mode = 2
+text = "Lobby Name"
+
+[node name="LobbyEdit" type="TextEdit" parent="LobbyGUI/HostData/HostBox/HBoxContainer" unique_id=610162072]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Lobby Name (required)"
+tab_input_mode = false
+virtual_keyboard_enabled = false
+
+[node name="MakePublicBox" type="HBoxContainer" parent="LobbyGUI/HostData/HostBox" unique_id=1214268434]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="LobbyGUI/HostData/HostBox/MakePublicBox" unique_id=2053924613]
+layout_mode = 2
+text = "Public"
+
+[node name="CheckBox" type="CheckBox" parent="LobbyGUI/HostData/HostBox/MakePublicBox" unique_id=715632528]
+layout_mode = 2
+
+[node name="PassLabel" type="Label" parent="LobbyGUI/HostData/HostBox/MakePublicBox" unique_id=1487679167]
+layout_mode = 2
+text = "Choose Password:"
+
+[node name="PassEdit" type="TextEdit" parent="LobbyGUI/HostData/HostBox/MakePublicBox" unique_id=2122847782]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "password (optional)"
+tab_input_mode = false
+virtual_keyboard_enabled = false
+
+[node name="CreateLobbyButton" type="Button" parent="LobbyGUI/HostData/HostBox" unique_id=1843965274]
+custom_minimum_size = Vector2(128, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Create Online Lobby
+"
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="LobbyGUI/HostData/HostBox" unique_id=866287915]
+layout_mode = 2
+text = "Unique Lobby ID:"
+
+[node name="StartButton" type="Button" parent="LobbyGUI" unique_id=1785050632]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.8
+anchor_top = 0.9
+anchor_right = 0.95
+anchor_bottom = 0.95
+grow_horizontal = 0
+grow_vertical = 0
+text = "Start Game"
+metadata/_edit_use_anchors_ = true
+
+[node name="ReturnToMain" type="Button" parent="LobbyGUI" unique_id=883118594]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.9
+anchor_right = 0.2
+anchor_bottom = 0.95
+offset_top = 0.35998535
+offset_right = 0.16000366
+offset_bottom = 0.19995117
+text = "Return To Main Menu"
+metadata/_edit_use_anchors_ = true
+
+[node name="SettingsContainer" type="PanelContainer" parent="LobbyGUI" unique_id=203225791]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.46015626
+anchor_top = 0.5347222
+anchor_right = 0.952875
+anchor_bottom = 0.7948889
+offset_right = 0.3199463
+offset_bottom = -0.32000732
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="Control" parent="LobbyGUI/SettingsContainer" unique_id=524066365]
+layout_mode = 2
+
+[node name="MenuButton" type="HBoxContainer" parent="LobbyGUI/SettingsContainer/MarginContainer" unique_id=666791049]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.026941363
+anchor_top = 0.080000006
+anchor_right = 0.23269571
+anchor_bottom = 0.26235837
+offset_top = 0.03999901
+offset_right = 0.16900635
+offset_bottom = -0.061012268
+size_flags_horizontal = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="LobbyGUI/SettingsContainer/MarginContainer/MenuButton" unique_id=910502103]
+layout_mode = 2
+text = "Map: "
+
+[node name="OptionButton" type="OptionButton" parent="LobbyGUI/SettingsContainer/MarginContainer/MenuButton" unique_id=981629081]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "River"
+popup/item_0/id = 0
+popup/item_1/text = "Chasm"
+popup/item_1/id = 1
+popup/item_2/text = "Serenity"
+popup/item_2/id = 2
+popup/item_3/text = "Dispatch"
+popup/item_3/id = 3
+
+[node name="DisconnectButton" type="Button" parent="." unique_id=1709665871]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.63359374
+anchor_top = 0.9013889
+anchor_right = 0.7835938
+anchor_bottom = 0.9513889
+grow_horizontal = 0
+grow_vertical = 0
+text = "Disconnect Lobby"
+metadata/_edit_use_anchors_ = true
