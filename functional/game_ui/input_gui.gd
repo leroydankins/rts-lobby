@@ -13,17 +13,16 @@ extends Control
 @onready var obb_progress_bar: ProgressBar = $Control/UnitHBox/MarginContainer/ObjectBeingBuiltControl/OBBProgressBar
 @onready var build_queue_container: HBoxContainer = $Control/UnitHBox/MarginContainer/BuildQueueContainer
 
-
-
 var cmd_box_arr: Array = [];
 var command_controller: CommandController;
 var first_selected: Node3D;
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#initialize variables
 	var _null_var: int;
 	cmd_box_arr = command_container.get_children();
-	command_controller = get_tree().get_first_node_in_group("CommandController");
+	command_controller = get_tree().get_first_node_in_group("command_controller");
 	build_slot.queue_pressed.connect(on_first_queue_pressed);
 
 	#Connect to signals

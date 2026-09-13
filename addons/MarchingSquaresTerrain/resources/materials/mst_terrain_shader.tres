@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://bahbybbjwkhlg"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://bahbybbjwkhlg"]
 
 [ext_resource type="Shader" uid="uid://ltkimbmrvpyo" path="res://addons/MarchingSquaresTerrain/resources/shaders/mst_terrain.gdshader" id="1_cywoj"]
 [ext_resource type="Texture2D" uid="uid://csvthlqhb8g5j" path="res://addons/MarchingSquaresTerrain/resources/materials/void_texture.tres" id="2_30qmr"]

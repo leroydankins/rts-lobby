@@ -18,6 +18,7 @@ dest_files=["res://.godot/imported/toolicon.svg-6e29e75cefc42f3f07050775b7c9127f
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.0
 compress/uastc_level=4
 compress/rdo_quality_loss=0.0

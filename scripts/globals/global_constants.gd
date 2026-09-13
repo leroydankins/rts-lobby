@@ -5,11 +5,11 @@ class_name GlobalConstants
 
 
 
-#Brother we should not have 1 2 3 4 be the team numbers but whatever
+# Brother we should not have 1 2 3 4 be the team numbers but whatever
 const TEAMS: Dictionary[int, String] = {0 : "1", 1: "2", 2: "3", 3: "4", 99: "neutral"}
 const COLORS: Dictionary[int, Color] = {0 : Color.NAVY_BLUE, 1: Color.DARK_RED, 2: Color.DARK_GREEN, 3: Color.REBECCA_PURPLE}
 const RACES: Dictionary[int, String] = {0 : "Dwarf", 1: "Orc"}
-#LOBBY DICTIONARY KEYS
+# LOBBY DICTIONARY KEYS
 const USERNAME_KEY: String = "username"; ## [member Lobby.lobby_player_dictionary] Username [string] Access Key
 const READY_KEY: String = "ready"; ## [member Lobby.lobby_player_dictionary] Ready [bool] Access Key
 const TEAM_KEY: String = "team"; ## [member Lobby.lobby_player_dictionary] Team [int] Access Key
@@ -18,23 +18,25 @@ const RACE_KEY: String = "race"; ## [member Lobby.lobby_player_dictionary] Race 
 const IS_CPU_KEY: String = "is_cpu"; ## [member Lobby.lobby_player_dictionary] Is_CPU [bool] Access Key
 const SLOT_KEY: String = "slot"; ## [member Lobby.lobby_player_dictionary] Slot [bool] Access Key
 
-const KEY_ARRAY: Array[String] = [USERNAME_KEY,READY_KEY,TEAM_KEY,COLOR_KEY,RACE_KEY];
-#GAME PATHS
+const KEY_ARRAY: Array[String] = [USERNAME_KEY,READY_KEY,TEAM_KEY,COLOR_KEY,RACE_KEY,IS_CPU_KEY,SLOT_KEY];
+# GAME PATHS
 const GAME: PackedScene = preload("uid://1vvyuea6fq3v") #game_scene/game.tscn
 const _DEPRECATED_GAME_PATH: String = "uid://1vvyuea6fq3v"; #game_scene/game.tscn
 const GAME_PATH: String = "uid://dcrsb32jubfy7"; #3D GAME SCENE PLACEHOLDER
 
-#ENTITY FILEPATHS
-const COMMAND_CENTER_FILEPATH: String = "uid://clusn5oxit4qc" #building_list/command_center/command_center.tscn
-const WORKER_FILEPATH: String = "uid://dm6nkl2orudho" #unit_list/worker.tscn
-const FORGE_FILEPATH: String = "uid://clyx8tbh0jeq3" #building_list/forge/forge.tscn
-const DWARF_SETTLEMENT_FILEPATH: String = "uid://bif7vwlmrd4j0" #building_list/dwarf_settlement.tscn
-const DWARF_WORKER_FILEPATH: String = "uid://bk5soe7dxxfcm" #unit_list/dwarf_worker/
+# ENTITY SCENE FILEPATHS
+const DWARF_SETTLEMENT_FILEPATH: String = "uid://bif7vwlmrd4j0" #buildings/dwarf_settlement.tscn
+const DWARF_WORKER_FILEPATH: String = "uid://bk5soe7dxxfcm" #units/dwarf/dwarf_worker
 const DWARF_BLUNDERBUSS_FILEPATH: String = "";
-const DWARF_BARRACKS_FILEPATH: String = "uid://sa4f355jrmcj"; #building_list/dwarf_barracks
-const DWARF_BRAWLER_FILEPATH: String = "uid://b5v73hrqfe7wf" #unit_list/dwarf_brawler
+const DWARF_BARRACKS_FILEPATH: String = "uid://sa4f355jrmcj"; #buildings/dwarf_barracks
+const DWARF_BRAWLER_FILEPATH: String = "uid://b5v73hrqfe7wf" #units/dwarf/dwarf_brawler
+const DWARF_SCOUT_FILEPATH: String = "uid://dw4osa4ddatr7" #units/dwarf/dwarf_scout
 
-#IMAGE FILEPATHS
+# ENTITY PREVIEW FILEPATHS
+const DWARF_SETTLEMENT_PREVIEW: String = "uid://cvv7t55e4dg88"
+const DWARF_BARRACKS_PREVIEW: String = "uid://bsqyhy830548j"
+
+# IMAGE FILEPATHS
 const BUILDING_PLACEHOLDER_TEXTURE: String = "uid://drsrhq5glvf4f" #building_placeholder.png
 const UNIT_PLACEHOLDER_TEXTURE: String = "uid://xdy8auqusfq" #unit_placeholder.png
 const MINERAL_PLACEHOLDER_TEXTURE: String = "uid://hkqpxnf6hhsj" #minerals.png
@@ -43,7 +45,7 @@ const MOVE_TO_PLACEHOLDER_TEXTURE: String = "uid://cvuy57vyaik8l"
 const UPGRADE_PLACEHOLDER_TEXTURE: String = "uid://cokfc1ue0hkgq"
 const CANCEL_PLACEHOLDER_TEXTURE: String = "uid://cvmj363eynq28"
 
-
+const ACTION_FEED_PATH: String = "uid://wgm62a18h2ce"
 
 ###ENUMS
 #ENTIY_TYPE
@@ -53,7 +55,7 @@ enum EntityType {
 	RESOURCE
 }
 #Unit Type Enum
-enum UnitTags{
+enum UnitType{
 LAND,
 AIR,
 SEA,
@@ -243,19 +245,20 @@ const ATTACK_MOVE_DICTIONARY: Dictionary [String, Variant] = {
 	"sprite_path" : ATTACK_PLACEHOLDER_TEXTURE
 }
 const TRAIN_DWARF_WORKER_DICTIONARY: Dictionary[String, Variant] = {
-	#Required command data
+	# Required command data
 	"mnemonic" : "DS001",
 	"command" : Commands.TRAIN,
 	"hotkey" : "E",
 	"is_group" : false,
 	"can_queue" : false,
 
-	#command specific data
-	"cost" : [50,0],
+	# command specific data
+
+	"cost" : [50,0], # Cost [minerals, gas]
 	"file_path" : DWARF_WORKER_FILEPATH,
 	"build_time" : 5,
 
-	#Command Metadata
+	# Command Metadata
 	"name" : "Dwarf Worker",
 	"description" : "Builds a dwarf worker",
 	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
@@ -268,16 +271,36 @@ const TRAIN_DWARF_BRAWLER_DICTIONARY: Dictionary[String, Variant] = {
 	"is_group" : false,
 	"can_queue" : false,
 
-	#command specific data
-	"cost" : [75,0],
+	# command specific data
+	"cost" : [75,0], # Cost [minerals, gas]
 	"file_path" : DWARF_BRAWLER_FILEPATH,
-	"build_time" : 12,
+	"build_time" : 8,
 
 	#Command Metadata
 	"name" : "Dwarf Brawler",
 	"description" : "Builds a dwarf brawler",
-	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
+	"sprite_path" : "uid://xdy8auqusfq", # unit_placeholder.png
 }
+const TRAIN_DWARF_SCOUT_DICTIONARY: Dictionary[String, Variant] = {
+	#Required command data
+	"mnemonic" : "DB002",
+	"command" : Commands.TRAIN,
+	"hotkey" : "K",
+	"is_group" : false,
+	"can_queue" : false,
+
+	# command specific data
+	"cost" : [50,0], # Cost [minerals, gas]
+	"file_path" : DWARF_SCOUT_FILEPATH,
+	"build_time" : 5,
+
+	#Command Metadata
+	"name" : "Dwarf Scout",
+	"description" : "Nimble, weak units that can move quickly and outrun most enemies",
+	"sprite_path" : "uid://xdy8auqusfq", # unit_placeholder.png
+}
+
+
 const BUILD_DWARF_SETTLEMENT_DICTIONARY  : Dictionary = {
 	#required command data
 	"mnemonic" : "DW001",
@@ -287,59 +310,21 @@ const BUILD_DWARF_SETTLEMENT_DICTIONARY  : Dictionary = {
 	"can_queue" : true,
 
 	#command specific data
-	"cost" : [400,0],
-	"building_array": [BuildingType.TOWNHALL, BuildingType.DEPOT],
-	"argument" : "location",
+	"cost" : [400,0], # Cost [minerals, gas]
+	"argument" : ["grid_location"],
+	"tile_size": [4,4],
+	"building_properties": [BuildingType.TOWNHALL, BuildingType.DEPOT],
 	"file_path" : DWARF_SETTLEMENT_FILEPATH,
-	"entity_preview" : "uid://bsqyhy830548j", #GET A NEW ONE
-
+	"entity_preview" : DWARF_SETTLEMENT_PREVIEW,
 
 	#command metadata
 	"name" : "Build Townhall",
 	"description" : "Builds Dwarven Settlement",
 	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
 }
-const BUILD_DWARF_BARRACKS_DICTIONARY: Dictionary = {
-	#required command data
-	"mnemonic" : "DW003",
-	"command" : Commands.BUILD,
-	"hotkey" : "B",
-	"is_group" : false,
-	"can_queue" : true,
 
-	#command specific data
-	"cost" : [150,0],
-	"building_array": [], #Check against buildingType enum for bool checks on buiilding-grid
-	"argument" : "location",
-	"file_path" : DWARF_BARRACKS_FILEPATH,
-	"entity_preview" : "uid://bsqyhy830548j",
-
-	#command metadata
-	"name" : "Dwarf Barracks",
-	"description" : "Build dwarven barracks, can create warriors",
-	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
-}
-const BUILD_DWARF_BARRACKS2_DICTIONARY: Dictionary = {
-	#required command data
-	"mnemonic" : "DW003",
-	"command" : Commands.BUILD,
-	"hotkey" : "B",
-	"is_group" : false,
-	"can_queue" : true,
-
-	#command specific data
-	"cost" : [150,0],
-	"argument" : "grid_location",
-	"file_path" : DWARF_BARRACKS_FILEPATH,
-	"entity_preview" : "uid://bsqyhy830548j",
-
-	#command metadata
-	"name" : "Dwarf Barracks",
-	"description" : "Build dwarven barracks, can create warriors",
-	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
-}
-##INCOMPLETE
-const BUILD_FORGE_DICTIONARY : Dictionary = {
+##TODO INCOMPLETE
+const BUILD_DWARF_FORGE_DICTIONARY : Dictionary = {
 	#Required command data
 	"mnemonic" : "DW002",
 	"command" : Commands.BUILD,
@@ -350,12 +335,33 @@ const BUILD_FORGE_DICTIONARY : Dictionary = {
 	#command specific data
 	"cost" : [200,0],
 	"argument" : "location",
-	"file_path" : FORGE_FILEPATH,
+	"file_path" : null,
 
 	#command metadata
-	"name" : "Forge",
+	"name" : "Dwarf Forge",
 	"description" : "Build dwarven forge for weapon research",
-	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
+	"sprite_path" : "uid://drsrhq5glvf4f" # building_placeholder.png
+}
+const BUILD_DWARF_BARRACKS_DICTIONARY: Dictionary = {
+	# required command data
+	"mnemonic" : "DW003",
+	"command" : Commands.BUILD,
+	"hotkey" : "B",
+	"is_group" : false,
+	"can_queue" : true,
+
+	# command specific data
+	"cost" : [150,0], # Cost [minerals, gas]
+	"argument" : ["grid_location"],
+	"tile_size": [2,2],
+	"building_properties": [],
+	"file_path" : DWARF_BARRACKS_FILEPATH,
+	"entity_preview" : DWARF_BARRACKS_PREVIEW,
+
+	# command metadata
+	"name" : "Dwarf Barracks",
+	"description" : "Build dwarven barracks, can create warriors",
+	"sprite_path" : "uid://drsrhq5glvf4f" # building_placeholder.png
 }
 const RESEARCH_DWARF_BLUNDERBUSS_DICTIONARY : Dictionary = {
 	#Required command data
@@ -406,28 +412,4 @@ const UPGRADE_ARMOR_2_DICTIONARY : Dictionary = {
 	"name" : "Upgrade Armor Level 2",
 	"description" : "Researches Armor Upgrade Level 2",
 	"sprite_path" : "uid://cokfc1ue0hkgq" #upgrade_placeholder.png
-}
-
-###DEPRECATED
-const BUILD_BASE_DICTIONARY  : Dictionary = {
-	"name" : "Build Base",
-	"mnemonic" : "WK001",
-	"command" : Commands.BUILD,
-	"cost" : [300,0],
-	"description" : "Builds Dwarven Base",
-	"file_path" : COMMAND_CENTER_FILEPATH,
-	"argument" : "location",
-	"sprite_path" : "uid://drsrhq5glvf4f" #building_placeholder.png
-}
-## @deprecated: Use [constant TRAIN_DWARF_WORKER_DICTIONARY] instead.
-const BUILD_WORKER_DICTIONARY: Dictionary[String, Variant] = {
-	"name" : "Worker",
-	"mnemonic" : "CC001",
-	"command" : Commands.BUILD,
-	"cost" : [50,0],
-	"description" : "Builds a dwarf worker",
-	"file_path" : WORKER_FILEPATH,
-	"build_time" : 5,
-	"sprite_path" : "uid://xdy8auqusfq", #unit_placeholder.png
-	"hotkey" : "E",
 }

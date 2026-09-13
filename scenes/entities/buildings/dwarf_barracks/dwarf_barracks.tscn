@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://sa4f355jrmcj"]
+
+[ext_resource type="Script" uid="uid://bjelw2va86bfd" path="res://scenes/entities/buildings/dwarf_barracks/data/dwarf_barracks.gd" id="1_6hkg5"]
+[ext_resource type="PackedScene" uid="uid://14s0usu8vx7j" path="res://components/highlight_mesh/highlight_mesh.tscn" id="2_deb4k"]
+[ext_resource type="PlaneMesh" uid="uid://bbxbndclj12rc" path="res://components/highlight_mesh/highlight_mesh_resource.tres" id="3_iinev"]
+[ext_resource type="BoxMesh" uid="uid://tsx37vxlw7q0" path="res://assets/meshes/dwarf_barracks/db_built.tres" id="4_faqvc"]
+[ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="5_ovbs2"]
+[ext_resource type="PackedScene" uid="uid://bp1byohtd1if2" path="res://components/unit_trainer_component/unit_trainer_component.tscn" id="6_ofmes"]
+[ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="7_u5rbw"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_g6x0b"]
+size = Vector3(1.5, 1.5, 1.5)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_stfpi"]
+properties/0/path = NodePath("HealthComponent:max_health")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath("HealthComponent:health")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:construction_value")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:is_constructed")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("UnitTrainerComponent:build_time")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath("UnitTrainerComponent:build_item")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath("UnitTrainerComponent:build_queue")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath("UnitTrainerComponent:build_progress")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath("UnitTrainerComponent:build_speed_mult")
+properties/8/spawn = true
+properties/8/replication_mode = 2
+
+[node name="DwarfBarracks" type="Area3D" unique_id=346874227 node_paths=PackedStringArray("unit_trainer_component", "body_mesh", "highlight_mesh") groups=["building", "entity"]]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
+collision_layer = 58
+script = ExtResource("1_6hkg5")
+unit_trainer_component = NodePath("UnitTrainerComponent")
+body_mesh = NodePath("Meshes/BodyMesh")
+highlight_mesh = NodePath("HighlightMesh")
+metadata/_custom_type_script = "uid://dtnlbq4vnh6ah"
+
+[node name="HighlightMesh" parent="." unique_id=283025203 instance=ExtResource("2_deb4k")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+visible = false
+mesh = ExtResource("3_iinev")
+
+[node name="MainCol" type="CollisionShape3D" parent="." unique_id=1538841347]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
+shape = SubResource("BoxShape3D_g6x0b")
+
+[node name="Meshes" type="Node3D" parent="." unique_id=469980567]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
+
+[node name="BodyMesh" type="MeshInstance3D" parent="Meshes" unique_id=165756683]
+mesh = ExtResource("4_faqvc")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1349025069]
+avoidance_enabled = true
+height = 2.5
+radius = 1.25
+neighbor_distance = 0.1
+
+[node name="HealthComponent" parent="." unique_id=378400957 instance=ExtResource("5_ovbs2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+health = 80
+max_health = 80
+subview_size = Vector2i(160, 16)
+
+[node name="UnitTrainerComponent" parent="." unique_id=926730106 instance=ExtResource("6_ofmes")]
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1315125353 groups=["sync_component"]]
+replication_config = SubResource("SceneReplicationConfig_stfpi")
+script = ExtResource("7_u5rbw")

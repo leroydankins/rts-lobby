@@ -3,14 +3,17 @@
 [ext_resource type="Script" uid="uid://uq2xxe87qrg3" path="res://scenes/main/main.gd" id="1_2w1kt"]
 [ext_resource type="Script" uid="uid://ny1k5n1wesmp" path="res://scenes/lobby_gui/lobby_gui.gd" id="1_yh5la"]
 [ext_resource type="PackedScene" uid="uid://bitlb2ag1imd" path="res://scenes/score_screen/score_screen.tscn" id="3_k2fmo"]
-[ext_resource type="PackedScene" uid="uid://b1sw5jrtyj01o" path="res://scenes/main_menu/main_menu.tscn" id="4_l3cfh"]
+[ext_resource type="PackedScene" uid="uid://b1sw5jrtyj01o" path="res://scenes/main_menu_scene/main_menu.tscn" id="4_l3cfh"]
+[ext_resource type="PackedScene" uid="uid://baoc76jkunmwq" path="res://scenes/join_lobby_scene/join_lobby_scene.tscn" id="5_ow5a4"]
+[ext_resource type="PackedScene" uid="uid://bhdpghl85vclq" path="res://scenes/game_lobby_scene/lobby_screen/lobby_screen.tscn" id="6_hujxm"]
 
-[node name="Main" type="Node" unique_id=863003041 groups=["Main"]]
+[node name="Main" type="Node" unique_id=863003041 groups=["main"]]
 script = ExtResource("1_2w1kt")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=802540709]
 
 [node name="LobbyGUI" type="Control" parent="CanvasLayer" unique_id=1367195987]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -409,10 +412,54 @@ offset_bottom = 0.19995117
 text = "Return To Main Menu"
 metadata/_edit_use_anchors_ = true
 
+[node name="LobbyScreen" parent="CanvasLayer" unique_id=375576163 instance=ExtResource("6_hujxm")]
+visible = false
+
 [node name="ScoreScreen" parent="CanvasLayer" unique_id=1695320857 instance=ExtResource("3_k2fmo")]
 visible = false
 
 [node name="MainMenu" parent="CanvasLayer" unique_id=1542155705 instance=ExtResource("4_l3cfh")]
+
+[node name="JoinLobbyScene" parent="CanvasLayer" unique_id=1124234939 instance=ExtResource("5_ow5a4")]
 visible = false
+
+[node name="GameDCScreen" type="Control" parent="CanvasLayer" unique_id=1702575461]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/GameDCScreen" unique_id=480422125]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_top = 0.3
+anchor_right = 0.7
+anchor_bottom = 0.7
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/GameDCScreen/PanelContainer" unique_id=1741357888]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/GameDCScreen/PanelContainer/CenterContainer" unique_id=5192641]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/GameDCScreen/PanelContainer/CenterContainer/VBoxContainer" unique_id=213233840]
+layout_mode = 2
+text = "Game Paused!"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="CanvasLayer/GameDCScreen/PanelContainer/CenterContainer/VBoxContainer" unique_id=1222872350]
+layout_mode = 2
+text = "Lost Connection To Server!"
+horizontal_alignment = 1
+
+[node name="DCToMenuButton" type="Button" parent="CanvasLayer/GameDCScreen/PanelContainer/CenterContainer/VBoxContainer" unique_id=819904050]
+layout_mode = 2
+text = "Return To Main Menu"
 
 [node name="GameHolder" type="Node" parent="." unique_id=879181187]

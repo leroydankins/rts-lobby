@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="FeedResource" format=3 uid="uid://wgm62a18h2ce"]
+
+[ext_resource type="Script" uid="uid://jx70we7wufad" path="res://scenes/UI/action_feed/feed_resource.gd" id="1_4yecr"]
+
+[resource]
+script = ExtResource("1_4yecr")
+metadata/_custom_type_script = "uid://jx70we7wufad"

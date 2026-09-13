@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://cbj3123mjf2ru"]
+
+[ext_resource type="Script" uid="uid://c0vxceag8mm7v" path="res://scenes/UI/action_feed/action_feed.gd" id="1_wxrg2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1ypwy"]
+bg_color = Color(0.22352941, 0.22352941, 0.22352941, 0.42745098)
+
+[node name="ActionFeed" type="Control" unique_id=1080147895]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_wxrg2")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=563381851]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_1ypwy")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer" unique_id=321103216]
+layout_mode = 2
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 12
+theme_override_font_sizes/bold_font_size = 12
+theme_override_font_sizes/bold_italics_font_size = 12
+theme_override_font_sizes/italics_font_size = 12
+theme_override_font_sizes/mono_font_size = 12
+bbcode_enabled = true
+vertical_alignment = 2

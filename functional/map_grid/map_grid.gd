@@ -5,14 +5,22 @@ extends Node3D
 ##
 ## MapGrid contains a 2D array grid of building squares for placement of building entities[br][br]
 ## Each index in the array grid represents one square, and is a packed byte array of flags and information[br][br]
-## Data type as a struct: [Flags.TEMPORARY_INVALID_FLAG] HIGHLIGHT_FLAG, INVALID_FLAG, USED_FLAG, INVALID_DEPOT_FLAG][br]
+## Data type as a struct: [RID_NUM, TEMPORARY_INVALID_FLAG HIGHLIGHT_FLAG, INVALID_FLAG, USED_FLAG, INVALID_DEPOT_FLAG][br]
 ## Grid data is used to update shader on terrain materials[br]
 ##
 ## [CommandController] utilizes functions in this script to establish command data for instantiation of buildings[br]
 ##
 ## Each
 
-## Placement of each flag in the stored grid indices
+const GREEN_MATERIAL: StandardMaterial3D = preload("uid://cqv5j3d2sdxl6")
+const RED_MATERIAL: StandardMaterial3D = preload("uid://c1xulthtr4co4")
+const MESH: Mesh = preload("uid://ccej8qr77u1p1")
+const MESH_STRING: String = "uid://ccej8qr77u1p1"
+## Y Layer tolerance for validity checks
+const Y_TOLERANCE: float = 0.125
+## Collision Mask Layer 14 used to bake the MapGrid matrix
+const GRID_BAKE_MASK: int = 0b0010000000000000 # 8196 or mask 13th bit layer 14
+## Placement of each flag in the stored grid indices, RID_VALUE is used so that placement works in the array
 enum Flags {
 	Y_LAYER,
 	USED_FLAG,
@@ -21,41 +29,57 @@ enum Flags {
 	TEMPORARY_INVALID_FLAG, #This is only used for when we are highlighting for placement
 	INVALID_DEPOT_FLAG,
 }
-## Layers enum that goes up to the byte sizing
-var y_layers: Array[int] = [];
-## Y Layer tolerance for validity checks
-const Y_TOL: float = 0.05
-
-## Collision Mask Layer 14 used to bake the MapGrid matrix
-const GRID_BAKE_MASK: int = 0b0010000000000000 # 8196 or mask 13th bit layer 14
+@export_group("Grid Configuration")
 ## Variable which determines the scale of grid tiles
 @export var grid_square_size: float = 1
 ## Determines the MxN grid size, must be equal to map size
-@export var grid_size: int = 10 # goes in both directions
+@export var grid_size: int = 10 # goes in both directions X and Z
+
+@export_group("Grid Data")
+## Layers enum that goes up to the byte sizing
+@export var y_layers: Array[int] = [];
 ## Actual Grid Array, may not need to be exported
 @export var grid: Array[Array] = [];
+## @deprecated: Vector array of all RIDs associated with the grid, for quick access to the entire array [br]
+@export var rid_array: Array[RID] = [];
 
 
 ## Vector array of what squares are currently highlighted to make iterating and removing highlight quick during physics process
 var highlight_arr: Array[Array] = [];
 
+
+# We should never have to serialize our entire grid! If you do, you're dumb. Initialize in game scene then update via indices
+
+
 func _ready() -> void:
-	setup();
+	# If initiating set_up during Ready, call_deferred to allow full map creation
+	call_deferred("initialize_grid");
+	#call_deferred("set_up");
 	pass # Replace with function body.
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
 
+#
+### incomplete [br]
+### functionality may be kept in physical representation of grid
+#func display_tiles()->void:
+	#var time: float = Time.get_ticks_usec()
+	##for i:int in rid_array.size():
+		##RenderingServer.instance_set_visible(rid_array[i],true)
+	#for i: int in grid_size:
+		#for j: int in grid_size:
+			#if(grid[i][j][Flags.INVALID_TILE_FLAG]):
+				#continue;
+			#else:
+				#RenderingServer.instance_set_visible(rid_grid[i][j],true)
+	#print(Time.get_ticks_usec()- time)
+	##for i: int in rid_array.size():
+		##RenderingServer.instance_set_visible(rid_array[i],true)
 
-## incomplete [br]
 ## functionality may be kept in physical representation of grid
-func display_tiles()->void:
-	pass;
-## functionality may be kept in physical representation of grid
-func hide_tiles() ->void:
-	pass;
+#func hide_tiles() ->void:
+	#for i: int in rid_array.size():
+		#RenderingServer.instance_set_visible(rid_array[i],false)
 
 ## Called during each physics process tick when the player is placing a building on the map, indicates what tiles are currently being moused over
 func highlight_tiles(x_start: int, z_start:int, size:Array) ->void:
@@ -111,11 +135,12 @@ func get_tile_world_position(x_start: int, z_start: int, x_size: int, z_size: in
 ## Takes in a [param Vector3] position, [param int] x_size, [param int] z_size, and the [param Array] of building properties to return the placement information dictionary.[br][br]
 ## Validates that the tileset is contiguous and placeable [br][br]
 ## Returns a Dictionary with the following values. [br] [br]
-## [b] grid_tiles [/b] : [param x_start_index] : int ,  [param z_start_index] : int , [param tile_size_array] : int [br] [br]
+## [b] grid_tiles [/b] : [param x_start] : int ,  [param z_start] : int , [param x_size] : int , [param z_size] : int [br] [br]
 ## [b] building_position [/b]: [param position] : Vector3
 func get_building_placement_dictionary(world_pos: Vector3, x_size: int, z_size: int, building_properties : Array) -> Dictionary:
-	#if position is outside of grid space then we cut it
+	# if position is outside of grid space then we cut it
 	if (world_pos.x < 0 || world_pos.z < 0 || world_pos.x > grid_size * grid_square_size || world_pos.z > grid_size * grid_square_size):
+		print("get_building_placement_dictionary: not in region during checl @ line 143")
 		return {};
 
 	var tile_index: Array[int]; #this will be the floor int value of the collider position
@@ -127,12 +152,10 @@ func get_building_placement_dictionary(world_pos: Vector3, x_size: int, z_size: 
 	var x_displacement: int
 	var z_displacement: int
 	tile_index = [floori(world_pos.x),floori(world_pos.z)]; #this will be the floor int value of the collider position
-
-
 	x_displacement = floori(float(x_size) / 2)  #if tile_size is 9, this would be 9 - 5 = 4;, if this was 8, this would be 8 - 4 = 4
 	z_displacement = floori(float(z_size) / 2) #maybe we dont need to do an int and we can instead just div
 
-	#X Index % X Building Position
+	# X Index % X Building Position
 	if (x_size % 2): #if the xtile_size is odd, we want to get the x starting value
 			building_position.x = floori(world_pos.x) + .5 #building position
 			x_start = tile_index[0] - x_displacement #if index is 13, this would be 14 - 2 = 12, then 12,13,14,15,16 would be lit for x tiles
@@ -158,8 +181,9 @@ func get_building_placement_dictionary(world_pos: Vector3, x_size: int, z_size: 
 	var tile_data : PackedByteArray = grid[x_start][z_start];
 	building_position.y = tile_data[Flags.Y_LAYER];
 
-	#Validate the placement with is_tiles_valid?
-	if (!is_tiles_valid(x_start, z_start, x_size, z_size, building_properties)):
+	# Validate the placement with is_tiles_valid?
+	if (!is_tiles_valid(Vector3i(x_start,0, z_start), Vector3i(x_size,0, z_size), building_properties)):
+		print("get_building_placement_dictionary: failed is_tiles_valid check @ line186")
 		return {};
 
 	placement_dict = {
@@ -176,15 +200,13 @@ func get_building_placement_dictionary(world_pos: Vector3, x_size: int, z_size: 
 ################################# INTERNAL FUNCTIONS
 
 ## Bakes the matrix of in-game grid tiles that all buildings adhere[br][br]
-## Creates an array of raycasts for each corner index and comparison is used to validate all flat tile spaces[br][br]
-## Currently, runs on _ready and thus takes a solid amount of time (30ms) to run for a 100x100 grid.[br][br]
-## [b]This must be baked as a @tool script function in implementation[/b]
-func setup()->void:
+## Does not handle the visual instantiation of the grid, this was getting to be difficult so we are going to just show grid with the preview node
+## Creates an array of raycasts for index center and Y value will be used during in game validation [br][br]
+## Currently, runs on _ready call deferred and thus takes a solid amount of time (30ms) to run for a 100x100 grid.[br][br]
+func initialize_grid() ->void:
 	var time: float = Time.get_ticks_usec()
-	var ray_length: int = 15;
-	var vec_dict: Dictionary
-	var vec_arr: PackedFloat32Array;
-	var y_check_var: float;
+	var ray_length: int = 25;
+	var y_height: float;
 	var y_layer: int
 	## [Y_LAYER, USED_FLAG, HIGHLIGHT_FLAG, INVALID_TILE_FLAG, TEMPORARY_INVALID_FLAG,  INVALID_DEPOT_FLAG]
 	var data_arr: PackedByteArray
@@ -193,46 +215,125 @@ func setup()->void:
 	var ray_query: PhysicsRayQueryParameters3D;
 	var space: PhysicsDirectSpaceState3D
 	var raycast_result: Dictionary;
-	#We should be doing this only in positive values due to the fact that this shit is ass
-	for x: int in (grid_size + 1):
-		for z: int in (grid_size + 1):
-			# Iterate through each of the
-			from = global_position + Vector3(x,0,z);
+	var size_offset: float = .5 * grid_square_size
+	# We should be doing this only in positive values due to the fact that this shit is ass
+	for x: int in (grid_size):
+		grid.append([])
+		for z: int in (grid_size):
+			data_arr = [0,0,0,0,0,0];
+			# Raycast position and iterate through each of the tiles relative to the start location of the unit
+			from = global_position + Vector3(x + size_offset,15,z + size_offset);
 			to = from + Vector3.DOWN * ray_length
 			ray_query = PhysicsRayQueryParameters3D.create(from,to,GRID_BAKE_MASK);
 			space = get_viewport().get_world_3d().direct_space_state;
 			ray_query.collide_with_areas = true
+			ray_query.collide_with_bodies = true
+			raycast_result = space.intersect_ray(ray_query)
+			# / Raycast
+			if(raycast_result.is_empty()): # if no ground was intercepted, we instantly can call it invalid
+				print("did not get a result at %s" % from)
+				y_height = -1;
+				data_arr[Flags.INVALID_TILE_FLAG] = 1;
+			else:
+				y_height = raycast_result["position"].y
+				# We are going to rule half-step layers to be invalid off the bat, deals with ramps
+				y_layer = roundi(y_height);
+				# Check within tolerance for mid-steps, ramps, etc
+				if (abs(y_layer - y_height) > Y_TOLERANCE):
+					# Set tile as invalid
+					data_arr[Flags.INVALID_TILE_FLAG] = 1;
+				if(!y_layers.has(y_layer)): # We only care that we encompass all Y layers for validating Vector3 checks by the controller
+					y_layers.append(y_layer)
+				data_arr[Flags.Y_LAYER] = y_layer #The value must be less than 128 since we are representing this with a Byte in the flag array
+			grid[x].append(data_arr)
+	print(y_layers)
+	print("time to do this shit in microseconds is %s usec" % [Time.get_ticks_usec() - time])
+
+## Bakes the matrix of in-game grid tiles that all buildings adhere[br][br]
+## Creates an array of raycasts for each corner index and comparison is used to validate all flat tile spaces[br][br]
+## Currently, runs on _ready and thus takes a solid amount of time (30ms) to run for a 100x100 grid.[br][br]
+## [b]This must be baked as a @tool script function in implementation[/b]
+func set_up()->void:
+	var time: float = Time.get_ticks_usec()
+	var ray_length: int = 25;
+	var vec_dict: Dictionary
+	var y_height: float;
+	var y_layer: int
+	## [Y_LAYER, USED_FLAG, HIGHLIGHT_FLAG, INVALID_TILE_FLAG, TEMPORARY_INVALID_FLAG,  INVALID_DEPOT_FLAG]
+	var data_arr: PackedByteArray
+	var from: Vector3;
+	var to: Vector3;
+	var ray_query: PhysicsRayQueryParameters3D;
+	var space: PhysicsDirectSpaceState3D
+	var raycast_result: Dictionary;
+	var xform: Transform3D;
+	var instance: RID;
+	var size_offset: float = .5 * grid_square_size
+	# Set the scenario from the world. This ensures it
+	# appears with the same objects as the scene.
+	var scenario: RID = get_world_3d().scenario;
+	# We should be doing this only in positive values due to the fact that this shit is ass
+	for x: int in (grid_size + 1):
+		for z: int in (grid_size + 1):
+			# Iterate through each of the tiles relative to the start location of the unit
+			from = global_position + Vector3(x,15,z);
+			to = from + Vector3.DOWN * ray_length
+			ray_query = PhysicsRayQueryParameters3D.create(from,to,GRID_BAKE_MASK);
+			space = get_viewport().get_world_3d().direct_space_state;
+			ray_query.collide_with_areas = true
+			ray_query.collide_with_bodies = true
 			raycast_result = space.intersect_ray(ray_query)
 			## This way is slightly more performant but I cannot make grabbing the locations very easy this way
 			#if(raycast_result.is_empty()):
+				## vec_arr is packedfloat32array
 				#vec_arr.append(0);
 			#else:
 				#var result_pos: Vector3 = raycast_result["position"]
 				#vec_arr.append(result_pos.y);
 			if(raycast_result.is_empty()): # if no ground was intercepted, we instantly can call it invalid
+				print("did not get a result at %s" % from)
 				vec_dict[[x,z]] = -1;
 			else:
 				vec_dict[[x,z]] = raycast_result["position"].y;
-
+	#A second loop is used because of the offsets and requiring the entire matrix of vector locations
 	for i: int in grid_size:
 		grid.append([])
+
 		for j: int in grid_size:
+			# Create a visual instance (for 3D).
+			instance= RenderingServer.instance_create()
+			RenderingServer.instance_set_scenario(instance, scenario)
+			# Add a mesh to it. Remember to keep this reference.
+			RenderingServer.instance_set_base(instance, MESH)
 			data_arr = [0,0,0,0,0,0];
-			y_check_var = vec_dict[[i,j]]
-			y_layer = roundi(y_check_var);
+			y_height = vec_dict[[i,j]]
+			y_layer = roundi(y_height);
 			if (
-				y_check_var != vec_dict[[i+1,j]] or y_check_var != vec_dict[[i,j+1]]
-				or y_check_var != vec_dict[[i+1,j+1]]
+				y_height != vec_dict[[i+1,j]] or y_height != vec_dict[[i,j+1]]
+				or y_height != vec_dict[[i+1,j+1]] or y_height == -1
 			):
 				data_arr[Flags.INVALID_TILE_FLAG] = 1;
+				RenderingServer.instance_set_visible(instance,false)
 			# After this, we consider the tile to be valid for placement
-			elif(!y_layers.has(y_layer)): # We only care that we encompass all Y layers for validating Vector3 checks by the controller
-				y_layers.append(y_layer)
+			else:
+				if(!y_layers.has(y_layer)): # We only care that we encompass all Y layers for validating Vector3 checks by the controller
+					y_layers.append(y_layer)
+
+
+			# Calculate the height location of the tile and set position
+			xform = Transform3D(Basis(), Vector3(i + size_offset, y_height + 0.1, j + size_offset))
+			RenderingServer.instance_set_transform(instance, xform)
+			#Initiate it as .25 alpha but we will probably switch this into the materials themselves later
+			RenderingServer.instance_geometry_set_transparency(instance,.25)
+
 			data_arr[Flags.Y_LAYER] = y_layer #The value must be less than 128 since we are representing this with a Byte in the flag array
 			grid[i].append(data_arr)
-	var time2: float = Time.get_ticks_usec();
-	print ("time is %s" % [(time2 - time) / 1000])
+			rid_array.append(instance);
+	print(y_layers)
+	print("time to do this shit in microseconds is %s usec" % [Time.get_ticks_usec() - time])
 
+func get_tile_y_value(index: Vector3i) -> float:
+	return grid[index.x][index.z][Flags.Y_LAYER]
 
 ## Validates if the tiles remain in bounds of the grid map
 func is_in_bounds(x_start: int, z_start: int, x_size: int, z_size: int) -> bool:
@@ -269,49 +370,61 @@ func is_in_bounds(x_start: int, z_start: int, x_size: int, z_size: int) -> bool:
 ################################## EXTERNALLY CALLED FUNCTIONS
 
 
-## [CommandController], [EntityHolder] check validity of tile selection
-func is_tiles_valid(x_start: int, z_start: int, x_size: int, z_size: int, building_properties: Array) ->bool:
-	var is_valid: bool = true;
+## [CommandController], [EntityHolder] check validity of tile selection, returns true if it is a valid placement [br][br]
+## TODO is update the return to be a specific flag, determine if it is out of bounds or if it is uneven floor
+func is_tiles_valid(start: Vector3i, size: Vector3i,building_properties: Array) ->bool:
 	var is_depot: bool = false;
-	var max_x: int = x_start + x_size;
-	var max_z: int = z_start + z_size;
+	var max_x: int = start.x + size.x;
+	var max_z: int = start.z + size.z;
+	var y_layer: int = grid[start.x][start.z][Flags.Y_LAYER];
+	var tile: Array;
 	if (building_properties.has(GlobalConstants.BuildingType.DEPOT)):
 		is_depot = true;
-		#we need to check if adjacent tiles cannot have a depot
+		# we need to check if adjacent tiles cannot have a depot
 	# If they are not contiguous, its not valid
 	# We can call is_in_bounds for this but not hiding logic right away
 	if (
-		x_start < 0 or z_start < 0
+		start.x < 0 or start.z < 0
 		or max_x > grid_size or max_z > grid_size
 	):
-		is_valid = false;
-		return is_valid;
-
-	for i: int in range(x_start, max_x):
-		for j: int in range (z_start, max_z):
-			var tile: Array = grid[i][j];
+		print("line @387")
+		return false;
+	# Iterate through each tile, if they have any invalid marks or if are not equal heights, return invalid
+	for i: int in range(start.x, max_x):
+		for j: int in range (start.z, max_z):
+			tile = grid[i][j];
+			if (tile[Flags.Y_LAYER] !=  y_layer):
+				print("we have uneven heights, returning invalid")
+				return false;
 			if (is_depot && tile[Flags.INVALID_DEPOT_FLAG]):
+				print("is_tiles_valid: invalid depot location @line 395")
 				return false;
 			if (tile[Flags.INVALID_TILE_FLAG] || tile[Flags.USED_FLAG] || tile[Flags.TEMPORARY_INVALID_FLAG]):
-				return false #one of the flags or tiles is invalid so we cant do it
-	return is_valid;
+				print("is_tiles_valid: flags failed @line 398")
+				return false # one of the flags or tiles is invalid so we cant do it
+	return true;
 
 ## [CommandController] Check if given Vector3 is a valid tile within a tolerance by [CommandController]
 func is_location_in_tile_layer(location: Vector3) ->bool:
-	var x_val: int = roundi(location.x)
+	# Floor the value so we round to the grid size down
+	var x_val: int = floori(location.x)
 	var y_val: int = roundi(location.y)
-	var z_val: int = roundi(location.z)
+	var z_val: int = floori(location.z)
 	if (x_val < 0 || z_val < 0 || x_val >= grid_size || z_val >= grid_size):
 		return false;
-
-	if (abs(y_val - location.y) >= Y_TOL):
+	if (abs(y_val - location.y) >= Y_TOLERANCE):
 	# invalid y check
 		return false;
 	if (!y_layers.has(y_val)):
 		return false;
-	#if (grid[x_val][z_val][Flags.INVALID_FLAG] == 1):
-		#return false;
 	return true;
+
+func is_location_in_region(world_pos: Vector3)->bool:
+	# if position is outside of grid space then we cut it
+	if (world_pos.x < 0 || world_pos.z < 0 || world_pos.x > grid_size * grid_square_size || world_pos.z > grid_size * grid_square_size):
+		return false;
+	return true;
+
 
 ## Used to check validity of single tile by CommandController
 func is_valid(x_val: int, z_val: int) ->bool:
@@ -326,6 +439,7 @@ func is_valid(x_val: int, z_val: int) ->bool:
 
 ## [EntityHolder] when instantiating a building on the grid in game [br]
 ## Called after validity checks in an RPC so there is no early offramp if invalid
+## TODO associate specific buildings to each group of tiles
 func use_tiles(x_start: int, z_start: int, x_size: int, z_size: int) ->void:
 	# We do not do a validity check since this is called from RPC EntityHolder
 	var max_x: int = x_start + x_size;

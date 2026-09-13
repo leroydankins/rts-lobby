@@ -10,7 +10,7 @@ var global_unit_array: Array[Node3D] = [];
 ##
 var global_building_array: Array[Node3D] = [];
 ## Dictionary holding the following information: [br][br]
-## [code] scene_path [/code] :   Building's location on MapGrid  in the following Array [br][br]
+## [code] node_path [/code] : String key of the scene's node_path Building's location on MapGrid  in the following Array [br][br]
 ## Array Data : [br][br]
 ## [code] x_start [/code] :    Starting X Tile in MapGrid [br]
 ## [code] z_start [/code] :    Starting Z Tile in MapGrid [br]
@@ -33,6 +33,7 @@ var player_arr: Dictionary[int, Dictionary] = {};
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	map_grid = get_tree().get_first_node_in_group("map_grid");
 	var entities: Array[Node] = get_children();
 	for entity: Node3D in entities:
 		global_entity_array.append(entity);
@@ -56,13 +57,16 @@ func request_instantiate_building(spawn_dict: Dictionary) ->void:
 	if (
 		!spawn_dict.has("grid_tiles") or !spawn_dict.has("building_properties")
 	):
+		print("EntityHolder: request_instantiate_building() failed. Did not contain 'grid_tiles' or 'building_properties' in spawn_dict");
 		return;
 	## Array of [x_start, z_start, x_size, z_size] integer values
 	var grid_tiles: Array = spawn_dict["grid_tiles"];
+	var start_index: Vector3i = Vector3i(grid_tiles[0],0, grid_tiles[1])
+	var size : Vector3i = Vector3i(grid_tiles[2],0, grid_tiles[3])
 	## Building Properties is an array of [enum GlobalConstants.BuildingType] values to indicate properties of instantiated building
 	var building_properties: Array = spawn_dict["building_properties"];
-	if !map_grid.is_tiles_valid(grid_tiles[0], grid_tiles[1], grid_tiles[2], grid_tiles[3], building_properties):
-			return;
+	if !map_grid.is_tiles_valid(start_index,size, building_properties):
+		return;
 	instantiate_building.rpc(spawn_dict);
 
 
@@ -82,14 +86,14 @@ func instantiate_building(spawn_dict: Dictionary) ->void:
 	entity = pack.instantiate();
 
 	entity.team = spawn_dict["team"];
-
 	#color is an int, the object will access the actual color via GlobalConstants
 	entity.color = spawn_dict["color"];
 
 	map_grid.use_tiles(x_start, z_start, x_size, z_size)
 
 	register_entity(entity);
-	var entity_path: String = entity.get_path();
+	var entity_node_path: String = entity.get_path();
+	building_dictionary[entity_node_path] = grid_tiles;
 
 	entity.global_position = spawn_dict["building_position"];
 
@@ -117,20 +121,53 @@ func instantiate_entity(spawn_dict: Dictionary, cmd: Dictionary) -> void: #Calle
 			return;
 		entity.request_cmd.rpc_id(get_multiplayer_authority(), cmd);
 
+
 ## Called locally on every player after we instantiate since you cannot rpc Nodes
 ## Assigns buildings to [member global_building_array] and units to [member global_unit_array] [br][br]
-## Does NOT assign to Dictionary [member building_dictionary] due to requiring grid_tiles data present in instantiate building
+## Do not use map_grid tiles here due to the fact that we check that BEFORE node creation [br][br]
+## Not an RPC, called inside of RPCs
+func register_building(building: Node3D, grid_tiles: Array) -> void:
+	global_entity_array.append(building);
+	global_building_array.append(building);
+	player_arr[building.color]["buildings"].append(building);
+	add_child(building);
+	var entity_node_path: String = building.get_path();
+	building_dictionary[entity_node_path] = grid_tiles;
+
+## Called locally on every player after we instantiate since you cannot rpc Nodes
+## Assigns buildings to [member global_building_array] and units to [member global_unit_array] [br][br]
+## Does NOT assign to Dictionary [member building_dictionary] due to requiring grid_tiles data present in instantiate building[br][br]
+## Not an RPC, called inside of RPCs
+func register_unit(unit: Node3D) -> void:
+	global_entity_array.append(unit);
+	global_unit_array.append(unit);
+	player_arr[unit.color]["units"].append(unit);
+	add_child(unit);
+
+## Called locally on every player after we instantiate since you cannot rpc Nodes
+## Assigns buildings to [member global_building_array] and units to [member global_unit_array] [br][br]
+## Does NOT assign to Dictionary [member building_dictionary] due to requiring grid_tiles data present in instantiate building [br][br]
+## Not an RPC, called inside of RPCs
 func register_entity(entity: Node3D) -> void:
 	global_entity_array.append(entity);
+	# If the entity is a building, assign it to the map_grid and track it
 	if(entity.ENTITY_TYPE == GlobalConstants.EntityType.BUILDING):
 		global_building_array.append(entity);
-		if(!player_arr.is_empty()):
-			player_arr[entity.color]["buildings"].append(entity);
+		player_arr[entity.color]["buildings"].append(entity);
+
 	elif(entity.ENTITY_TYPE == GlobalConstants.EntityType.UNIT):
 		global_unit_array.append(entity);
-		if(!player_arr.is_empty()):
-			player_arr[entity.color]["units"].append(entity);
+
+		player_arr[entity.color]["units"].append(entity);
 	add_child(entity);
+
+func request_remove_entity(entity_path: String) ->void:
+	if(!is_multiplayer_authority()):
+		return;
+	var entity : Node3D = get_tree().root.get_node(entity_path)
+	if(entity == null):
+		return;
+	var _null_return : int = rpc("remove_entity", entity_path);
 
 
 ## Iterates through
@@ -157,13 +194,14 @@ func remove_entity(entity_path: String) -> void:
 			## Remove them from the MapGrid
 			if(!building_dictionary.has(entity_path)):
 				push_warning("Building was not in the grid? May be functionality later if buildings fly like terran!! :3")
-			#var grid_tiles: Array = building_dictionary[entity_path];
-			## We will break the array into variables to make the code clearer
-			#var x_start: int = grid_tiles[0];
-			#var z_start: int = grid_tiles[1];
-			#var x_size: int = grid_tiles[2];
-			#var z_size: int = grid_tiles[3];
-			#map_grid.free_tiles(x_start,z_start,x_size,z_size);
+			var grid_tiles: Array = building_dictionary[entity_path];
+			# We will break the array into variables to make the code clearer
+			var x_start: int = grid_tiles[0];
+			var z_start: int = grid_tiles[1];
+			var x_size: int = grid_tiles[2];
+			var z_size: int = grid_tiles[3];
+			map_grid.free_tiles(x_start,z_start,x_size,z_size);
+			building_dictionary.erase(entity_path);
 
 			# Iterate through the array backwards to ensure resizing does not interfere while we remove entities
 			for i: int in range(global_building_array.size()-1,-1, -1):
@@ -180,7 +218,9 @@ func remove_entity(entity_path: String) -> void:
 			if(is_multiplayer_authority()):
 				if(player_arr[ent_color]["buildings"].is_empty()):
 					player_lost.emit(ent_color); #Goes to game scene who calls player data manager
-	remove_child(entity);
+
+	# Do we remove child or do we queue free or do we just let them be dead after their own animation?
+	# remove_child(entity);
 
 @rpc("authority", "call_local", "reliable")
 func initialize_player_arr(players: Array[int]) ->void:

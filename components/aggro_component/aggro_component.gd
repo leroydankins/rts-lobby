@@ -25,7 +25,6 @@ func on_aggro_entered(entity: Node3D) ->void:
 		return;
 	enemy_array.append(entity);
 
-
 func on_aggro_exited(entity: Node3D) ->void:
 	if(entity.team == parent.team):
 		return;
@@ -34,10 +33,8 @@ func on_aggro_exited(entity: Node3D) ->void:
 			enemy_array.remove_at(i);
 			break;
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if(can_aggro):
 		if (!enemy_array.is_empty()):
 			print(can_aggro)
 			aggrod.emit(enemy_array[0])
-	pass

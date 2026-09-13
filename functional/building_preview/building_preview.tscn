@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://ulcfs3d0n4d"]
+
+[ext_resource type="Script" uid="uid://cpbdgh5cah41y" path="res://functional/building_preview/building_preview.gd" id="1_0mknu"]
+
+[node name="BuildingPreview" type="Node3D" unique_id=726564246]
+script = ExtResource("1_0mknu")
+
+[node name="Building" type="MeshInstance3D" parent="." unique_id=1755553575]
+
+[node name="Grid" type="MeshInstance3D" parent="." unique_id=1595504906]

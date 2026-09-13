@@ -118,7 +118,7 @@ func on_lobby_update() -> void:
 		#update local controls if things change
 
 		# DISABLE AVAILABLE COLORS IF IT IS ALREADY BEING USED
-		var colors_in_use_arr: Array[Variant] = GlobalFunctions.get_player_property_array(Lobby.lobby_player_dictionary, GlobalConstants.COLOR_KEY) 
+		var colors_in_use_arr: Array[Variant] = GlobalFunctions.get_player_property_array(Lobby.lobby_player_dictionary, GlobalConstants.COLOR_KEY)
 		for i: int in GlobalConstants.COLORS.size():
 			#if someone is currently using the color, disable the button
 			if colors_in_use_arr.has(i):
@@ -129,11 +129,12 @@ func on_lobby_update() -> void:
 		color_dropdown.selected = Lobby.lobby_player_dictionary[str(Lobby.multiplayer.get_unique_id())][GlobalConstants.COLOR_KEY];
 		team_dropdown.selected = Lobby.lobby_player_dictionary[str(Lobby.multiplayer.get_unique_id())][GlobalConstants.TEAM_KEY];
 		race_dropdown.selected = Lobby.lobby_player_dictionary[str(Lobby.multiplayer.get_unique_id())][GlobalConstants.RACE_KEY];
-		if (!Lobby.multiplayer.is_server()):
+		if (!Lobby.is_multiplayer_authority()):
 			return;
 
 		##SERVER ONLY ACTIONS
 		var enough_players:bool = true;
+		print("got to server actions")
 		if(Lobby.lobby_player_dictionary.size() <= 1 || Lobby.lobby_player_dictionary.size() > Lobby.MAX_CONNECTIONS):
 			enough_players = false;
 		if(start_ready && enough_players):
@@ -186,8 +187,6 @@ func on_start_pressed() -> void:
 		if (lob_dict[peer]["ready"] == false):
 			push_error("team isnt ready yet");
 			return
-
-
 	# CALL START GAME RPC AS THE SERVER
 	print("did we get here");
 	Lobby.load_game.rpc(GlobalConstants.GAME_PATH);
@@ -243,7 +242,6 @@ func on_join_lobby_pressed()-> Error:
 		return Error.FAILED;
 	LocalPlayerData.update_dictionary_data(GlobalConstants.USERNAME_KEY, username_edit.text);
 	var err: Error = Lobby.join_lobby(ip_text_box.text);
-
 	return err;
 
 func on_return_to_main() ->void:

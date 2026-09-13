@@ -1,0 +1,165 @@
+[gd_scene format=3 uid="uid://dw4osa4ddatr7"]
+
+[ext_resource type="Script" uid="uid://cx2tgawtr1xdk" path="res://scenes/entities/units/dwarf/dwarf_scout/dwarf_scout.gd" id="1_ne42d"]
+[ext_resource type="Texture2D" uid="uid://xdy8auqusfq" path="res://assets/placeholder/unit_placeholder.png" id="2_2im2n"]
+[ext_resource type="Script" uid="uid://swxn4x2lonig" path="res://components/command_component/command_component.gd" id="3_hv3ih"]
+[ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="6_5lo3k"]
+[ext_resource type="PackedScene" uid="uid://jhhshf2am8jm" path="res://components/interact_component/interact_component.tscn" id="7_klfhs"]
+[ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="8_g0ngj"]
+[ext_resource type="Script" uid="uid://doytopsoqqvoe" path="res://components/navigation_component/nav_component.gd" id="9_2im2n"]
+[ext_resource type="PackedScene" uid="uid://cv673a3v7wsju" path="res://components/aggro_component/aggro_component.tscn" id="9_ysbks"]
+[ext_resource type="PackedScene" uid="uid://14s0usu8vx7j" path="res://components/highlight_mesh/highlight_mesh.tscn" id="11_mrrop"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dvfqx"]
+radius = 0.25
+height = 1.0
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_2im2n"]
+properties/0/path = NodePath("HealthComponent:health")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath("HealthComponent:max_health")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath("CommandComponent:sync_state")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:position")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:rotation")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_dvfqx"]
+radius = 0.25
+height = 1.0
+
+[sub_resource type="Shader" id="Shader_1dcwv"]
+code = "shader_type spatial;
+
+uniform vec3 line_color = vec3(1.0, 1.0, 0.0);
+uniform float radius = 0.5;
+uniform float line_width = 0.01;
+uniform float alpha = 1;
+uniform bool hollow = false;
+float circle(vec2 position, float rad, float feather) {
+	return smoothstep(radius, rad + feather, dot(position, position) * 4.0);
+}
+
+void fragment() {
+	float dist = length(UV - vec2(0.5));
+	if (hollow)
+	{
+		if (dist > radius - line_width && dist < radius)
+		{
+			circle(UV, radius, 0.005);
+			ALBEDO = line_color;
+			ALPHA = alpha;
+		}
+			else {
+		ALPHA = 0.0;
+		}
+	}
+	else
+	{
+		if (dist < radius)
+		{
+		circle(UV, radius, 0.005);
+		ALBEDO = line_color;
+		ALPHA = alpha;
+		}
+		else {
+		ALPHA = 0.0;
+		}
+	}
+
+
+}
+
+void vertex() {
+	// Called for every vertex the material is visible on.
+}
+
+//void light() {
+//	// Called for every pixel for every light affecting the material.
+//	// Uncomment to replace the default light processing function with this one.
+//}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2im2n"]
+render_priority = 0
+shader = SubResource("Shader_1dcwv")
+shader_parameter/line_color = Vector3(0, 0.8, 0.15)
+shader_parameter/radius = 0.5
+shader_parameter/line_width = 0.15
+shader_parameter/alpha = 0.5
+shader_parameter/hollow = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_2im2n"]
+material = SubResource("ShaderMaterial_2im2n")
+size = Vector2(1, 1)
+
+[node name="DwarfScout" type="Area3D" unique_id=86560224 node_paths=PackedStringArray("anim", "command_component", "nav_component", "health_component", "highlight_mesh", "entity_mesh", "sync_component") groups=["entity", "unit"]]
+collision_layer = 54
+collision_mask = 13
+script = ExtResource("1_ne42d")
+ENTITY_NUMBER = 2
+MOVE_SPEED = 5.0
+anim = NodePath("Anim")
+command_component = NodePath("CommandComponent")
+nav_component = NodePath("NavComponent")
+health_component = NodePath("HealthComponent")
+ENTITY_NAME = "Dwarf Scout"
+PREVIEW = ExtResource("2_2im2n")
+highlight_mesh = NodePath("HighlightMesh")
+entity_mesh = NodePath("EntityMesh")
+sync_component = NodePath("SyncComponent")
+metadata/_custom_type_script = "uid://jc1lhvqa7ftr"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1675084584]
+shape = SubResource("CapsuleShape3D_dvfqx")
+
+[node name="SyncComponent" type="MultiplayerSynchronizer" parent="." unique_id=1897545300 groups=["sync_component"]]
+editor_description = "Must assign sync properties by scene
+Called By: game_scene.gd"
+replication_config = SubResource("SceneReplicationConfig_2im2n")
+script = ExtResource("8_g0ngj")
+metadata/_custom_type_script = "uid://ceu2n4mkguec6"
+
+[node name="CommandComponent" type="Node" parent="." unique_id=1715123712 node_paths=PackedStringArray("parent", "anim", "nav_component", "interact_component", "aggro_component")]
+script = ExtResource("3_hv3ih")
+parent = NodePath("..")
+anim = NodePath("../Anim")
+nav_component = NodePath("../NavComponent")
+interact_component = NodePath("../InteractComponent")
+aggro_component = NodePath("../AggroComponent")
+metadata/_custom_type_script = "uid://swxn4x2lonig"
+
+[node name="Anim" type="AnimationPlayer" parent="." unique_id=1816922367]
+
+[node name="HealthComponent" parent="." unique_id=378400957 instance=ExtResource("6_5lo3k")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3383136, 0)
+health = 24
+max_health = 24
+subview_size = Vector2i(128, 12)
+
+[node name="NavComponent" type="NavigationAgent3D" parent="." unique_id=653312756 node_paths=PackedStringArray("parent")]
+path_height_offset = 0.25
+script = ExtResource("9_2im2n")
+parent = NodePath("..")
+metadata/_custom_type_script = "uid://doytopsoqqvoe"
+
+[node name="InteractComponent" parent="." unique_id=1909443595 instance=ExtResource("7_klfhs")]
+
+[node name="AggroComponent" parent="." unique_id=1337634102 instance=ExtResource("9_ysbks")]
+
+[node name="EntityMesh" type="MeshInstance3D" parent="." unique_id=1742820106]
+mesh = SubResource("CapsuleMesh_dvfqx")
+
+[node name="HighlightMesh" parent="." unique_id=1550632870 instance=ExtResource("11_mrrop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("PlaneMesh_2im2n")
+preset_size = Vector2(1, 1)
+
+[node name="Timer" type="Timer" parent="." unique_id=267037262]

@@ -9,6 +9,7 @@ extends Node
 	set(new_value):
 		if(Engine.is_editor_hint()):
 			bake();
+
 @export var unbake_bool: bool = true:
 	set(new_value):
 		if(Engine.is_editor_hint()):
@@ -31,15 +32,6 @@ extends Node
 		building_grid.grid_size_z = new_z;
 		if Engine.is_editor_hint():
 			update_size(grid_size_x, grid_size_z);
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass;
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
 
 func bake()->void:
 	if(Engine.is_editor_hint()):
@@ -72,7 +64,6 @@ func unbake()->void:
 		grid = [];
 		building_grid.grid  = [];
 		var time2: float = Time.get_ticks_msec();
-
 
 func update_size(x: float, z: float) ->void:
 	col.position = Vector3((x * tile_size) /2, 0, (z * tile_size)/2);

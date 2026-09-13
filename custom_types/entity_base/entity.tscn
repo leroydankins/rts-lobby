@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://cvdxvbbjmqhf0"]
+
+[ext_resource type="Script" uid="uid://jc1lhvqa7ftr" path="res://custom_types/entity_base/entity.gd" id="1_tly16"]
+
+[node name="Entity" type="Area3D" unique_id=1206900671]
+editor_description = "Base entity class used by all entities in game.
+Inherits Area3D to be clickable and accessible by [CommandComponent]
+ Holds common properties and references required nodes that each entity needs to function
+Optional nodes are included but require configurating to use functionality"
+script = ExtResource("1_tly16")

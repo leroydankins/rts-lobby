@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://14s0usu8vx7j"]
+
+[ext_resource type="PlaneMesh" uid="uid://bbxbndclj12rc" path="res://components/highlight_mesh/highlight_mesh_resource.tres" id="1_k85g6"]
+[ext_resource type="Script" uid="uid://vkncus0raspm" path="res://components/highlight_mesh/highlight_mesh.gd" id="2_vlrtx"]
+
+[node name="HighlightMesh" type="MeshInstance3D" unique_id=1550632870]
+mesh = ExtResource("1_k85g6")
+script = ExtResource("2_vlrtx")

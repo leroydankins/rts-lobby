@@ -23,10 +23,24 @@ Create prototype infantry unit
 	Implement worker command queue system
 	moves, attacks enemy units
 
+Create ranged unit
+	Mesh
+	Animation
+	State Machine
+	Components
+
+Make commands a resource that can get serialized and sent over network
+	Point is to be able to customize the commands a unit has inside of the engine
+	Create base resource class that all commands inherit
+	Update them to get sent over RPC via serialization?
+	See how hard this would be
+	Allows for ease of implementation in the engine UI
+	Reference base resource as just a string UID that gets sent perhaps?
+
 Player technology
 	Array of bools associated with GlobalConstants.Research which determines what technology is available to the player and what units can be built
-	Rankorian_Research = Array[bool] [false, false, false, false]
-	Dwarf_Research = Array[bool] = [false,false,false,false,false,false,false]
+		Rankorian_Research = Array[bool] [false, false, false, false]
+		Dwarf_Research = Array[bool] = [false,false,false,false,false,false,false]
 	Array of bools associated with globalconstants.upgrades
 #BACKLOG LOL
 	Show unit health and stats when selected

@@ -7,24 +7,23 @@ signal return_to_game_pressed();
 signal quit_pressed();
 signal options_pressed();
 
+var state_manager: StateManager
+
 #constant
 @onready var options: Button = $MenuContainer/VBoxContainer/OptionsContainer/Options
-
 #end game buttons
 @onready var return_to_game: Button = $MenuContainer/VBoxContainer/ReturnContainer/ReturnToGame
 @onready var score_screen: Button = $MenuContainer/VBoxContainer/ScoreContainer/ScoreScreen
-
-
 #pause buttons
 @onready var resume_game: Button = $MenuContainer/VBoxContainer/ResumeContainer/ResumeGame
 @onready var quit_game: Button = $MenuContainer/VBoxContainer/QuitContainer/QuitGame
-
-
 @onready var result_label: Label = $MenuContainer/VBoxContainer/ResultLabel
+
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	state_manager = get_tree().get_first_node_in_group("state_manager")
 	hide();
 	#To discard the returned int rn 3/20
 	var _null_var: int;
@@ -69,7 +68,7 @@ func on_quit() -> void:
 	print("quit pressed")
 
 
-#Gets called externally by game scene
+## Gets called externally by game scene
 func show_victory() -> void:
 	result_label.show();
 	result_label.text = "Victory!";
@@ -81,7 +80,7 @@ func show_victory() -> void:
 	quit_game.hide();
 	visible = true;
 
-#Gets called externally by game scene
+## Gets called externally by game scene
 func show_defeat() -> void:
 	result_label.show();
 	result_label.text = "Defeat!"
@@ -94,14 +93,14 @@ func show_defeat() -> void:
 	visible = true;
 	#show finished game buttons
 
-
-
-#Gets called externally by game scene
+## Gets called externally by game scene
 func toggle_menu() -> void:
 	if(is_visible()):
 		visible = false;
+		state_manager.set_in_menu(false)
 	else:
+		state_manager.set_in_menu(true);
 		visible = true;
-	#if solo game, we are also pausing the world but it will be handled in game script?
-	#we dont pause if its multiplayer (most of this game is about multiplayer so
+	# if solo game, we are also pausing the world but it will be handled in game script?
+	# we dont pause if its multiplayer (most of this game is about multiplayer so
 	pass;

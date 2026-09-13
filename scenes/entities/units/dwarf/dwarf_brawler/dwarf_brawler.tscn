@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://b5v73hrqfe7wf"]
+
+[ext_resource type="Script" uid="uid://bvj0fb40fat76" path="res://scenes/entities/units/dwarf/dwarf_brawler/dwarf_brawler.gd" id="1_mmvja"]
+[ext_resource type="PackedScene" uid="uid://14s0usu8vx7j" path="res://components/highlight_mesh/highlight_mesh.tscn" id="2_5wxkg"]
+[ext_resource type="Texture2D" uid="uid://xdy8auqusfq" path="res://assets/placeholder/unit_placeholder.png" id="2_dscpt"]
+[ext_resource type="PackedScene" uid="uid://cb4lqsexn3odw" path="res://components/command_component/command_component.tscn" id="4_81ujs"]
+[ext_resource type="Script" uid="uid://swxn4x2lonig" path="res://components/command_component/command_component.gd" id="5_qdo67"]
+[ext_resource type="PackedScene" uid="uid://cv673a3v7wsju" path="res://components/aggro_component/aggro_component.tscn" id="7_he245"]
+[ext_resource type="PackedScene" uid="uid://jhhshf2am8jm" path="res://components/interact_component/interact_component.tscn" id="8_6i0bs"]
+[ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="9_fo7cv"]
+[ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="10_qcys0"]
+[ext_resource type="PlaneMesh" uid="uid://bbxbndclj12rc" path="res://components/highlight_mesh/highlight_mesh_resource.tres" id="11_5wxkg"]
+[ext_resource type="Script" uid="uid://doytopsoqqvoe" path="res://components/navigation_component/nav_component.gd" id="14_qdo67"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_26kgp"]
+height = 1.0
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_81ujs"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath("CommandComponent:sync_state")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath("HealthComponent:health")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("HealthComponent:max_health")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1xdpu"]
+height = 1.0
+
+[node name="dwarf_brawler" type="Area3D" unique_id=530992823 node_paths=PackedStringArray("anim", "command_component", "nav_component", "health_component", "highlight_mesh", "entity_mesh", "sync_component") groups=["entity", "unit"]]
+collision_layer = 54
+collision_mask = 13
+script = ExtResource("1_mmvja")
+UNIT_TYPE = Array[int]([0])
+anim = NodePath("Anim")
+command_component = NodePath("CommandComponent")
+nav_component = NodePath("NavComponent")
+health_component = NodePath("HealthComponent")
+ENTITY_NAME = "Dwarf Brawler"
+PREVIEW = ExtResource("2_dscpt")
+highlight_mesh = NodePath("HighlightMesh")
+entity_mesh = NodePath("EntityMesh")
+sync_component = NodePath("SyncComponent")
+metadata/_custom_type_script = "uid://jc1lhvqa7ftr"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1551214245]
+shape = SubResource("CylinderShape3D_26kgp")
+
+[node name="SyncComponent" type="MultiplayerSynchronizer" parent="." unique_id=1135089735 groups=["sync_component"]]
+replication_config = SubResource("SceneReplicationConfig_81ujs")
+script = ExtResource("10_qcys0")
+metadata/_custom_type_script = "uid://ceu2n4mkguec6"
+
+[node name="CommandComponent" parent="." unique_id=504498673 node_paths=PackedStringArray("parent", "anim", "nav_component", "interact_component", "aggro_component") instance=ExtResource("4_81ujs")]
+script = ExtResource("5_qdo67")
+parent = NodePath("..")
+anim = NodePath("../Anim")
+nav_component = NodePath("../NavComponent")
+interact_component = NodePath("../InteractComponent")
+aggro_component = NodePath("../AggroComponent")
+
+[node name="Anim" type="AnimationPlayer" parent="." unique_id=1509320611]
+
+[node name="HealthComponent" parent="." unique_id=378400957 instance=ExtResource("9_fo7cv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0071979, 0)
+health = 30
+max_health = 30
+subview_size = Vector2i(128, 16)
+
+[node name="NavComponent" type="NavigationAgent3D" parent="." unique_id=1823332079 node_paths=PackedStringArray("parent")]
+path_height_offset = 0.25
+script = ExtResource("14_qdo67")
+parent = NodePath("..")
+metadata/_custom_type_script = "uid://doytopsoqqvoe"
+
+[node name="InteractComponent" parent="." unique_id=1909443595 instance=ExtResource("8_6i0bs")]
+
+[node name="AggroComponent" parent="." unique_id=1337634102 instance=ExtResource("7_he245")]
+
+[node name="EntityMesh" type="MeshInstance3D" parent="." unique_id=177686970]
+mesh = SubResource("CylinderMesh_1xdpu")
+
+[node name="HighlightMesh" parent="." unique_id=1766444261 instance=ExtResource("2_5wxkg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.49, 0)
+visible = false
+mesh = ExtResource("11_5wxkg")
+preset_size = Vector2(1.5, 1.5)

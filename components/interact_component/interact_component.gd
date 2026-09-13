@@ -20,8 +20,6 @@ func on_entered(body: Node3D) ->void:
 	interactable_array.append(body);
 	entity_enter.emit(body);
 
-
-
 func on_exited(body: Node3D) ->void:
 	if(!is_multiplayer_authority()):
 		return

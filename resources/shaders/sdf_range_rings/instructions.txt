@@ -1,0 +1,21 @@
+Sample method for these rings
+
+var selected_unit_locations:PackedVector3Array
+var selected_units:Array = []
+
+func _process(_delta):
+	if Globals.selected_objects.size() > 0: # using a "Globals" singleton/autoload to store currently selected objects
+		selected_unit_locations.clear()  # Clear the array before appending
+		var excluded_units_count = 0
+		for unit in Globals.selected_objects:
+			if unit.is_in_group("range_ring_exclude"):
+				excluded_units_count += 1
+				continue  # Skip adding this unit's location
+			selected_unit_locations.append(unit.global_position)
+		# Set the number of active circles after accounting for exclusions
+		var active_circles = Globals.selected_objects.size() - excluded_units_count
+		$"YOUR TERRAIN NODE".get_surface_override_material(0).set_shader_parameter("num_active_circles", active_circles)
+		$"YOUR TERRAIN NODE".get_surface_override_material(0).set_shader_parameter("range_positions", selected_unit_locations)
+	else:
+		selected_unit_locations.clear()
+		$"YOUR TERRAIN NODE".get_surface_override_material(0).set_shader_parameter("num_active_circles", 0)

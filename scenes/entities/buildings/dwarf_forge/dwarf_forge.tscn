@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://diycqherevyqy"]
+
+[ext_resource type="Script" uid="uid://jc1lhvqa7ftr" path="res://custom_types/entity_base/entity.gd" id="1_iw83d"]
+[ext_resource type="PlaneMesh" uid="uid://bbxbndclj12rc" path="res://components/highlight_mesh/highlight_mesh_resource.tres" id="2_7pgin"]
+[ext_resource type="Script" uid="uid://vkncus0raspm" path="res://components/highlight_mesh/highlight_mesh.gd" id="3_5nrw0"]
+[ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="4_5nrw0"]
+[ext_resource type="Script" uid="uid://swxn4x2lonig" path="res://components/command_component/command_component.gd" id="5_wurpp"]
+[ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="6_fb2og"]
+[ext_resource type="Script" uid="uid://edmc2mk1kfm1" path="res://components/unit_trainer_component/unit_trainer_component.gd" id="7_k3pjj"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_k3pjj"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dvfqx"]
+
+[node name="dwarf_forge" type="Area3D" unique_id=154392314 node_paths=PackedStringArray("highlight_mesh", "health_component") groups=["building", "entity"]]
+script = ExtResource("1_iw83d")
+highlight_mesh = NodePath("HighlightMesh")
+health_component = NodePath("HealthComponent")
+metadata/_custom_type_script = "uid://jc1lhvqa7ftr"
+
+[node name="HighlightMesh" type="MeshInstance3D" parent="." unique_id=679848872]
+mesh = ExtResource("2_7pgin")
+script = ExtResource("3_5nrw0")
+metadata/_custom_type_script = "uid://vkncus0raspm"
+
+[node name="HealthComponent" parent="." unique_id=378400957 instance=ExtResource("4_5nrw0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68500423, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=454702489]
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=743239027]
+
+[node name="CommandComponent" type="Node" parent="." unique_id=1799746067]
+script = ExtResource("5_wurpp")
+metadata/_custom_type_script = "uid://swxn4x2lonig"
+
+[node name="SyncComponent" type="MultiplayerSynchronizer" parent="." unique_id=189126192]
+replication_config = SubResource("SceneReplicationConfig_k3pjj")
+script = ExtResource("6_fb2og")
+metadata/_custom_type_script = "uid://ceu2n4mkguec6"
+
+[node name="UnitTrainerComponent" type="Node3D" parent="." unique_id=2094552635]
+script = ExtResource("7_k3pjj")
+metadata/_custom_type_script = "uid://edmc2mk1kfm1"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2009579770]
+shape = SubResource("BoxShape3D_dvfqx")

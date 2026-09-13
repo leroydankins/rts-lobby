@@ -2,5 +2,5 @@
 
 [ext_resource type="Script" uid="uid://me7gnw2pybgj" path="res://functional/map_grid/map_grid.gd" id="1_6ptgb"]
 
-[node name="MapGrid" type="Node3D" unique_id=972101212 groups=["MapGrid"]]
+[node name="MapGrid" type="Node3D" unique_id=972101212 groups=["map_grid"]]
 script = ExtResource("1_6ptgb")

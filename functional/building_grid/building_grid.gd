@@ -1,18 +1,11 @@
 class_name BuildingGrid
 extends Area3D
-
-
 @onready var grid_tile: PackedScene = preload("uid://cj2g37cbu27v")
-
-
 @export var tile_size: float = 1
 @export var grid_size_x: int = 10
 @export var grid_size_z: int = 10
 @export var grid: Array[Array] = [];
-
 @export var col: CollisionShape3D;
-
-
 
 func _ready()->void:
 	set_up();

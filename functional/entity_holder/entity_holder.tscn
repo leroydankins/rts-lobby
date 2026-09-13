@@ -2,5 +2,5 @@
 
 [ext_resource type="Script" uid="uid://bdllmkufli582" path="res://functional/entity_holder/entity_holder.gd" id="1_qcxye"]
 
-[node name="EntityHolder" type="Node3D" unique_id=1904239509 groups=["EntityHolder"]]
+[node name="EntityHolder" type="Node3D" unique_id=1904239509 groups=["entity_holder"]]
 script = ExtResource("1_qcxye")

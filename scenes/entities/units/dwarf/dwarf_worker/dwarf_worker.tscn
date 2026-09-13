@@ -1,0 +1,174 @@
+[gd_scene format=3 uid="uid://bk5soe7dxxfcm"]
+
+[ext_resource type="Script" uid="uid://ceb5gf4ushwyn" path="res://scenes/entities/units/dwarf/dwarf_worker/dwarf_worker.gd" id="1_0sj1g"]
+[ext_resource type="Texture2D" uid="uid://xdy8auqusfq" path="res://assets/placeholder/unit_placeholder.png" id="2_51nwk"]
+[ext_resource type="PlaneMesh" uid="uid://bbxbndclj12rc" path="res://components/highlight_mesh/highlight_mesh_resource.tres" id="2_fjqhk"]
+[ext_resource type="PackedScene" uid="uid://jhhshf2am8jm" path="res://components/interact_component/interact_component.tscn" id="4_s5j4y"]
+[ext_resource type="PackedScene" uid="uid://cv673a3v7wsju" path="res://components/aggro_component/aggro_component.tscn" id="5_51nwk"]
+[ext_resource type="Script" uid="uid://ceu2n4mkguec6" path="res://components/sync_component/sync_component.gd" id="6_q1f5c"]
+[ext_resource type="Script" uid="uid://doytopsoqqvoe" path="res://components/navigation_component/nav_component.gd" id="6_s5j4y"]
+[ext_resource type="PackedScene" uid="uid://b25o6ctlk0w71" path="res://components/health_component/health_component.tscn" id="7_wrn01"]
+[ext_resource type="StyleBox" uid="uid://13cokopx1lfh" path="res://resources/healthbar_resource/player_healthbar_back.tres" id="8_fjqhk"]
+[ext_resource type="Script" uid="uid://vkncus0raspm" path="res://components/highlight_mesh/highlight_mesh.gd" id="9_fjqhk"]
+[ext_resource type="StyleBox" uid="uid://bskkp8d15ek8w" path="res://resources/healthbar_resource/player_healthbar.tres" id="9_s5j4y"]
+[ext_resource type="Script" uid="uid://swxn4x2lonig" path="res://components/command_component/command_component.gd" id="11_51nwk"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_auf3i"]
+top_radius = 0.25
+bottom_radius = 0.25
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g1rkk"]
+albedo_color = Color(0, 0.48721582, 0.90107334, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_t7rom"]
+material = SubResource("StandardMaterial3D_g1rkk")
+size = Vector3(0.25, 0.25, 0.25)
+
+[sub_resource type="Animation" id="Animation_e1u8e"]
+resource_name = "attack_target"
+length = 2.0
+loop_mode = 1
+step = 0.0333333
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(1.3666667),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"attack_enemy"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_gaj3j"]
+resource_name = "extract_resource"
+step = 0.0333333
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.8),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"extract_resource"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_f2n24"]
+_data = {
+&"attack_target": SubResource("Animation_e1u8e"),
+&"extract_resource": SubResource("Animation_gaj3j")
+}
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_g1rkk"]
+height = 1.0
+radius = 0.25
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_g1rkk"]
+properties/0/path = NodePath(".:held_resource")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:target_pos")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:position")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath("HealthComponent:health")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("HealthComponent:max_health")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_s5j4y"]
+viewport_path = NodePath("SubViewport")
+
+[node name="DwarfWorker" type="Area3D" unique_id=123064061 node_paths=PackedStringArray("resource_mesh", "interact_component", "aggro_component", "anim", "command_component", "nav_component", "health_component", "highlight_mesh", "entity_mesh", "sync_component") groups=["entity", "unit"]]
+collision_layer = 54
+collision_mask = 13
+script = ExtResource("1_0sj1g")
+resource_mesh = NodePath("UnitMesh/ResourceMesh")
+interact_component = NodePath("InteractComponent")
+aggro_component = NodePath("AggroComponent")
+anim = NodePath("Anim")
+command_component = NodePath("CommandComponent")
+nav_component = NodePath("NavComponent")
+health_component = NodePath("HealthComponent")
+ENTITY_NAME = "Dwarf Worker"
+PREVIEW = ExtResource("2_51nwk")
+highlight_mesh = NodePath("HighlightMesh")
+entity_mesh = NodePath("UnitMesh")
+sync_component = NodePath("MultiplayerSynchronizer")
+metadata/_custom_type_script = "uid://baw40dd4not5w"
+
+[node name="HighlightMesh" type="MeshInstance3D" parent="." unique_id=1243849398]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.45, 0)
+visible = false
+mesh = ExtResource("2_fjqhk")
+script = ExtResource("9_fjqhk")
+preset_size = Vector2(1, 1)
+metadata/_custom_type_script = "uid://vkncus0raspm"
+
+[node name="UnitMesh" type="MeshInstance3D" parent="." unique_id=1184654598]
+mesh = SubResource("CylinderMesh_auf3i")
+
+[node name="ResourceMesh" type="MeshInstance3D" parent="UnitMesh" unique_id=1493570494]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5)
+mesh = SubResource("BoxMesh_t7rom")
+
+[node name="InteractComponent" parent="." unique_id=1909443595 instance=ExtResource("4_s5j4y")]
+
+[node name="AggroComponent" parent="." unique_id=1337634102 instance=ExtResource("5_51nwk")]
+aggro_range = 7
+auto_aggro = false
+
+[node name="NavComponent" type="NavigationAgent3D" parent="." unique_id=504743911 node_paths=PackedStringArray("parent")]
+path_height_offset = 0.25
+simplify_path = true
+simplify_epsilon = 1.0
+script = ExtResource("6_s5j4y")
+parent = NodePath("..")
+metadata/_custom_type_script = "uid://doytopsoqqvoe"
+
+[node name="Anim" type="AnimationPlayer" parent="." unique_id=1830062704]
+libraries/ = SubResource("AnimationLibrary_f2n24")
+
+[node name="CollisionBody" type="CollisionShape3D" parent="." unique_id=802037494]
+shape = SubResource("CylinderShape3D_g1rkk")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1926167555 groups=["sync_component"]]
+replication_config = SubResource("SceneReplicationConfig_g1rkk")
+script = ExtResource("6_q1f5c")
+
+[node name="HealthComponent" parent="." unique_id=2041268192 instance=ExtResource("7_wrn01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.961928, 0)
+health = 25
+max_health = 25
+
+[node name="HPSprite" parent="HealthComponent" index="0" unique_id=1806707282]
+texture = SubResource("ViewportTexture_s5j4y")
+
+[node name="Healthbar" parent="HealthComponent/SubViewport" parent_id_path=PackedInt32Array(2041268192, 1164087689) index="0" unique_id=1429475855]
+theme_override_styles/background = ExtResource("8_fjqhk")
+theme_override_styles/fill = ExtResource("9_s5j4y")
+
+[node name="CommandComponent" type="Node" parent="." unique_id=1404739041 node_paths=PackedStringArray("parent", "anim", "nav_component", "interact_component", "aggro_component")]
+script = ExtResource("11_51nwk")
+parent = NodePath("..")
+anim = NodePath("../Anim")
+nav_component = NodePath("../NavComponent")
+interact_component = NodePath("../InteractComponent")
+aggro_component = NodePath("../AggroComponent")
+metadata/_custom_type_script = "uid://swxn4x2lonig"
+
+[editable path="HealthComponent"]

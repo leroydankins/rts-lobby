@@ -20,7 +20,9 @@ signal team_won(winning_team: int);
 ##[code] player_supply[/code] :  [Array] of Initialized Supply, [ [code]used[/code] ,  [code]capacity[/code] ] [br][br]
 ##[code] player_peer_id[/code] :  [String] Online Multiplayer Peer ID for the individual, used in RPC ID calls but game logic should rely on player_id [br][br]
 ##[code] player_playing[/code] :  [bool] for checking players still in game in win/loss conditionals [br][br]
+##[code] player_is_cpu[/code] :  [bool] determines if player is a cpu or a player to RPC [br][br]
 var player_dict: Dictionary[int, Dictionary] = {};
+var player_object_dict: Dictionary[int, Object] = {};
 
 var local_id: int ## This is the player color id number that is tied to local machine's player identity
 const USERNAME_KEY: String = "player_username";
@@ -32,24 +34,24 @@ const PEER_ID_KEY: String = "player_peer_id";
 const SUPPLY_KEY: String = "player_supply";
 const MINERAL_KEY: String = "player_mineral";
 const PLAYING_KEY: String = "player_playing";
+const IS_CPU_KEY: String = "player_is_cpu";
 
 
-
+## Changes to mineral/gas resources are additive in request date
 @rpc("any_peer", "call_local", "reliable")
 func request_player_data_update(player_id: int, key: String, data: Variant) -> void:
 	if (!is_multiplayer_authority()):
 		return;
 	if (!player_dict.has(player_id)):
 		return;
+
 	if(key == MINERAL_KEY || key == GAS_KEY):
 		var val: int = player_dict[player_id][key];
 		var new_val: int = val + data;
 		if (val <= 0):
 			val = 0;
 		data = new_val;
-
 	player_dict[player_id][key] = data;
-
 	push_player_data_update.rpc(player_id,key,data);
 
 ##TODO
@@ -61,10 +63,6 @@ func request_player_data_update_batch(_player_id: int, _new_dict: Dictionary[Str
 ##TODO
 @rpc("authority", "call_local", "reliable")
 func push_player_data_update(updated_player: int, key: String, data: Variant) ->void:
-	#if this was not called by the authority return;
-	if (multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
-		push_error("this wasnt sent by the authority? wtf");
-		return;
 	#if this is not a valid player return;
 	if (!player_dict.has(updated_player)):
 		push_error("not a valid player in dictionary");
@@ -76,10 +74,6 @@ func push_player_data_update(updated_player: int, key: String, data: Variant) ->
 
 @rpc("authority", "call_local", "reliable")
 func push_player_data_update_batch(updated_player:int, dict: Dictionary[int, Variant]) ->void:
-	#if this was not called by the authority return;
-	if (multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
-		push_error("this wasnt sent by the authority? wtf");
-		return;
 	#if this is not a valid player return;
 	if (!player_dict.has(updated_player)):
 		push_error("not a valid player in dictionary");
@@ -93,22 +87,17 @@ func push_player_data_update_batch(updated_player:int, dict: Dictionary[int, Var
 # Called during the game initialization startup
 @rpc("authority","call_local","reliable")
 func push_game_data_batch(dict: Dictionary[int, Dictionary]) ->void:
-	#if this was not called by the authority return;
-	if (multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
-		push_error("this wasnt sent by the authority? wtf");
-		return;
 	player_dict = dict;
 
 func spend_resources(player_id: int, cost_arr: Array) -> bool:
 	var mineral_cost: int = cost_arr[0];
 	var gas_cost: int = cost_arr[1];
-	#final check on resources
-
+	# final check on resources
 	if (mineral_cost > player_dict[player_id][MINERAL_KEY]):
 		return false;
 	if (gas_cost> player_dict[player_id][GAS_KEY]):
 		return false;
-	#cost array is converted to absolute values
+	# cost array is converted to absolute values
 	request_player_data_update.rpc(player_id, MINERAL_KEY, -1 * abs(mineral_cost));
 	request_player_data_update.rpc(player_id, GAS_KEY, -1 * abs(gas_cost));
 	return true;
@@ -117,33 +106,30 @@ func spend_resources(player_id: int, cost_arr: Array) -> bool:
 func refund_resources(player_id: int, cost_arr: Array) ->bool:
 	var mineral_cost: int = cost_arr[0];
 	var gas_cost: int = cost_arr[1];
-	#final check on resources
-
-	#max allowable minerals?
+	# max allowable minerals?
 	if (mineral_cost > 99999):
 		return false;
-	#max allowable gas?
+	# max allowable gas?
 	if (gas_cost> 99999):
 		return false;
-
 	request_player_data_update.rpc(player_id, MINERAL_KEY, abs(mineral_cost));
 	request_player_data_update.rpc(player_id, GAS_KEY, abs(gas_cost));
 	return true;
 
-#check which resource to supply in this scenario, different than spend s
-func gain_resources(player_id: int, resource_arr: Array) -> bool:
-	#slot 0 is amount, slot 1 is resource type
-	match(resource_arr[1]):
+# check which resource to supply in this scenario, different than spend s
+func gain_resources(player_id: int, cost_arr: Array) -> bool:
+	# slot 0 is amount, slot 1 is resource type
+	match(cost_arr[1]):
 		GlobalConstants.ResourceType.MINERAL:
-			var mineral_cost: int = resource_arr[0];
+			var mineral_cost: int = cost_arr[0];
 			request_player_data_update.rpc(player_id, MINERAL_KEY, mineral_cost);
 			return true;
 		GlobalConstants.ResourceType.GAS:
-			var gas_cost: int = resource_arr[0];
+			var gas_cost: int = cost_arr[0];
 			request_player_data_update.rpc(player_id, GAS_KEY, gas_cost);
 			return true;
 		_:
-			print("not valid resource type, returning  false")
+			print("not valid resource type, returning false")
 			return false;
 
 @rpc("any_peer","call_local","reliable")

@@ -1,3 +1,51 @@
 #TO DO 6/6/26
-# Continue on game_lobby_gui lobby_update work to iterate on slots based on the slots 
+# Continue on game_lobby_gui lobby_update work to iterate on slots based on the slots
 # inside of the lobby dictionary
+
+Continue to build out DwarfScout
+
+NEW TODO
+	Update command GUI display to include cooldowns
+		Move away from simple dictionary into a perhaps GameObject system that includes a timer for when it is available?
+		This will complicate things but allow for special skills/abilities
+	Show Health in stat block when selecting solo unit
+	Create an action log in the game window (only local to player) that says things like when unit failed to do X
+	Create separate command components or state machines for units and buildings?
+
+StateMachine
+	InterruptHandler
+	Each other component can send signals (call interrupt methods) to tell the state machine what has come in
+	State logic will stay ENTIRELY within state machine and execute functions tasks but not require nodes?
+	State logic will be unit specific? Am I just throwing this back into the damn main unit script?
+
+TODO
+	MAJOR TODO: Buildings can be built inside mineral fields rn
+	Decide if we are going to instantiate buildings external to units or in worker units? Be consistent
+	Connect Remove button to server to kick clients and CPU
+	Move Username to external screen and not in lobby setup
+	Add vbox of labels that say what you need to start the game when not start ready on LobbyScreen
+	dwarf worker pull out variables into beginning of start command
+	Change string to int as a nice to have on peer id in the lobby
+	Create unique lobby ID when you host a game
+	Figure out why the height works for both barracks and settlement
+	Have direction look at movement target
+
+DONE
+	Return to Main Menu Button off LobbyScreen needs to work
+	Fix issue on loading a game from new lobby screen
+	Only allow editing if it is tied to your local player OR its a bot
+	Dropdown for color is not limited on slot 2-4
+	Reflect Ready status on all players
+	Start game has to connect
+	Hide host controls when you join as a peer to a lobby
+	Gray out all options for host settings when you create online lobby
+	Fix player overwriting other player in lobby
+	Add CPU button needs to be set up
+	Check if we are the authority in a better way for lobby gui
+	Dont start if we dont have unique teams
+	Update game_scene to spawn on grid!
+		Add functionality to spawn on grid from entity_holder
+		Find way to get tile locations for spawn in game_scene
+	Connect disconnect lobby to disconnecting the online lobby
+	Update all other building commands to use map grid!
+## Pause does not pause command controller or input handling

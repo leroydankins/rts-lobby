@@ -1,4 +1,4 @@
-[gd_resource type="CylinderMesh" load_steps=2 format=3 uid="uid://cg3lvmu68oaaa"]
+[gd_resource type="CylinderMesh" format=3 uid="uid://cg3lvmu68oaaa"]
 
 [ext_resource type="Material" uid="uid://dtevocyixqsgv" path="res://addons/MarchingSquaresTerrain/resources/materials/round_brush_radius_material.tres" id="1_jqffj"]
 

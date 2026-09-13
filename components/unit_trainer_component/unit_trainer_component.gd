@@ -14,10 +14,12 @@ const BUILD_LIMIT: int = 8;
 
 var game: GameScene;
 var entity_holder: EntityHolder;
+var feed_resource: FeedResource = preload("uid://wgm62a18h2ce")
 
 func _ready() ->void:
-	game = get_tree().get_first_node_in_group("Game");
-	entity_holder = get_tree().get_first_node_in_group("EntityHolder");
+	game = get_tree().get_first_node_in_group("game");
+	entity_holder = get_tree().get_first_node_in_group("entity_holder");
+
 
 #called in process of the building
 func build(delta: float) -> void:
@@ -35,19 +37,19 @@ func build(delta: float) -> void:
 		pass;
 
 func start_build() -> void:
-	#When we start a build, assign the dictionary to build_item and get rid of it in the queue
+	# When we start a build, assign the dictionary to build_item and get rid of it in the queue
 	build_item = build_queue.pop_front()
 	print(build_item)
-	#if there was nothing in the queue then we just close out our build data
+	# if there was nothing in the queue then we just close out our build data
 	if (build_item == null || build_item.is_empty()):
 		build_time = 0;
 		build_progress = 0;
 		return;
-	assert (build_item.has("build_time")) #assert to make sure no bug occurred from building
+	assert(build_item.has("build_time")) # assert to make sure no bug occurred from building
 	build_time = build_item.build_time;
 
 func finish_build() -> void:
-	if (!multiplayer.is_server()):
+	if (!is_multiplayer_authority()):
 		return;
 	if(build_item.has("file_path")):
 		spawn_unit(build_item["file_path"]);
@@ -93,7 +95,7 @@ func cancel_build() ->void:
 		start_build();
 
 
-#called by multiplayer authority only
+## Spawn function called by multiplayer authority only
 func spawn_unit(filepath: String) -> void:
 	if (!is_multiplayer_authority()): # Will call RPC to sync with all players
 		return;
@@ -119,7 +121,7 @@ func spawn_unit(filepath: String) -> void:
 	if(is_instance_valid(parent.target)): # if we are targeting something from building
 		cmd = GlobalConstants.TARGET_UNIT_DICTIONARY.duplicate();
 		cmd["target_node_path"] = parent.target.get_path();
-	elif(parent.target_location != Vector3.ZERO): #if we are targeting a spawn location
+	elif(parent.target_location != Vector3.ZERO): # if we are targeting a spawn location
 		cmd = GlobalConstants.MOVE_TO_DICTIONARY.duplicate();
 		cmd["location"] = parent.target_location;
 

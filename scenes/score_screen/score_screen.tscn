@@ -26,6 +26,7 @@ text = "Return To Main"
 metadata/_edit_use_anchors_ = true
 
 [node name="LobbyButton" type="Button" parent="." unique_id=18063774]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.70703125

@@ -4,17 +4,15 @@
 [ext_resource type="StyleBox" uid="uid://13cokopx1lfh" path="res://resources/healthbar_resource/player_healthbar_back.tres" id="2_gunwg"]
 [ext_resource type="StyleBox" uid="uid://bskkp8d15ek8w" path="res://resources/healthbar_resource/player_healthbar.tres" id="3_qi36u"]
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_n5rls"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_wurpp"]
+viewport_path = NodePath("SubViewport")
 
 [node name="HealthComponent" type="Node3D" unique_id=378400957]
 script = ExtResource("1_ol33d")
-health = null
-max_health = null
 
 [node name="HPSprite" type="Sprite3D" parent="." unique_id=1806707282]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6714654, 0)
 billboard = 1
-texture = SubResource("ViewportTexture_n5rls")
+texture = SubResource("ViewportTexture_wurpp")
 
 [node name="SubViewport" type="SubViewport" parent="." unique_id=1164087689]
 disable_3d = true

@@ -12,11 +12,13 @@ signal game_finished();
 @onready var team_label: Label = $UI_Layer/ResourceBox/TeamLabel
 @export var player_data_manager: PlayerDataManager;
 @onready var command_controller: Node = $CommandController
+@onready var state_manager: StateManager = $StateManager
 
 @onready var camera: Node3D = $CameraBase
 @onready var entity_holder: EntityHolder = $EntityHolder
-@onready var spawn_holder: Node3D = $SpawnHolder
+@onready var spawn_holder: Node3D = $MapHolder/SpawnHolder
 @onready var in_game_menu: InGameMenu = $UI_Layer/InGameMenu
+@onready var map_grid: MapGrid = $MapGrid
 
 ## Array Marker3Ds of used in establishing each player's initial TownHall and Workers
 var spawns: Array[Node3D];
@@ -34,7 +36,7 @@ var spawns: Array[Node3D];
 ##[code] player_playing[/code] :  [bool] for checking players still in game in win/loss conditionals, [br][br]
 var initializing_player_dict: Dictionary[String, Variant];
 
-var player_resource: int = 50; ## Initial [code] Mineral [/code] count at the start of the game
+var player_resource: int = 400; ## Initial [code] Mineral [/code] count at the start of the game
 var player_gas: int = 0; ## Initial [code] Gas [/code] count at the start of the game
 var elapsed_time: float = 0; ## Time since [method start_game] has been called
 var start_time: float = 0;
@@ -47,12 +49,11 @@ var sec: int = 0;
 const PLAYER_DICTIONARY_KEY: String = "player_dictionary";
 
 
-# Called when the node enters the scene tree for the first time.
+
 func _ready() -> void:
 	for spawn: Node3D in spawn_holder.get_children():
 		spawns.append(spawn);
 	multiplayer.multiplayer_peer = Lobby.multiplayer.multiplayer_peer;
-
 	# Connect to signals from Lobby
 	var _null_var: int = Lobby.start_game.connect(on_start);
 	entity_holder.player_lost.connect(on_player_lost);
@@ -62,9 +63,11 @@ func _ready() -> void:
 	_null_var = in_game_menu.resume_pressed.connect(on_resume);
 	_null_var = in_game_menu.return_to_game_pressed.connect(on_return);
 	_null_var = in_game_menu.score_screen_pressed.connect(on_score_screen);
-	Lobby.game_scene_loaded.rpc_id(get_multiplayer_authority());
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+	# Tells the Lobby we have loaded for it to startr the whole thing
+	Lobby.call_deferred("rpc_id",get_multiplayer_authority(),"game_scene_loaded")
+	#Lobby.game_scene_loaded.rpc_id(get_multiplayer_authority());
+
 func _process(_delta: float) -> void:
 	if (!game_is_active):
 		return;
@@ -78,38 +81,58 @@ func _process(_delta: float) -> void:
 	game_clock.text = "%s: %s: %s" % [hr, minutes, sec]
 	pass
 
+## function that server does to set everyone's information [br][br]
+## iterates over the Lobby dictionary and establish their information [br][br]
 func on_start() -> void:
 	if(!multiplayer.is_server()):
 		return
+	## Individual Player Dictionary used in iteration
+	var p_dict: Dictionary
+	var player_id: int;
+	var player_username: String;
+	var player_race: int;
+	var player_team: int;
+	## Initializing Dictionary for game start in [method GameScene.initialize_local_start]
 	var init_dict: Dictionary = {};
+	## Int used to dictate which starting location each player [br][br]
 	var start_spot: int = 0;
-	# before all data has been collected for each player and our dictionary game has been created, create the player arr in entity_hjolder
+	var spawn_loc: Vector3
+
+	# before all data has been collected for each player and our game dictionary has been created, create the player arr in entity_hjolder
 	var player_arr: Array[int] = [];
+
 	for player: String in Lobby.lobby_player_dictionary:
 		player_arr.append(Lobby.lobby_player_dictionary[player][GlobalConstants.COLOR_KEY])
 
 	entity_holder.initialize_player_arr.rpc(player_arr);
-	for player_id: String in Lobby.lobby_player_dictionary:
-		var player: int = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY];
-		#new version, we do not want to base unit values off peer id so we care about color/player_id instead of peer id
-		## Data is collected from the lobby node and then we do not communicate with lobby after
+	# For each peer_id in the Lobby
+	for peer_id: String in Lobby.lobby_player_dictionary:
+		p_dict = Lobby.lobby_player_dictionary[peer_id];
+		player_id = p_dict[GlobalConstants.COLOR_KEY];
+		player_username = p_dict[GlobalConstants.USERNAME_KEY]
+		player_race = p_dict[GlobalConstants.RACE_KEY];
+		player_team = p_dict[GlobalConstants.TEAM_KEY];
+
+		# new version, we do not want to base unit values off peer id so we care about color/player_id instead of peer id
+		# Data is collected from the lobby node and then we do not communicate with lobby after
 		initializing_player_dict = {
-		"player_id" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY], #num int and also is the same as color
-		"player_username" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.USERNAME_KEY],
-		"player_race" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.RACE_KEY],
-		"player_team" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.TEAM_KEY],
-		"player_color" = Lobby.lobby_player_dictionary[player_id][GlobalConstants.COLOR_KEY],
+		"player_id" = player_id, #num int and also is the same as color
+		"player_username" = player_username,
+		"player_race" = player_race,
+		"player_team" = player_team,
+		"player_color" = player_id,
 		"player_mineral" = player_resource,
 		"player_gas" = player_gas,
 		"player_supply" = [0,0],
-		"player_peer_id" = player_id,
+		"player_peer_id" = peer_id,
 		"player_playing" = true,
+		"player_is_cpu" = p_dict[GlobalConstants.IS_CPU_KEY],
 		}
-
-		player_data_manager.player_dict[player] = initializing_player_dict; #player is an int key for the
+		# Establish this data in the player_data_manager
+		player_data_manager.player_dict[player_id] = initializing_player_dict; #player is an int key for the
 
 		init_dict["spawn_id"] = start_spot; #Package starting location to send in RPC
-		var spawn_loc: Vector3 = spawns[start_spot].global_position;
+		spawn_loc = spawns[start_spot].global_position;
 		#spawn the starting player's command center via RPC to all players
 		var spawn_dictionary: Dictionary ={
 			"team" = initializing_player_dict[PlayerDataManager.TEAM_KEY],
@@ -120,12 +143,16 @@ func on_start() -> void:
 		}
 		create_initial_player_entities.rpc(spawn_dictionary)
 		start_spot += 1;
+		# If this is not a CPU player, we call an RPC to establish their local client's configuration
+		if(!p_dict[GlobalConstants.IS_CPU_KEY]):
+			initialize_local_start.rpc_id(peer_id.to_int(), init_dict, player_id); #RPC To create local player data, data is repeated in local dict for ease of access
 
-		initialize_local_start.rpc_id(player_id.to_int(), init_dict, initializing_player_dict["player_color"]); #RPC To create local player data, data is repeated in local dict for ease of access
-	# Initialize every player's dictionary of all player data
+	# Initialize every client dictionaries of all player data after establishing it on the host
 	player_data_manager.push_game_data_batch.rpc(player_data_manager.player_dict)
 
-	start_game.rpc();
+	# RPC call in the next frame so that we can let all the other RPCs get called a frame earlier and keep better sync
+	call_deferred("rpc","start_game")
+
 
 @rpc("authority", "call_local", "reliable")
 func add_entity_from_dict(spawn_dictionary: Dictionary) -> void:
@@ -141,30 +168,52 @@ func add_entity_from_dict(spawn_dictionary: Dictionary) -> void:
 	entity_holder.add_child(obj);
 	pass;
 
+## Establishes initial units and buildings for each player
 @rpc("authority", "call_local", "reliable")
 func create_initial_player_entities(dict: Dictionary) -> void:
 	var start_building : Node3D;
 	var spawn_path : String;
 	var packed_scene: PackedScene;
-	if (multiplayer.get_remote_sender_id() != get_multiplayer_authority()):
-		return;
+	var spawn_dictionary: Dictionary
+	var building_properties: Array;
+	var tile_size: Array
+	var grid_tiles: Array;
+	var resultant_grid_dictionary: Dictionary
 	if (dict.is_empty()):
 		push_error("BUG AT GAME_SCENE TRYING TO SPAWN INITIAL UNITS");
 		return;
 
 	match(dict["race"]):
 		0:#dwarf
-			spawn_path = GlobalConstants.DWARF_SETTLEMENT_FILEPATH;
+			spawn_dictionary = GlobalConstants.BUILD_DWARF_SETTLEMENT_DICTIONARY
+			# Local Var Defines
+			building_properties = spawn_dictionary["building_properties"];
+			# Breakout array into ints for clarity on function calls
+			tile_size = spawn_dictionary["tile_size"];
+			resultant_grid_dictionary = map_grid.get_building_placement_dictionary(dict["position"],tile_size[0],tile_size[1],building_properties)
+			spawn_path = spawn_dictionary["file_path"];
+			grid_tiles = resultant_grid_dictionary["grid_tiles"]
 		_:
 			#Default is dwarf rn
-			spawn_path = GlobalConstants.DWARF_SETTLEMENT_FILEPATH;
+			spawn_dictionary = GlobalConstants.BUILD_DWARF_SETTLEMENT_DICTIONARY
+			# Local Var Defines
+			building_properties = spawn_dictionary["building_properties"];
+			# Breakout array into ints for clarity on function calls
+			tile_size = spawn_dictionary["tile_size"];
+			resultant_grid_dictionary = map_grid.get_building_placement_dictionary(dict["position"],tile_size[0],tile_size[1],building_properties)
+			spawn_path = spawn_dictionary["file_path"];
+			grid_tiles = resultant_grid_dictionary["grid_tiles"]
+	# Check that it is still valid
+	if(map_grid.is_tiles_valid(Vector3i(grid_tiles[0],0,grid_tiles[1]),Vector3i(grid_tiles[2],0,grid_tiles[3]),building_properties)):
+		map_grid.use_tiles(grid_tiles[0], grid_tiles[1], grid_tiles[2], grid_tiles[3])
+	else: push_error("WTF")
 	packed_scene = load(spawn_path);
 	start_building = packed_scene.instantiate();
 	start_building.team = dict["team"];
 	# color is an int, the object will access the actual color via GlobalConstants
 	start_building.color = dict["color"];
 	start_building.is_constructed = true;
-	entity_holder.register_entity(start_building);
+	entity_holder.register_building(start_building, grid_tiles);
 	start_building.global_position = dict["position"];
 	pass;
 
@@ -180,9 +229,8 @@ func initialize_local_start(init_dict: Dictionary, player_id: int) -> void:
 		camera.global_position = Vector3(spawn.global_position.x, 0, spawn.global_position.z);
 
 
-## function that server does to set everyone's information [br][br]
-## iterates over the Lobby dictionary and establish their information [br][br]
-## called by the server, each local person starts the game [br][br]
+
+## called by the server, each local person starts the _process function [br][br]
 @rpc("authority","call_local","reliable")
 func start_game() -> void:
 	print("started game game start at %s" % Time.get_ticks_msec())
@@ -207,8 +255,12 @@ func on_team_won(winner_team: int) ->void:
 	if(!is_multiplayer_authority()):
 		return;
 	var dict: Dictionary = player_data_manager.player_dict;
+	var peer_id: String;
 	for player: int in dict:
-		var peer_id: String = dict[player][PlayerDataManager.PEER_ID_KEY];
+		# Skip CPUs
+		if (dict[player][PlayerDataManager.IS_CPU_KEY]):
+			continue;
+		peer_id = dict[player][PlayerDataManager.PEER_ID_KEY];
 		if dict[player][PlayerDataManager.TEAM_KEY] == winner_team:
 			end_game_rpc.rpc_id(int(peer_id), true); # Winner
 		else:
@@ -218,16 +270,18 @@ func on_team_won(winner_team: int) ->void:
 
 @rpc("authority","call_local","reliable")
 func player_lost_rpc(peer_id: int) ->void:
-	var local: bool = false;
-	if(peer_id == int(player_data_manager.player_dict[player_data_manager.local_id][PlayerDataManager.PEER_ID_KEY])): #If this is us
-		local = true;
+	var sync_array: Array[Node] = get_tree().get_nodes_in_group("sync_component")
+	# If we are the local peer, disable our process mode and end the game
+	if(peer_id == int(player_data_manager.player_dict[player_data_manager.local_id][PlayerDataManager.PEER_ID_KEY])):
 		process_mode = Node.PROCESS_MODE_DISABLED;
 		game_is_active = false;
 		in_game_menu.show_defeat();
-	for sync: SyncComponent in get_tree().get_nodes_in_group("SyncComponent"):
+		get_tree().call_group("sync_component","stop_sync");
+	# Regardless of this being local, iterate on them all after to set visibility
+	for sync: SyncComponent in sync_array:
 		sync.set_visibility_for(peer_id, false)
-		if(local):
-			sync.stop_sync();
+
+
 
 
 
@@ -235,8 +289,7 @@ func player_lost_rpc(peer_id: int) ->void:
 @rpc("authority", "call_local", "reliable")
 func end_game_rpc(is_winner: bool) -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED;
-	for sync: SyncComponent in get_tree().get_nodes_in_group("SyncComponent"):
-		sync.stop_sync()
+	get_tree().call_group("sync_component","stop_sync");
 	game_is_active = false;
 	if (is_winner):
 		in_game_menu.show_victory();
